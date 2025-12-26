@@ -3,20 +3,21 @@ import { motion } from 'framer-motion';
 
 interface LandingPageProps {
     onExplore: () => void;
+    onCategorySelect?: (category: string) => void;
 }
 
 const CATEGORIES = [
-    { name: 'South Indian', icon: '🥘', color: '#ffedd5', image: '/images/cat-south.jpg' },
-    { name: 'Dosa Special', icon: '🥞', color: '#fee2e2', image: '/images/cat-dosa.jpg' },
-    { name: 'Rice Bowls', icon: '🍚', color: '#dcfce7', image: '/images/cat-rice.jpg' },
-    { name: 'North Indian', icon: '🍛', color: '#e0e7ff', image: '/images/cat-north.jpg' },
-    { name: 'Snacks', icon: '🍟', color: '#fef9c3', image: '/images/cat-snacks.jpg' },
-    { name: 'Beverages', icon: '☕', color: '#fae8ff', image: '/images/cat-bev.jpg' },
-    { name: 'Chaat', icon: '🥟', color: '#f3f4f6', image: '/images/cat-chaat.jpg' },
-    { name: 'Desserts', icon: '🍦', color: '#ffe4e6', image: '/images/cat-sweet.jpg' },
+    { name: 'South Indian', dataCategory: 'South Indian', icon: '🥘', color: '#ffedd5', image: '/images/cat-south.jpg' },
+    { name: 'Dosa Special', dataCategory: 'Dosa', icon: '🥞', color: '#fee2e2', image: '/images/cat-dosa.jpg' },
+    { name: 'Rice Bowls', dataCategory: 'Rice', icon: '🍚', color: '#dcfce7', image: '/images/cat-rice.jpg' },
+    { name: 'North Indian', dataCategory: 'North Indian', icon: '🍛', color: '#e0e7ff', image: '/images/cat-north.jpg' },
+    { name: 'Snacks', dataCategory: 'Snacks', icon: '🍟', color: '#fef9c3', image: '/images/cat-snacks.jpg' },
+    { name: 'Beverages', dataCategory: 'Beverages', icon: '☕', color: '#fae8ff', image: '/images/cat-bev.jpg' },
+    { name: 'Chaat', dataCategory: 'Chaat', icon: '🥟', color: '#f3f4f6', image: '/images/cat-chaat.jpg' },
+    { name: 'Desserts', dataCategory: 'Dessert', icon: '🍦', color: '#ffe4e6', image: '/images/cat-sweet.jpg' },
 ];
 
-export default function LandingPage({ onExplore }: LandingPageProps) {
+export default function LandingPage({ onExplore, onCategorySelect }: LandingPageProps) {
     return (
         <div style={{
             minHeight: '100vh',
@@ -95,6 +96,7 @@ export default function LandingPage({ onExplore }: LandingPageProps) {
                     {CATEGORIES.map((cat, index) => (
                         <motion.div
                             key={cat.name}
+                            onClick={() => onCategorySelect && onCategorySelect(cat.dataCategory)}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.05 }}
@@ -107,7 +109,7 @@ export default function LandingPage({ onExplore }: LandingPageProps) {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 textAlign: 'center',
-                                cursor: 'default', // Visual only
+                                cursor: 'pointer',
                                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
                             }}
                         >

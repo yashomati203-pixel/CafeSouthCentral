@@ -278,7 +278,13 @@ export default function DashboardPage() {
             <>
 
                 {layoutStyles}
-                <LandingPage onExplore={() => setHasExplored(true)} />
+                <LandingPage
+                    onExplore={() => setHasExplored(true)}
+                    onCategorySelect={(category) => {
+                        setSelectedCategory(category);
+                        setHasExplored(true);
+                    }}
+                />
             </>
         );
     }
