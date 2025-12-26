@@ -141,10 +141,17 @@ export async function createSubscriptionOrder(userId: string, items: CartItem[])
             data: { itemsRedeemedCount: { increment: totalNewItems } }
         });
 
-        await tx.userSubscription.update({
-            where: { id: subscription.id },
+        const result = await tx.userSubscription.updateMany({
+            where: {
+                id: subscription.id,
+                mealsConsumedThisMonth: { lte: subscription.monthlyQuota - totalNewItems }
+            },
             data: { mealsConsumedThisMonth: { increment: totalNewItems } }
         });
+
+        if (result.count === 0) {
+            throw new Error('Transaction Failed: Monthly quota limit reached (Concurrency Protection).');
+        }
 
         // 6. Create Order
         const displayId = await generateOrderDisplayId(tx);

@@ -10,6 +10,8 @@ import { MenuItem, MenuItemType } from '@/types/db';
 import LoginPage from '@/components/auth/LoginPage';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
+import LandingPage from '@/components/marketing/LandingPage';
+import { useRouter } from 'next/navigation';
 
 // Mock Data for Display
 const MOCK_MENU: MenuItem[] = [
@@ -58,15 +60,18 @@ const MOCK_MENU: MenuItem[] = [
 
 const CATEGORY_ORDER = ['South Indian', 'Dosa', 'Rice', 'North Indian', 'Snacks', 'Beverages', 'Chaat', 'Dessert'];
 
-import { useRouter } from 'next/navigation';
-
-
 export default function DashboardPage() {
     const router = useRouter();
     const [user, setUser] = useState<{ id?: string; name: string; phone: string; role?: string } | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [subscriptionData, setSubscriptionData] = useState<any>(null);
     const [isMember, setIsMember] = useState(false);
+
+    // View State: Guest vs Member
+    const [hasExplored, setHasExplored] = useState(false);
+
+    // Login Handling
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     const [mode, setMode] = useState<'NORMAL' | 'SUBSCRIPTION'>('NORMAL');
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -125,6 +130,9 @@ export default function DashboardPage() {
                         return;
                     }
                     setUser(parsedUser);
+                    setHasExplored(true); // If logged in, skip landing page
+                } else {
+                    // No user, stay in Landing unless explored
                 }
             } catch (e) {
                 console.error("Failed to parse user", e);
@@ -159,7 +167,6 @@ export default function DashboardPage() {
                     return null;
                 })
                 .then(data => {
-                    console.log("Subscription Check:", data);
                     if (data && data.validUntil && new Date(data.validUntil) > new Date()) {
                         setIsMember(true);
                     } else {
@@ -205,9 +212,11 @@ export default function DashboardPage() {
                 router.push('/admin/dashboard');
             } else {
                 setUser(fullUser);
+                setShowLoginModal(false);
+                setHasExplored(true);
                 // Trigger Invitation if NOT Admin. Logic for "already member" handled by component or subsequent checks
                 // but better to show it. The user can dismiss.
-                setShowInvitation(true);
+                setTimeout(() => setShowInvitation(true), 1000);
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -220,25 +229,27 @@ export default function DashboardPage() {
         sessionStorage.removeItem('cafe_user');
         setUser(null);
         setSubscriptionData(null);
+        setHasExplored(false); // Go back to Landing? Or Guest Menu? Let's go to Landing for dramatic effect.
     };
 
-    // Connect to Cart Context
     // Connect to Cart Context
     const { addToCart, decreaseQty, items } = useCart();
 
     // Calculate total items for badge
     const cartItemCount = items.reduce((sum, item) => sum + item.qty, 0);
-    console.log("Cart Items:", cartItemCount, "Items Array:", items);
 
     const handleAddToCart = (item: MenuItem) => {
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+
         addToCart(item, mode);
         // Auto-open drawer on mobile/tablet (if sidebar is likely hidden)
         if (typeof window !== 'undefined' && window.innerWidth < 768) {
             setIsCartOpen(true);
         }
     };
-
-    // Loading check removed to prevent blocking UI
 
     // Define styles here to ensure they are available
     const layoutStyles = (
@@ -261,13 +272,36 @@ export default function DashboardPage() {
         `}</style>
     );
 
-    if (!user) return (
-        <>
-            {layoutStyles}
-            <LoginPage onLogin={handleLogin} />
-        </>
-    );
+    // LANDING PAGE VIEW
+    if (!user && !hasExplored) {
+        return (
+            <>
 
+                {layoutStyles}
+                <LandingPage onExplore={() => setHasExplored(true)} />
+            </>
+        );
+    }
+
+    // LOGIN MODAL (Rendered on top if open)
+    if (showLoginModal && !user) {
+        return (
+            <>
+                {layoutStyles}
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'white' }}>
+                    <button
+                        onClick={() => setShowLoginModal(false)}
+                        style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10000, padding: '0.5rem', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.5rem' }}
+                    >
+                        ×
+                    </button>
+                    <LoginPage onLogin={handleLogin} />
+                </div>
+            </>
+        );
+    }
+
+    // MAIN DASHBOARD (GUEST OR AUTH)
     return (
         <main style={{ minHeight: '100vh', padding: '2rem', position: 'relative' }}>
             {layoutStyles}
@@ -293,14 +327,33 @@ export default function DashboardPage() {
                         />
                     </div>
                     <p style={{ color: '#2F4F2F', fontWeight: 600 }}>
-                        Welcome, {user.name}
+                        {user ? `Welcome, ${user.name}` : 'Welcome, Guest'}
                     </p>
                 </div>
 
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+
+                    {!user && (
+                        <button
+                            onClick={() => setShowLoginModal(true)}
+                            style={{
+                                padding: '0.5rem 1.5rem',
+                                backgroundColor: '#5C3A1A',
+                                color: 'white',
+                                borderRadius: '0.5rem',
+                                border: 'none',
+                                fontWeight: 'bold',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Login
+                        </button>
+                    )}
+
                     {isMember && <ModeToggle mode={mode} setMode={setMode} />}
 
-                    {/* Cart Button */}
+                    {/* Cart Button (Only show if user is logged in OR allow showing 0 items) */}
+                    {/* Strategy: Show it, but it will be empty for guest. Handled by cartItemCount=0 */}
                     <button
                         onClick={() => setIsCartOpen(true)}
                         style={{
@@ -314,7 +367,8 @@ export default function DashboardPage() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            opacity: user ? 1 : 0.5 // Dim if not user
                         }}
                     >
                         🛒 Cart
@@ -338,73 +392,75 @@ export default function DashboardPage() {
                         )}
                     </button>
 
-                    {/* Options Dropdown */}
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                            <button
-                                style={{
-                                    padding: '0.5rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '0.5rem',
-                                    background: 'white',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="1" />
-                                    <circle cx="19" cy="12" r="1" />
-                                    <circle cx="5" cy="12" r="1" />
-                                </svg>
-                            </button>
-                        </DropdownMenu.Trigger>
+                    {/* Options Dropdown - Only if User */}
+                    {user && (
+                        <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                                <button
+                                    style={{
+                                        padding: '0.5rem',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '0.5rem',
+                                        background: 'white',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="1" />
+                                        <circle cx="19" cy="12" r="1" />
+                                        <circle cx="5" cy="12" r="1" />
+                                    </svg>
+                                </button>
+                            </DropdownMenu.Trigger>
 
-                        <DropdownMenu.Portal>
-                            <DropdownMenu.Content
-                                style={{
-                                    backgroundColor: 'white',
-                                    padding: '0.5rem',
-                                    borderRadius: '0.5rem',
-                                    boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
-                                    minWidth: '150px',
-                                    zIndex: 1000
-                                }}
-                                sideOffset={5}
-                            >
-                                <DropdownMenu.Item
-                                    onSelect={handleLogout}
+                            <DropdownMenu.Portal>
+                                <DropdownMenu.Content
                                     style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
+                                        backgroundColor: 'white',
                                         padding: '0.5rem',
-                                        color: 'red',
-                                        cursor: 'pointer',
-                                        borderRadius: '0.25rem',
-                                        outline: 'none',
+                                        borderRadius: '0.5rem',
+                                        boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
+                                        minWidth: '150px',
+                                        zIndex: 1000
                                     }}
+                                    sideOffset={5}
                                 >
-                                    Log out
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item
-                                    onSelect={() => router.push('/subscription')}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        padding: '0.5rem',
-                                        color: '#5C3A1A',
-                                        cursor: 'pointer',
-                                        borderRadius: '0.25rem',
-                                        outline: 'none',
-                                        fontWeight: '500'
-                                    }}
-                                >
-                                    Subscription Plans
-                                </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+                                    <DropdownMenu.Item
+                                        onSelect={handleLogout}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '0.5rem',
+                                            color: 'red',
+                                            cursor: 'pointer',
+                                            borderRadius: '0.25rem',
+                                            outline: 'none',
+                                        }}
+                                    >
+                                        Log out
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onSelect={() => router.push('/subscription')}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '0.5rem',
+                                            color: '#5C3A1A',
+                                            cursor: 'pointer',
+                                            borderRadius: '0.25rem',
+                                            outline: 'none',
+                                            fontWeight: '500'
+                                        }}
+                                    >
+                                        Subscription Plans
+                                    </DropdownMenu.Item>
+                                </DropdownMenu.Content>
+                            </DropdownMenu.Portal>
+                        </DropdownMenu.Root>
+                    )}
                 </div>
             </header>
 
@@ -416,13 +472,10 @@ export default function DashboardPage() {
                     padding: '2rem',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                 }}>
-                    {/* Subscription Summary Removed by Request */}
-
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>
                             {mode === 'NORMAL' ? '🍔 Normal Menu' : '🥗 Subscription Plan'}
                         </h2>
-                        {/* Removed Items Remaining Badge as per request */}
                     </div>
 
                     <p style={{ color: '#666', marginBottom: '2rem' }}>
@@ -476,10 +529,8 @@ export default function DashboardPage() {
                             return acc;
                         }, {} as Record<string, MenuItem[]>)
                     ).sort((a, b) => {
-                        // Sort logic based on CATEGORY_ORDER
                         const indexA = CATEGORY_ORDER.indexOf(a[0]);
                         const indexB = CATEGORY_ORDER.indexOf(b[0]);
-                        // If not found (index -1), push to end
                         const safeIndexA = indexA === -1 ? 999 : indexA;
                         const safeIndexB = indexB === -1 ? 999 : indexB;
                         return safeIndexA - safeIndexB;
@@ -490,7 +541,7 @@ export default function DashboardPage() {
                                     fontSize: '1.25rem',
                                     fontWeight: 'bold',
                                     marginBottom: '1rem',
-                                    color: '#5C3A1A', // Using Coconut Brown
+                                    color: '#5C3A1A',
                                     borderBottom: '2px solid #EEE',
                                     paddingBottom: '0.5rem'
                                 }}>
@@ -510,8 +561,7 @@ export default function DashboardPage() {
                                             display: 'flex',
                                             flexDirection: 'column',
                                             justifyContent: 'space-between',
-                                            opacity: item.inventoryCount === 0 ? 0.6 : 1, // Gray out if sold out
-                                            pointerEvents: item.inventoryCount === 0 ? 'none' : 'auto' // Prevent interaction if sold out? No, maybe just visual
+                                            opacity: item.inventoryCount === 0 ? 0.6 : 1,
                                         }}>
                                             <div>
                                                 <div style={{
@@ -633,7 +683,11 @@ export default function DashboardPage() {
                                                             onMouseOver={(e) => { if (item.inventoryCount > 0) e.currentTarget.style.opacity = '0.9'; }}
                                                             onMouseOut={(e) => { if (item.inventoryCount > 0) e.currentTarget.style.opacity = '1'; }}
                                                         >
-                                                            {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                                                            {item.inventoryCount === 0 ? 'Sold Out' : (
+                                                                // Change button text for Guest? Or keep "Add to Cart" and it prompts login.
+                                                                // User requested "Add to Cart" prompts login.
+                                                                'Add to Cart'
+                                                            )}
                                                         </button>
                                                     );
                                                 })()}
@@ -647,7 +701,7 @@ export default function DashboardPage() {
                 </section>
 
                 {/* Sidebar Cart for Desktop (Visible when items exist) */}
-                {cartItemCount > 0 && (
+                {cartItemCount > 0 && user && ( // Hide sidebar if guest (cart empty anyway)
                     <div className="desktop-sidebar">
                         <CartDrawer
                             isOpen={true}
@@ -662,18 +716,6 @@ export default function DashboardPage() {
                     </div>
                 )}
             </div>
-
-            {/* Cart Drawer Overlay (Mobile or when sidebar not active logic?) 
-                Actually, if effective layout handles sidebar on desktop, we still need overlay for mobile
-                if we want to view cart on mobile. 
-                But for this task "right side", implying desktop. 
-                I will make the Sidebar appear in the grid flow on desktop.
-                I will HIDE the overlay drawer on desktop if items > 0 to avoid duplication? 
-                Actually the overlay drawer has `isOpen` controlled by `isCartOpen`.
-                Button click sets `isCartOpen(true)`.
-                If I click Cart button on desktop while sidebar is visible, it might open overlay on top.
-                Use `hidden-on-desktop` for the overlay if items > 0?
-            */}
 
             {/* Cart Drawer Overlay (Mobile) */}
             <div className="mobile-drawer-wrapper">
@@ -705,8 +747,6 @@ export default function DashboardPage() {
                     }
                 }
             `}</style>
-
-
         </main >
     );
 }
