@@ -1,15 +1,14 @@
-'use client';
-
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SubscriptionInvitationProps {
     isOpen: boolean;
     onClose: () => void;
-    onJoin: () => void;
 }
 
-export default function SubscriptionInvitation({ isOpen, onClose, onJoin }: SubscriptionInvitationProps) {
+export default function SubscriptionInvitation({ isOpen, onClose }: SubscriptionInvitationProps) {
+    const router = useRouter();
     const [dailySpend, setDailySpend] = useState(150);
     const SUBSCRIPTION_PRICE = 3000; // Example monthly price
     // Assuming 22 working days or 30 days? Let's say 30 days for easy math or user perception.
@@ -118,7 +117,10 @@ export default function SubscriptionInvitation({ isOpen, onClose, onJoin }: Subs
                         {/* Actions */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <button
-                                onClick={onJoin}
+                                onClick={() => {
+                                    onClose();
+                                    router.push('/subscription');
+                                }}
                                 style={{
                                     width: '100%',
                                     padding: '1rem',

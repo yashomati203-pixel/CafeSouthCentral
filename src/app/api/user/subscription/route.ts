@@ -39,3 +39,72 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+// ... (GET method remains)
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { userId, planId } = body;
+
+        if (!userId || !planId) {
+            return NextResponse.json({ error: 'Missing userId or planId' }, { status: 400 });
+        }
+
+        // Logic to determine plan details
+        // In a real app, fetch from DB. For now, hardcode matches frontend.
+        let durationDays = 30;
+        let monthlyQuota = 60; // Default
+        let dailyLimit = 4;
+        let price = 3000;
+
+        if (planId === 'monthly') {
+            durationDays = 30;
+            monthlyQuota = 60;
+            dailyLimit = 4;
+            price = 3000;
+        } else if (planId === 'student') {
+            durationDays = 30;
+            monthlyQuota = 45; // 3 items * 15 days? or just diff limit
+            dailyLimit = 3;
+            price = 2500;
+        } else if (planId === 'weekly') {
+            durationDays = 7;
+            monthlyQuota = 14;
+            dailyLimit = 4;
+            price = 800;
+        }
+
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(startDate.getDate() + durationDays);
+
+        // Deactivate old subscriptions?
+        await prisma.userSubscription.updateMany({
+            where: { userId, isActive: true },
+            data: { isActive: false }
+        });
+
+        // Create new
+        const newSub = await prisma.userSubscription.create({
+            data: {
+                userId,
+                planType: 'MONTHLY_MESS', // Enum restriction, mapping everything to this for now or need to update Enum
+                dailyLimit,
+                monthlyQuota,
+                mealsConsumedThisMonth: 0,
+                startDate,
+                endDate,
+                isActive: true
+            }
+        });
+
+        // Reset user role to indicate they might be special now? 
+        // Or just rely on subscription table. API/Frontend relies on sub table.
+
+        return NextResponse.json(newSub);
+
+    } catch (error) {
+        console.error("Failed to create subscription:", error);
+        return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 });
+    }
+}

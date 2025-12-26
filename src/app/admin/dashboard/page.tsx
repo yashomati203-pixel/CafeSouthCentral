@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import useSound from 'use-sound';
 import StockItem from '@/components/admin/StockItem';
 
 // Ensure the sound file path is correct. If doesn't exist, it might silent fail or error.
@@ -31,7 +30,9 @@ interface Order {
 export default function AdminDashboard() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock'>('active');
+    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock' | 'members'>('active');
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
+    const [users, setUsers] = useState<any[]>([]);
 
     // Inventory State
     const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -68,10 +69,11 @@ export default function AdminDashboard() {
 
         fetchOrders(); // Initial fetch
         fetchInventory(); // Inventory fetch
+        fetchUsers(); // Fetch users
 
         const interval = setInterval(() => {
             fetchOrders();
-            // sync inventory occasionally too?
+            fetchInventory();
         }, 5000); // Poll every 5s for "Live" feel (user requested live)
 
         return () => clearInterval(interval);
@@ -109,6 +111,18 @@ export default function AdminDashboard() {
             }
         } catch (e) {
             console.error("Failed to fetch inventory", e);
+        }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const res = await fetch('/api/admin/users');
+            if (res.ok) {
+                const data = await res.json();
+                setUsers(data);
+            }
+        } catch (e) {
+            console.error("Failed to fetch users", e);
         }
     };
 
@@ -188,8 +202,11 @@ export default function AdminDashboard() {
                 <button onClick={() => setActiveTab('active')} style={{ padding: '1rem', borderBottom: activeTab === 'active' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'active' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     ⚡ Live Orders <span style={{ backgroundColor: '#f3f4f6', padding: '0.1rem 0.5rem', borderRadius: '99px', fontSize: '0.8rem' }}>{activeOrders.length}</span>
                 </button>
+                <button onClick={() => { setActiveTab('members'); fetchUsers(); }} style={{ padding: '1rem', borderBottom: activeTab === 'members' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'members' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
+                    👥 Members
+                </button>
                 <button onClick={() => { setActiveTab('stock'); fetchInventory(); }} style={{ padding: '1rem', borderBottom: activeTab === 'stock' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'stock' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
-                    📦 Stock Management
+                    📦 Stock
                 </button>
                 <button onClick={() => setActiveTab('sold')} style={{ padding: '1rem', borderBottom: activeTab === 'sold' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'sold' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
                     📜 History
@@ -260,12 +277,91 @@ export default function AdminDashboard() {
                 </div>
             )}
 
+            {/* MEMBERS TAB */}
+            {activeTab === 'members' && (
+                <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead style={{ backgroundColor: '#f3f4f6' }}>
+                            <tr>
+                                <th style={{ padding: '1rem', textAlign: 'left' }}>Name</th>
+                                <th style={{ padding: '1rem', textAlign: 'left' }}>Phone</th>
+                                <th style={{ padding: '1rem', textAlign: 'left' }}>Status</th>
+                                <th style={{ padding: '1rem', textAlign: 'left' }}>Orders</th>
+                                <th style={{ padding: '1rem', textAlign: 'left' }}>Plan Expiry</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user.id} style={{ borderTop: '1px solid #eee' }}>
+                                    <td style={{ padding: '1rem', fontWeight: 'bold' }}>{user.name}</td>
+                                    <td style={{ padding: '1rem' }}>{user.phone}</td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <span style={{
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: '999px',
+                                            fontSize: '0.8rem',
+                                            backgroundColor: user.isMember ? '#dcfce7' : '#f3f4f6',
+                                            color: user.isMember ? '#166534' : '#666',
+                                            fontWeight: 'bold'
+                                        }}>
+                                            {user.isMember ? 'SUBSCRIBED' : 'CUSTOMER'}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>{user.orderCount}</td>
+                                    <td style={{ padding: '1rem', color: '#666' }}>
+                                        {user.subscription
+                                            ? new Date(user.subscription.endDate).toLocaleDateString()
+                                            : '-'
+                                        }
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {users.length === 0 && <div style={{ padding: '2rem', textAlign: 'center' }}>No users found</div>}
+                </div>
+            )}
+
             {/* STOCK MANAGEMENT TAB */}
             {activeTab === 'stock' && (
                 <div style={{ paddingBottom: '4rem' }}>
+                    {/* Category Filter Tabs */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        overflowX: 'auto',
+                        paddingBottom: '1rem',
+                        marginBottom: '1rem',
+                        scrollbarWidth: 'none'
+                    }}>
+                        {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                style={{
+                                    padding: '0.5rem 1.5rem',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#EEE',
+                                    color: selectedCategory === cat ? 'white' : '#666',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
                     {Object.entries(
                         menuItems.reduce((acc, item) => {
                             const cat = item.category || 'Uncategorized';
+
+                            // Filter Logic
+                            if (selectedCategory !== 'All' && cat !== selectedCategory) return acc;
+
                             if (!acc[cat]) acc[cat] = [];
                             acc[cat].push(item);
                             return acc;

@@ -49,11 +49,38 @@ export default function SubscriptionPage() {
         }
     ];
 
-    const handleSelectPlan = (planId: string) => {
-        // Implement payment logic here
-        alert(`You selected the ${PLANS.find(p => p.id === planId)?.name}. Payment integration coming soon!`);
-        // Mock successful subscription for flow testing:
-        // router.push('/');
+    const handleSelectPlan = async (planId: string) => {
+        // Get user from local storage
+        try {
+            const storedUser = localStorage.getItem('cafe_user') || sessionStorage.getItem('cafe_user');
+            if (!storedUser) {
+                alert("Please login first");
+                router.push('/');
+                return;
+            }
+            const user = JSON.parse(storedUser);
+
+            // Mock Payment Processing
+            const confirmed = window.confirm(`Confirm subscription to ${PLANS.find(p => p.id === planId)?.name}?`);
+            if (!confirmed) return;
+
+            // Call API
+            const res = await fetch('/api/user/subscription', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, planId })
+            });
+
+            if (res.ok) {
+                alert("Subscription activated successfully! Welcome to the club.");
+                router.push('/');
+            } else {
+                alert("Failed to activate subscription.");
+            }
+        } catch (e) {
+            console.error("Subscription Error", e);
+            alert("Something went wrong");
+        }
     };
 
     return (
