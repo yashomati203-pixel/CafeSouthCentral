@@ -1,0 +1,701 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import ModeToggle from '@/components/ui/ModeToggle';
+import SubscriptionSummary from '@/components/dashboard/SubscriptionSummary';
+import { useCart } from '@/context/CartContext';
+import CartDrawer from '@/components/ordering/CartDrawer';
+import { MenuItem, MenuItemType } from '@/types/db';
+import LoginPage from '@/components/auth/LoginPage';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
+
+// Mock Data for Display
+const MOCK_MENU: MenuItem[] = [
+    // South Indian Tiffins
+    { id: '1', name: 'Idli', description: 'Steamed rice cakes (2 pcs)', price: 49, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '2', name: 'Ghee Podi Idli', description: 'Idli tossed in spicy podi & ghee', price: 69, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '3', name: 'Thatte Idli', description: 'Large flat idli', price: 49, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '4', name: 'Idli Sambar', description: 'Idli dipped in sambar', price: 59, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '5', name: 'Sambar Vada', description: 'Lentil donuts in sambar', price: 59, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '6', name: 'Upma', description: 'Savory semolina porridge', price: 59, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 30, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '7', name: 'Mysore Bonda', description: 'Fried flour dumplings', price: 49, type: MenuItemType.BOTH, category: 'South Indian', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Dosa
+    { id: '8', name: 'Plain Dosa', description: 'Crispy savory crepe', price: 59, type: MenuItemType.BOTH, category: 'Dosa', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '9', name: 'Masala Dosa', description: 'Dosa with potato filling', price: 69, type: MenuItemType.BOTH, category: 'Dosa', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '10', name: 'Paneer Dosa', description: 'Dosa with spiced paneer', price: 109, type: MenuItemType.NORMAL, category: 'Dosa', isVeg: true, isAvailable: true, inventoryCount: 30, isDoubleAllowed: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '11', name: 'Set Dosa', description: 'Soft spongy dosas (set of 2)', price: 99, type: MenuItemType.BOTH, category: 'Dosa', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Rice
+    { id: '12', name: 'Lemon Rice', description: 'Tangy lemon flavored rice', price: 69, type: MenuItemType.BOTH, category: 'Rice', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '13', name: 'Curd Rice', description: 'Rice with yogurt and tempering', price: 59, type: MenuItemType.BOTH, category: 'Rice', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '14', name: 'Veg Biryani', description: 'Served with Mirchi Ka Salan', price: 129, type: MenuItemType.NORMAL, category: 'Rice', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // North Indian
+    { id: '15', name: 'Aloo Paratha', description: 'Stuffed potato flatbread', price: 59, type: MenuItemType.BOTH, category: 'North Indian', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '16', name: 'Chole Bhature', description: 'Fried bread with chickpea curry', price: 149, type: MenuItemType.NORMAL, category: 'North Indian', isVeg: true, isAvailable: true, inventoryCount: 30, isDoubleAllowed: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '17', name: 'Puri Bhaji', description: 'Fried bread with potato curry', price: 99, type: MenuItemType.BOTH, category: 'North Indian', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Snacks
+    { id: '18', name: 'Mirchi Bajji', description: 'Stuffed chilli fritters', price: 49, type: MenuItemType.BOTH, category: 'Snacks', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '19', name: 'Punugulu', description: 'Deep fried rice batter balls', price: 49, type: MenuItemType.BOTH, category: 'Snacks', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Beverages
+    { id: '20', name: 'Filter Coffee', description: 'Classic South Indian coffee', price: 29, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, inventoryCount: 100, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '21', name: 'Tea', description: 'Masala Chai', price: 19, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, inventoryCount: 100, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '22', name: 'Lassi', description: 'Sweet yogurt drink', price: 59, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Chaat
+    { id: '23', name: 'Pani Puri', description: 'Hollow balls with spicy water', price: 20, type: MenuItemType.BOTH, category: 'Chaat', isVeg: true, isAvailable: true, inventoryCount: 100, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '24', name: 'Dahi Puri', description: 'Puri filled with yogurt', price: 30, type: MenuItemType.BOTH, category: 'Chaat', isVeg: true, isAvailable: true, inventoryCount: 50, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+
+    // Desserts
+    { id: '25', name: 'Gulab Jamun', description: 'Sweet syrup dumplings', price: 59, type: MenuItemType.NORMAL, category: 'Dessert', isVeg: true, isAvailable: true, inventoryCount: 40, isDoubleAllowed: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
+    { id: '26', name: 'Waffles', description: 'Freshly baked waffles', price: 120, type: MenuItemType.NORMAL, category: 'Dessert', isVeg: true, isAvailable: true, inventoryCount: 20, isDoubleAllowed: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' }
+];
+
+import { useRouter } from 'next/navigation';
+
+
+export default function DashboardPage() {
+    const router = useRouter();
+    const [user, setUser] = useState<{ id?: string; name: string; phone: string; role?: string } | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [subscriptionData, setSubscriptionData] = useState<any>(null);
+    const [isMember, setIsMember] = useState(false);
+
+    const [mode, setMode] = useState<'NORMAL' | 'SUBSCRIPTION'>('NORMAL');
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+    // Feature Loop: Subscription Hook
+    const [showInvitation, setShowInvitation] = useState(false);
+
+    // Feature Loop: Smart Inventory
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [isMenuLoading, setIsMenuLoading] = useState(true);
+
+    const fetchMenu = async () => {
+        try {
+            const res = await fetch('/api/menu');
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    setMenuItems(data);
+                } else {
+                    setMenuItems(MOCK_MENU);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch menu", e);
+            setMenuItems(MOCK_MENU);
+        } finally {
+            setIsMenuLoading(false);
+        }
+    };
+
+    const fetchSubscriptionData = async () => {
+        if (!user?.id) return;
+        try {
+            const res = await fetch(`/api/user/subscription?userId=${user.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setSubscriptionData(data);
+            }
+        } catch (e) {
+            console.error("Failed to fetch sub data", e);
+        }
+    };
+
+    // Load user from storage with safety timeout
+    useEffect(() => {
+        const checkUser = () => {
+            try {
+                // Check localStorage first (Persistent), then sessionStorage (Temporary)
+                const storedUser = localStorage.getItem('cafe_user') || sessionStorage.getItem('cafe_user');
+
+                if (storedUser) {
+                    const parsedUser = JSON.parse(storedUser);
+                    if (parsedUser.role === 'ADMIN') {
+                        router.push('/admin/dashboard');
+                        return;
+                    }
+                    setUser(parsedUser);
+                }
+            } catch (e) {
+                console.error("Failed to parse user", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Run check immediately or after short delay to allow hydration
+        const timer = setTimeout(checkUser, 100);
+        return () => clearTimeout(timer);
+    }, [router]);
+
+    // Initial Data Fetch
+    useEffect(() => {
+        fetchMenu();
+    }, []);
+
+    // Fetch subscription data when user/mode changes
+    useEffect(() => {
+        if (user && mode === 'SUBSCRIPTION') {
+            fetchSubscriptionData();
+        }
+    }, [user, mode]);
+
+    // Check membership status
+    useEffect(() => {
+        if (user?.id) {
+            fetch(`/api/user/subscription?userId=${user.id}`, { cache: 'no-store' })
+                .then(res => {
+                    if (res.ok) return res.json();
+                    return null;
+                })
+                .then(data => {
+                    console.log("Subscription Check:", data);
+                    if (data && data.validUntil && new Date(data.validUntil) > new Date()) {
+                        setIsMember(true);
+                    } else {
+                        setIsMember(false);
+                        setMode('NORMAL'); // Reset mode if not member
+                    }
+                })
+                .catch((e) => {
+                    console.error("Subscription check failed", e);
+                    setIsMember(false);
+                    setMode('NORMAL');
+                });
+        } else {
+            setIsMember(false);
+            setMode('NORMAL');
+        }
+    }, [user]);
+
+    const handleLogin = async (userData: { name: string; phone: string }, stayLoggedIn: boolean) => {
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Login failed');
+                return;
+            }
+
+            const fullUser = { ...userData, id: data.id, role: data.role };
+
+            if (stayLoggedIn) {
+                localStorage.setItem('cafe_user', JSON.stringify(fullUser));
+            } else {
+                sessionStorage.setItem('cafe_user', JSON.stringify(fullUser));
+            }
+
+            if (data.role === 'ADMIN') {
+                router.push('/admin/dashboard');
+            } else {
+                setUser(fullUser);
+                // Trigger Invitation if New User (0 Orders)
+                if (data._count && data._count.orders === 0) {
+                    setShowInvitation(true);
+                }
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Failed to login. Please try again.');
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('cafe_user');
+        sessionStorage.removeItem('cafe_user');
+        setUser(null);
+        setSubscriptionData(null);
+    };
+
+    // Connect to Cart Context
+    // Connect to Cart Context
+    const { addToCart, decreaseQty, items } = useCart();
+
+    // Calculate total items for badge
+    const cartItemCount = items.reduce((sum, item) => sum + item.qty, 0);
+    console.log("Cart Items:", cartItemCount, "Items Array:", items);
+
+    const handleAddToCart = (item: MenuItem) => {
+        addToCart(item, mode);
+        // Auto-open drawer on mobile/tablet (if sidebar is likely hidden)
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setIsCartOpen(true);
+        }
+    };
+
+    // Loading check removed to prevent blocking UI
+
+    // Define styles here to ensure they are available
+    const layoutStyles = (
+        <style>{`
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            
+            .layout-content {
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            @media (min-width: 768px) {
+                .layout-content.with-sidebar {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) 400px;
+                    align-items: start;
+                }
+            }
+        `}</style>
+    );
+
+    if (!user) return (
+        <>
+            {layoutStyles}
+            <LoginPage onLogin={handleLogin} />
+        </>
+    );
+
+    return (
+        <main style={{ minHeight: '100vh', padding: '2rem', position: 'relative' }}>
+            {layoutStyles}
+
+            <SubscriptionInvitation
+                isOpen={showInvitation}
+                onClose={() => setShowInvitation(false)}
+                onJoin={() => {
+                    setMode('SUBSCRIPTION');
+                    setShowInvitation(false);
+                }}
+            />
+
+            {/* Header Section */}
+            <header style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '2rem'
+            }}>
+                <div>
+                    <div>
+                        <img
+                            src="/logo.png"
+                            alt="Cafe South Central"
+                            style={{ width: '250px', height: '80px', marginBottom: '0.5rem', objectFit: 'contain', objectPosition: 'left' }}
+                        />
+                    </div>
+                    <p style={{ color: '#2F4F2F', fontWeight: 600 }}>
+                        Welcome, {user.name}
+                    </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    {isMember && <ModeToggle mode={mode} setMode={setMode} />}
+
+                    {/* Cart Button */}
+                    <button
+                        onClick={() => setIsCartOpen(true)}
+                        style={{
+                            position: 'relative',
+                            padding: '0.5rem 1rem',
+                            backgroundColor: '#5C3A1A',
+                            color: 'white',
+                            borderRadius: '0.5rem',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        🛒 Cart
+                        {cartItemCount > 0 && (
+                            <span style={{
+                                position: 'absolute',
+                                top: '-8px',
+                                right: '-8px',
+                                backgroundColor: 'red',
+                                color: 'white',
+                                borderRadius: '50%',
+                                width: '20px',
+                                height: '20px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                fontSize: '0.75rem'
+                            }}>
+                                {cartItemCount}
+                            </span>
+                        )}
+                    </button>
+
+                    {/* Options Dropdown */}
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                            <button
+                                style={{
+                                    padding: '0.5rem',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '0.5rem',
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="1" />
+                                    <circle cx="19" cy="12" r="1" />
+                                    <circle cx="5" cy="12" r="1" />
+                                </svg>
+                            </button>
+                        </DropdownMenu.Trigger>
+
+                        <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                                style={{
+                                    backgroundColor: 'white',
+                                    padding: '0.5rem',
+                                    borderRadius: '0.5rem',
+                                    boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
+                                    minWidth: '150px',
+                                    zIndex: 1000
+                                }}
+                                sideOffset={5}
+                            >
+                                <DropdownMenu.Item
+                                    onSelect={handleLogout}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '0.5rem',
+                                        color: 'red',
+                                        cursor: 'pointer',
+                                        borderRadius: '0.25rem',
+                                        outline: 'none',
+                                    }}
+                                >
+                                    Log out
+                                </DropdownMenu.Item>
+                                {isMember && (
+                                    <DropdownMenu.Item
+                                        onSelect={() => router.push('/subscription')}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '0.5rem',
+                                            color: '#5C3A1A',
+                                            cursor: 'pointer',
+                                            borderRadius: '0.25rem',
+                                            outline: 'none',
+                                            fontWeight: '500'
+                                        }}
+                                    >
+                                        Subscription Plans
+                                    </DropdownMenu.Item>
+                                )}
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                </div>
+            </header>
+
+            {/* Dynamic Content Area Wrapper */}
+            <div className={`layout-content ${cartItemCount > 0 ? 'with-sidebar' : ''}`}>
+                {/* Main Menu Section */}<section style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '1rem',
+                    padding: '2rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}>
+                    {/* Subscription Summary Removed by Request */}
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>
+                            {mode === 'NORMAL' ? '🍔 Normal Menu' : '🥗 Subscription Plan'}
+                        </h2>
+                        {/* Removed Items Remaining Badge as per request */}
+                    </div>
+
+                    <p style={{ color: '#666', marginBottom: '2rem' }}>
+                        {mode === 'NORMAL'
+                            ? 'Order anything from our wide range of delicacies. Pay per order.'
+                            : 'Select items for your daily meal quota. No payment required at checkout.'}
+                    </p>
+
+                    {/* Category Filter Pills */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        overflowX: 'auto',
+                        paddingBottom: '1rem',
+                        marginBottom: '1rem',
+                        scrollbarWidth: 'none'
+                    }}>
+                        {['All', ...Array.from(new Set(MOCK_MENU.map(i => i.category)))].map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                style={{
+                                    padding: '0.5rem 1.5rem',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#EEE',
+                                    color: selectedCategory === cat ? 'white' : '#666',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Grouped Menu Sections */}
+                    {Object.entries(
+                        (menuItems.length > 0 ? menuItems : MOCK_MENU).reduce((acc, item) => {
+                            // Filter Logic
+                            const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
+                            if (mode === 'SUBSCRIPTION' && !isAvailableInSub) return acc;
+
+                            // Category Filter Logic
+                            if (selectedCategory !== 'All' && item.category !== selectedCategory) return acc;
+
+                            if (!acc[item.category]) acc[item.category] = [];
+                            acc[item.category].push(item);
+                            return acc;
+                        }, {} as Record<string, MenuItem[]>)
+                    ).map(([category, categoryItems]) => (
+                        <div key={category} style={{ marginBottom: '2rem' }}>
+                            <h3 style={{
+                                fontSize: '1.25rem',
+                                fontWeight: 'bold',
+                                marginBottom: '1rem',
+                                color: '#5C3A1A', // Using Coconut Brown
+                                borderBottom: '2px solid #EEE',
+                                paddingBottom: '0.5rem'
+                            }}>
+                                {category}
+                            </h3>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                                gap: '1.5rem'
+                            }}>
+                                {categoryItems.map((item) => (
+                                    <div key={item.id} style={{
+                                        border: '1px solid #eee',
+                                        borderRadius: '0.5rem',
+                                        padding: '1rem',
+                                        backgroundColor: mode === 'SUBSCRIPTION' ? '#f0fdf4' : 'white',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        opacity: item.inventoryCount === 0 ? 0.6 : 1, // Gray out if sold out
+                                        pointerEvents: item.inventoryCount === 0 ? 'none' : 'auto' // Prevent interaction if sold out? No, maybe just visual
+                                    }}>
+                                        <div>
+                                            <div style={{
+                                                height: '150px',
+                                                backgroundColor: '#eee',
+                                                borderRadius: '0.25rem',
+                                                marginBottom: '1rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: '#aaa'
+                                            }}>
+                                                [Image: {item.name}]
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                                <h3 style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{item.name}</h3>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                                    <span style={{
+                                                        fontSize: '0.75rem',
+                                                        padding: '2px 6px',
+                                                        border: item.isVeg ? '1px solid green' : '1px solid red',
+                                                        color: item.isVeg ? 'green' : 'red',
+                                                        borderRadius: '4px'
+                                                    }}>
+                                                        {item.isVeg ? 'VEG' : 'NON-VEG'}
+                                                    </span>
+                                                    {item.inventoryCount === 0 ? (
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
+                                                            SOLD OUT
+                                                        </span>
+                                                    ) : item.inventoryCount <= 5 ? (
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
+                                                            Running Out!
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                            <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+                                                {item.description}
+                                            </p>
+                                        </div>
+
+                                        <div style={{ marginTop: '1rem' }}>
+                                            <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#5C3A1A' }}>
+                                                {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
+                                            </p>
+                                            {(() => {
+                                                const cartItem = items.find(i =>
+                                                    i.id === item.id &&
+                                                    (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
+                                                );
+
+                                                if (cartItem) {
+                                                    return (
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'space-between',
+                                                            backgroundColor: '#f3f4f6',
+                                                            borderRadius: '0.5rem',
+                                                            padding: '0.25rem'
+                                                        }}>
+                                                            <button
+                                                                onClick={() => decreaseQty(item.id, mode)}
+                                                                style={{
+                                                                    width: '32px',
+                                                                    height: '32px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    border: 'none',
+                                                                    backgroundColor: '#5C3A1A',
+                                                                    color: 'white',
+                                                                    borderRadius: '0.25rem',
+                                                                    cursor: 'pointer',
+                                                                    fontWeight: 'bold'
+                                                                }}
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
+                                                            <button
+                                                                onClick={() => handleAddToCart(item)}
+                                                                style={{
+                                                                    width: '32px',
+                                                                    height: '32px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    border: 'none',
+                                                                    backgroundColor: '#5C3A1A',
+                                                                    color: 'white',
+                                                                    borderRadius: '0.25rem',
+                                                                    cursor: 'pointer',
+                                                                    fontWeight: 'bold'
+                                                                }}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <button
+                                                        onClick={() => handleAddToCart(item)}
+                                                        disabled={item.inventoryCount === 0}
+                                                        style={{
+                                                            width: '100%',
+                                                            padding: '0.75rem',
+                                                            backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#5C3A1A',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '0.5rem',
+                                                            cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
+                                                            fontWeight: 600,
+                                                            transition: 'opacity 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => { if (item.inventoryCount > 0) e.currentTarget.style.opacity = '0.9'; }}
+                                                        onMouseOut={(e) => { if (item.inventoryCount > 0) e.currentTarget.style.opacity = '1'; }}
+                                                    >
+                                                        {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                                                    </button>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+
+                </section>
+
+                {/* Sidebar Cart for Desktop (Visible when items exist) */}
+                {cartItemCount > 0 && (
+                    <div className="desktop-sidebar">
+                        <CartDrawer
+                            isOpen={true}
+                            onClose={() => { }}
+                            user={user}
+                            onOrderSuccess={fetchSubscriptionData}
+                            variant="sidebar"
+                        />
+                    </div>
+                )}
+            </div>
+
+            {/* Cart Drawer Overlay (Mobile or when sidebar not active logic?) 
+                Actually, if effective layout handles sidebar on desktop, we still need overlay for mobile
+                if we want to view cart on mobile. 
+                But for this task "right side", implying desktop. 
+                I will make the Sidebar appear in the grid flow on desktop.
+                I will HIDE the overlay drawer on desktop if items > 0 to avoid duplication? 
+                Actually the overlay drawer has `isOpen` controlled by `isCartOpen`.
+                Button click sets `isCartOpen(true)`.
+                If I click Cart button on desktop while sidebar is visible, it might open overlay on top.
+                Use `hidden-on-desktop` for the overlay if items > 0?
+            */}
+
+            {/* Cart Drawer Overlay (Mobile) */}
+            <div className="mobile-drawer-wrapper">
+                <CartDrawer
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    user={user}
+                    onOrderSuccess={fetchSubscriptionData}
+                    variant="drawer"
+                />
+            </div>
+            <style>{`
+                /* Desktop Sidebar: Hidden by default (Mobile), Block on Desktop */
+                .desktop-sidebar {
+                    display: none;
+                }
+
+                /* Mobile Drawer Wrapper: Visible by default */
+                .mobile-drawer-wrapper {
+                    display: block;
+                }
+
+                @media (min-width: 768px) {
+                    .desktop-sidebar {
+                        display: block;
+                    }
+                }
+            `}</style>
+
+
+        </main >
+    );
+}

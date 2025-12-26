@@ -1,0 +1,57 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+}
+
+.label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-charcoal-black);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+    user-select: none;
+}
+
+.label.active {
+    opacity: 1;
+    color: var(--color-coconut-brown);
+}
+
+.switch {
+    position: relative;
+    width: 3.5rem;
+    height: 2rem;
+    background-color: #ddd;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* When subscription (right side) is active, change background to green */
+.switch:has(.slideRight) {
+    background-color: var(--color-palm-green-light);
+}
+
+.slider {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    /* Start position (Normal) */
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.slideRight {
+    transform: translateX(1.5rem);
+    /* Move to right */
+}

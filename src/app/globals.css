@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 🎨 Primary Brand Colors */
+  --color-coconut-brown: #5C3A1A;
+  --color-palm-green-dark: #2F4F2F;
+  --color-palm-green-light: #4B6F44;
+
+  /* 🌴 Accent Colors */
+  --color-tropical-yellow: #F5B700;
+  
+  /* Backgrounds & Text */
+  --color-sand-beige: #F9F6F0;
+  --color-charcoal-black: #1F1F1F;
+  --color-white: #FFFFFF;
+
+  /* Semantic Mappings */
+  --background: var(--color-sand-beige);
+  --foreground: var(--color-charcoal-black);
+  
+  --primary: var(--color-coconut-brown);
+  --primary-foreground: var(--color-sand-beige);
+
+  --secondary: var(--color-palm-green-dark);
+  --secondary-foreground: var(--color-white);
+
+  --accent: var(--color-tropical-yellow);
+  --accent-foreground: var(--color-charcoal-black);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif; /* Assumes Inter is available or fallback */
+}
+
+/* Toggle Switch Utility */
+.toggle-checkbox:checked {
+  right: 0;
+  border-color: var(--color-palm-green-dark);
+}
+.toggle-checkbox:checked + .toggle-label {
+  background-color: var(--color-palm-green-dark);
+}

@@ -1,0 +1,162 @@
+.card {
+    background-color: var(--color-white);
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 0.75rem;
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-coconut-brown);
+    margin: 0;
+}
+
+.validity {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 640px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Daily Section */
+.dailySection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.labelGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.value {
+    color: var(--color-palm-green-dark);
+}
+
+.boxContainer {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.box {
+    flex: 1;
+    height: 0.75rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.used {
+    background-color: #e5e7eb;
+    /* Dim gray for used */
+    border: 1px solid #d1d5db;
+}
+
+.available {
+    background-color: var(--color-tropical-yellow);
+    /* Bright accent for available */
+    box-shadow: 0 0 8px rgba(245, 183, 0, 0.4);
+}
+
+.helperText {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Monthly Quota Section / Radial Progress */
+.quotaSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.circleWidget {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.circularChart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.circleBg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 3.8;
+}
+
+.circleLine {
+    fill: none;
+    stroke: var(--color-palm-green-dark);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.circleContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    line-height: 1;
+}
+
+.bigNumber {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-coconut-brown);
+}
+
+.unit {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.quotaDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.quotaLabel {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.quotaValue {
+    font-weight: 600;
+    color: var(--color-charcoal-black);
+}

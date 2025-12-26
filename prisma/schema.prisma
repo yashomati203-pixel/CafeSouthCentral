@@ -1,0 +1,124 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  CUSTOMER
+  KITCHEN
+  ADMIN
+}
+
+enum MenuItemType {
+  NORMAL
+  SUBSCRIPTION
+  BOTH
+  NORMAL_ONLY
+}
+
+enum PlanType {
+  MONTHLY_MESS
+  TRIAL
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+  RECEIVED
+  DONE // Alias for READY/COMPLETED, requested by user
+  SOLD // Requested by user
+}
+
+enum OrderMode {
+  NORMAL
+  SUBSCRIPTION
+}
+
+model User {
+  id            String             @id @default(uuid())
+  name          String?
+  phone         String             @unique
+  email         String?            @unique
+  role          UserRole           @default(CUSTOMER)
+  walletBalance Float              @default(0.0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  subscriptions UserSubscription[]
+  orders        Order[]
+  dailyUsages   DailyUsage[]
+}
+
+model MenuItem {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  price           Float
+  type            MenuItemType
+  category        String
+  imageUrl        String?
+  inventoryCount  Int          @default(0)
+  isDoubleAllowed Boolean      @default(false)
+  isAvailable     Boolean      @default(true)
+  isVeg           Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  orderItems      OrderItem[]
+}
+
+model UserSubscription {
+  id                     String   @id @default(uuid())
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id])
+  planType               PlanType
+  dailyLimit             Int      @default(4)
+  monthlyQuota           Int
+  mealsConsumedThisMonth Int      @default(0)
+  startDate              DateTime
+  endDate                DateTime
+  isActive               Boolean  @default(true)
+}
+
+model DailyUsage {
+  id                 String @id @default(uuid())
+  userId             String
+  user               User   @relation(fields: [userId], references: [id])
+  date               String // YYYY-MM-DD
+  itemsRedeemedCount Int    @default(0)
+
+  // Use a composite unique constraint to ensure one record per user per day
+  @@unique([userId, date])
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  displayId   String?     // Custom Readable ID like DEC-0001
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  status      OrderStatus @default(PENDING)
+  mode        OrderMode
+  totalAmount Float       @default(0)
+  paymentMethod String?   // "CASH", "UPI", "SCAN"
+  paymentDetails String?  // Stores UPI ID or other related info
+  timeSlot    String?     // Selected pickup time slot
+  createdAt   DateTime    @default(now())
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  name       String   // Snapshot of name
+  price      Float    // Snapshot of price
+  quantity   Int
+}
