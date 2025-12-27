@@ -25,7 +25,7 @@ This application is a specialized food ordering system designed for high-traffic
     *   Persistent drawer UI.
     *   Add/Remove items.
     *   Real-time validation of subscription limits.
-*   **Order Tracking**: Live status updates (Received -> Preparing -> Ready).
+*   **Order Tracking**: Live status updates (Received -> Preparing -> Ready for Pickup -> Completed).
 
 ### For Administration
 *   **Dashboard**: Overview of orders and inventory.

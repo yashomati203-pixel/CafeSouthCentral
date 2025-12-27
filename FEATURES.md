@@ -43,8 +43,8 @@ This document provides a comprehensive overview of the features implemented in t
   - **📷 Scan & Pay**: Displays a QR code placeholder for scanning (Simulated processing delay).
 - **Seamless Redemption**: Subscription items skips payment and are instantly confirmed.
 - **Success Experience**:
-  - Plays a rich **Order Confirmation Animation** (WebM video).
-  - Generates a unique **Digital Token (QR Code)** for the order.
+  - Plays a rich **Order Confirmation Animation** (WebM video) with a manual "Done" button.
+  - Generates a unique **Digital Token (QR Code)** for the order along with a friendly **Order ID** (e.g., `#DEC25-0026`).
   - This QR code is used for order verification at the counter.
 
 ---
@@ -55,9 +55,9 @@ This document provides a comprehensive overview of the features implemented in t
 - **Real-Time Tracking**: Auto-refreshes every 5 seconds to fetch new orders.
 - **Audio Alerts**: Plays a notification sound when a new order arrives.
 - **Visual Urgency System**:
-  - **🟢 Green**: Fresh order (< 10 mins).
-  - **🟡 Yellow**: Delayed (> 10 mins).
-  - **🔴 Red Pulse**: Critical/Late (> 20 mins) - The card pulses visually to attract attention.
+  - **🟢 Green (Pastel)**: Fresh order (< 10 mins).
+  - **🟡 Yellow (Pastel)**: Delayed (> 10 mins).
+  - **🔴 Red (Pastel)**: Critical/Late (> 20 mins) - The card pulses visually to attract attention.
 - **Status Management**:
   - Admins can update status: `RECEIVED` → `PREPARING` → `DONE` → `SOLD`.
   - One-click **"Mark as Ready"** button for quick kitchen throughput.

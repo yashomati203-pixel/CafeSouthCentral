@@ -8,7 +8,14 @@ export async function GET() {
         console.log("API: Fetching orders...");
         const orders = await prisma.order.findMany({
             include: {
-                user: true,
+                user: {
+                    include: {
+                        subscriptions: {
+                            where: { isActive: true },
+                            take: 1
+                        }
+                    }
+                },
                 items: {
                     include: {
                         menuItem: true

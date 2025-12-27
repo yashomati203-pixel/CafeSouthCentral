@@ -19,12 +19,13 @@ interface OrderItem {
 interface Order {
     id: string;
     displayId?: string;
-    user: { name: string; phone: string };
+    user: { name: string; phone: string; subscriptions: any[] };
     items: OrderItem[];
     totalAmount: number;
     status: string;
     createdAt: string;
     timeSlot?: string;
+    mode?: string;
 }
 
 export default function AdminDashboard() {
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
 
     const fetchInventory = async () => {
         try {
-            const res = await fetch('/api/menu');
+            const res = await fetch('/api/menu', { cache: 'no-store' }); // Force fresh data
             if (res.ok) {
                 const data = await res.json();
                 setMenuItems(data);
@@ -164,9 +165,12 @@ export default function AdminDashboard() {
     // Color Logic for Urgency
     const getUrgencyStyle = (createdAt: string) => {
         const diffMinutes = (new Date().getTime() - new Date(createdAt).getTime()) / 60000;
-        if (diffMinutes > 20) return { borderLeft: '6px solid #ef4444', animation: 'pulse 2s infinite' }; // Red Pulse
-        if (diffMinutes > 10) return { borderLeft: '6px solid #f59e0b' }; // Yellow
-        return { borderLeft: '6px solid #10b981' }; // Green
+        // Red - Urgent (>20 mins)
+        if (diffMinutes > 20) return { borderLeft: '6px solid #ef4444', backgroundColor: '#fee2e2', animation: 'pulse 2s infinite' };
+        // Yellow - Warning (>10 mins)
+        if (diffMinutes > 10) return { borderLeft: '6px solid #f59e0b', backgroundColor: '#fef9c3' };
+        // Green - Fresh (<10 mins)
+        return { borderLeft: '6px solid #10b981', backgroundColor: '#dcfce7' };
     };
 
     return (
@@ -325,34 +329,52 @@ export default function AdminDashboard() {
             {/* STOCK MANAGEMENT TAB */}
             {activeTab === 'stock' && (
                 <div style={{ paddingBottom: '4rem' }}>
-                    {/* Category Filter Tabs */}
-                    <div style={{
-                        display: 'flex',
-                        gap: '1rem',
-                        overflowX: 'auto',
-                        paddingBottom: '1rem',
-                        marginBottom: '1rem',
-                        scrollbarWidth: 'none'
-                    }}>
-                        {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                style={{
-                                    padding: '0.5rem 1.5rem',
-                                    borderRadius: '999px',
-                                    border: 'none',
-                                    backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#EEE',
-                                    color: selectedCategory === cat ? 'white' : '#666',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    whiteSpace: 'nowrap',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        {/* Category Filter Tabs */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '1rem',
+                            overflowX: 'auto',
+                            scrollbarWidth: 'none'
+                        }}>
+                            {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    style={{
+                                        padding: '0.5rem 1.5rem',
+                                        borderRadius: '999px',
+                                        border: 'none',
+                                        backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#EEE',
+                                        color: selectedCategory === cat ? 'white' : '#666',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        whiteSpace: 'nowrap',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Manual Refresh Button */}
+                        <button
+                            onClick={() => fetchInventory()}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                padding: '0.5rem 1rem',
+                                backgroundColor: 'white',
+                                border: '1px solid #ddd',
+                                borderRadius: '0.5rem',
+                                cursor: 'pointer',
+                                color: '#5C3A1A',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            🔄 Refresh
+                        </button>
                     </div>
 
                     {Object.entries(
@@ -397,35 +419,89 @@ export default function AdminDashboard() {
 
             {/* HISTORY TAB */}
             {activeTab === 'sold' && (
-                <div>
-                    {/* Reuse existing history table logic or simplify */}
-                    {Object.entries(soldOrdersByDate).map(([date, dayOrders]) => (
-                        <div key={date} style={{ marginBottom: '2rem' }}>
-                            <h3 style={{ marginBottom: '1rem', color: '#666' }}>{date} ({dayOrders.length})</h3>
-                            {dayOrders.map(order => (
-                                <div key={order.id} style={{ backgroundColor: 'white', padding: '1rem', marginBottom: '0.5rem', borderRadius: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>#{order.displayId} - {order.user?.name}</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <span style={{ fontWeight: 'bold' }}>₹{order.totalAmount}</span>
-                                        <button
-                                            onClick={() => updateStatus(order.id, 'DONE')}
-                                            style={{
-                                                padding: '0.25rem 0.75rem',
-                                                fontSize: '0.8rem',
-                                                backgroundColor: '#fff',
-                                                border: '1px solid #ddd',
-                                                borderRadius: '0.25rem',
-                                                cursor: 'pointer',
-                                                color: '#666'
-                                            }}
-                                        >
-                                            Undo
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
+                <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                    {soldOrders.length === 0 ? (
+                        <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>No history available</div>
+                    ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                            <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                <tr>
+                                    <th style={{ padding: '1rem', textAlign: 'left', color: '#6b7280' }}>Order ID</th>
+                                    <th style={{ padding: '1rem', textAlign: 'left', color: '#6b7280' }}>Date</th>
+                                    <th style={{ padding: '1rem', textAlign: 'left', color: '#6b7280' }}>Customer</th>
+                                    <th style={{ padding: '1rem', textAlign: 'left', color: '#6b7280' }}>Type</th>
+                                    <th style={{ padding: '1rem', textAlign: 'left', color: '#6b7280' }}>Items</th>
+                                    <th style={{ padding: '1rem', textAlign: 'right', color: '#6b7280' }}>Total</th>
+                                    <th style={{ padding: '1rem', textAlign: 'right', color: '#6b7280' }}>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {soldOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(order => (
+                                    <tr key={order.id} style={{ borderBottom: '1px solid #eee' }}>
+                                        <td style={{ padding: '1rem', fontWeight: 'bold' }}>#{order.displayId || order.id.slice(0, 5)}</td>
+                                        <td style={{ padding: '1rem', color: '#666' }}>
+                                            {new Date(order.createdAt).toLocaleString()}
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontWeight: '500' }}>{order.user?.name}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#666' }}>{order.user?.phone}</div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.2rem' }}>
+                                                {order.user?.subscriptions?.length > 0 ? (
+                                                    <span style={{
+                                                        backgroundColor: '#dcfce7', color: '#166534',
+                                                        fontSize: '0.65rem', padding: '0.1rem 0.4rem',
+                                                        borderRadius: '4px', fontWeight: 'bold', textTransform: 'uppercase'
+                                                    }}>
+                                                        Member
+                                                    </span>
+                                                ) : (
+                                                    <span style={{
+                                                        padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold',
+                                                        backgroundColor: order.mode === 'SUBSCRIPTION' ? '#dbeafe' : '#f3f4f6',
+                                                        color: order.mode === 'SUBSCRIPTION' ? '#1e40af' : '#374151'
+                                                    }}>
+                                                        {order.mode || 'NORMAL'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            {order.items.map((item, idx) => (
+                                                <div key={idx} style={{ marginBottom: '0.2rem' }}>
+                                                    {item.quantity}x {item.name}
+                                                </div>
+                                            ))}
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold' }}>
+                                            ₹{order.totalAmount}
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                            <button
+                                                onClick={() => updateStatus(order.id, 'DONE')}
+                                                style={{
+                                                    padding: '0.4rem 0.8rem',
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #d1d5db',
+                                                    borderRadius: '0.375rem',
+                                                    color: '#374151',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.8rem',
+                                                    transition: 'all 0.2s',
+                                                    display: 'inline-flex', alignItems: 'center', gap: '0.3rem'
+                                                }}
+                                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                            >
+                                                ↩ Undo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             )}
         </div>

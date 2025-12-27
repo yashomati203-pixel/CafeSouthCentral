@@ -63,6 +63,21 @@ All notable changes to the **Cafe South Central** project will be documented in 
 - **Feature Documentation**: Created `FEATURES.md` listing all application capabilities.
 - **Changelog**: Initialized `CHANGELOG.md` to track project history.
 
+## [2025-12-27]
+### User Experience (UX)
+- **Order Success Screen**:
+  - Removed auto-close timer to prevent users from missing the confirmation.
+  - Added a dedicated "Close" button.
+  - Displayed "Friendly Order ID" (e.g., `#DEC25-0026`) instead of database UUIDs for easier verification.
+- **Order History**:
+  - **Status Updates**: Display "Ready for Pickup" (Green) for ready orders and "Completed" (Gray) for sold orders.
+  - **QR Code Visibility**: Now visible for "RECEIVED" and "DONE" (Ready) orders, ensuring access at all relevant stages.
+
+### Admin Dashboard
+- **Visual Improvements**:
+  - **Pastel Cards**: Enhanced urgency indicators with full pastel background colors (Red/Yellow/Green) for better readability.
+- **Order Management**: Synced "Ready for Pickup" status with the user-facing UI.
+
 ---
 
 *Note: This changelog is reconstructed from development history and may not capture every minor commit.*

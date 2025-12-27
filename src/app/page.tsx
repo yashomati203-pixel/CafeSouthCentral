@@ -11,7 +11,7 @@ import LoginPage from '@/components/auth/LoginPage';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
 import LandingPage from '@/components/marketing/LandingPage';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock Data for Display
 const MOCK_MENU: MenuItem[] = [
@@ -116,6 +116,8 @@ export default function DashboardPage() {
         }
     };
 
+    const searchParams = useSearchParams();
+
     // Load user from storage with safety timeout
     useEffect(() => {
         const checkUser = () => {
@@ -132,7 +134,13 @@ export default function DashboardPage() {
                     setUser(parsedUser);
                     setHasExplored(true); // If logged in, skip landing page
                 } else {
-                    // No user, stay in Landing unless explored
+                    // No user, check URL params for guest mode
+                    const mode = searchParams.get('mode');
+                    if (mode === 'guest') {
+                        setHasExplored(true);
+                    } else {
+                        setHasExplored(false);
+                    }
                 }
             } catch (e) {
                 console.error("Failed to parse user", e);
@@ -144,7 +152,7 @@ export default function DashboardPage() {
         // Run check immediately or after short delay to allow hydration
         const timer = setTimeout(checkUser, 100);
         return () => clearTimeout(timer);
-    }, [router]);
+    }, [router, searchParams]); // Added searchParams dependency
 
     // Initial Data Fetch
     useEffect(() => {
@@ -229,7 +237,10 @@ export default function DashboardPage() {
         sessionStorage.removeItem('cafe_user');
         setUser(null);
         setSubscriptionData(null);
-        setHasExplored(false); // Go back to Landing? Or Guest Menu? Let's go to Landing for dramatic effect.
+
+        // Return to landing page cleanly
+        router.push('/');
+        setHasExplored(false);
     };
 
     // Connect to Cart Context
@@ -262,13 +273,12 @@ export default function DashboardPage() {
                 gap: 2rem;
             }
             
-            @media (min-width: 768px) {
-                .layout-content.with-sidebar {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1fr) 400px;
-                    align-items: start;
-                }
-            }
+                    @media (min-width: 768px) {
+                        .layout-content.with-sidebar {
+                            display: grid;
+                            grid-template-columns: minmax(0, 1fr) 400px;
+                        }
+                    }
         `}</style>
     );
 
@@ -279,9 +289,14 @@ export default function DashboardPage() {
 
                 {layoutStyles}
                 <LandingPage
-                    onExplore={() => setHasExplored(true)}
+                    onExplore={() => {
+                        // Push query param for back button support
+                        router.push('?mode=guest');
+                        setHasExplored(true);
+                    }}
                     onCategorySelect={(category) => {
                         setSelectedCategory(category);
+                        router.push('?mode=guest'); // Also sync URL here
                         setHasExplored(true);
                     }}
                 />
@@ -325,7 +340,15 @@ export default function DashboardPage() {
                 marginBottom: '2rem'
             }}>
                 <div>
-                    <div>
+                    <div
+                        onClick={() => {
+                            router.push('/');
+                            // Also manually reset state if needed, though useEffect should handle it
+                            // but for faster feedback:
+                            if (!user) setHasExplored(false);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                    >
                         <img
                             src="/logo.png"
                             alt="Cafe South Central"
@@ -428,40 +451,47 @@ export default function DashboardPage() {
                                         backgroundColor: 'white',
                                         padding: '0.5rem',
                                         borderRadius: '0.5rem',
-                                        boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
-                                        minWidth: '150px',
-                                        zIndex: 1000
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                                        minWidth: '160px',
+                                        zIndex: 1000,
+                                        marginRight: '1rem'
                                     }}
                                     sideOffset={5}
                                 >
                                     <DropdownMenu.Item
+                                        className="DropdownMenuItem"
+                                        onSelect={() => router.push('/orders')}
+                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
+                                    >
+                                        <span>📜</span> Order History
+                                    </DropdownMenu.Item>
+
+                                    <DropdownMenu.Item
+                                        className="DropdownMenuItem"
+                                        onSelect={() => router.push('/subscription')}
+                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
+                                    >
+                                        <span>✨</span> Subscription Plans
+                                    </DropdownMenu.Item>
+
+                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
+
+                                    <DropdownMenu.Item
+                                        className="DropdownMenuItem"
                                         onSelect={handleLogout}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             padding: '0.5rem',
-                                            color: 'red',
+                                            color: '#dc2626',
                                             cursor: 'pointer',
                                             borderRadius: '0.25rem',
                                             outline: 'none',
+                                            gap: '0.5rem',
+                                            fontWeight: 500
                                         }}
                                     >
-                                        Log out
-                                    </DropdownMenu.Item>
-                                    <DropdownMenu.Item
-                                        onSelect={() => router.push('/subscription')}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '0.5rem',
-                                            color: '#5C3A1A',
-                                            cursor: 'pointer',
-                                            borderRadius: '0.25rem',
-                                            outline: 'none',
-                                            fontWeight: '500'
-                                        }}
-                                    >
-                                        Subscription Plans
+                                        <span>🚪</span> Log out
                                     </DropdownMenu.Item>
                                 </DropdownMenu.Content>
                             </DropdownMenu.Portal>

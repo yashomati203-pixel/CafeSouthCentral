@@ -3,8 +3,9 @@
 import { TrashIcon } from '@radix-ui/react-icons';
 import { useCart } from '@/context/CartContext';
 import styles from './CartDrawer.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OrderConfirmed from '@/components/ui/OrderConfirmed';
+import { QRCodeSVG } from 'qrcode.react';
 
 
 interface CartProps {
@@ -33,6 +34,10 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
 
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
     const [lastOrderId, setLastOrderId] = useState<string | undefined>(undefined);
+    const [lastDisplayId, setLastDisplayId] = useState<string | undefined>(undefined);
+
+    // Auto-close Effect REMOVED by user request
+    // useEffect(() => { ... }, []);
 
     // If drawer is closed, don't render anything (unless we want to keep it mounted for transitions, but simple is better)
     if (!isOpen && variant === 'drawer') return null;
@@ -41,6 +46,13 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     const hasSubscription = subscriptionItems.length > 0;
     const hasNormal = normalItems.length > 0;
     const isMixed = hasSubscription && hasNormal;
+
+    const handleAnimationComplete = () => {
+        setShowSuccessAnimation(false);
+        clearCart();
+        onClose();
+        if (onOrderSuccess) onOrderSuccess();
+    };
 
     const handleCheckout = async () => {
         try {
@@ -72,6 +84,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 }
                 const data = await response.json();
                 if (data.orderId) setLastOrderId(data.orderId);
+                if (data.displayId) setLastDisplayId(data.displayId);
             }
 
             // 2. Process Normal Part (Payment + Order Creation)
@@ -118,6 +131,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 const data = await response.json();
                 setIsProcessing(false);
                 if (data.orderId) setLastOrderId(data.orderId);
+                if (data.displayId) setLastDisplayId(data.displayId);
             }
 
             // Success - Trigger Animation
@@ -172,12 +186,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             handleCheckout={handleCheckout}
                             getButtonText={getButtonText}
                             showSuccessAnimation={showSuccessAnimation}
-                            onAnimationComplete={() => {
-                                setShowSuccessAnimation(false);
-                                clearCart();
-                                onClose();
-                                if (onOrderSuccess) onOrderSuccess();
-                            }}
+                            onAnimationComplete={handleAnimationComplete}
+                            lastOrderId={lastOrderId}
+                            displayId={lastDisplayId}
                         />
                     </div>
                 </div>
@@ -209,11 +220,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             handleCheckout={handleCheckout}
                             getButtonText={getButtonText}
                             showSuccessAnimation={showSuccessAnimation}
-                            onAnimationComplete={() => {
-                                setShowSuccessAnimation(false);
-                                onClose();
-                                if (onOrderSuccess) onOrderSuccess();
-                            }}
+                            onAnimationComplete={handleAnimationComplete}
+                            lastOrderId={lastOrderId}
+                            displayId={lastDisplayId}
                         />
                     </div>
                 </div>
@@ -244,8 +253,22 @@ function CartContent({
     getButtonText,
     showSuccessAnimation,
     onAnimationComplete,
-    lastOrderId
+    lastOrderId,
+    displayId
 }: any) {
+    if (showSuccessAnimation) {
+        return (
+            <div className={styles.content} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <OrderConfirmed
+                    inline={true}
+                    onComplete={onAnimationComplete}
+                    orderId={lastOrderId}
+                    displayId={displayId}
+                />
+            </div>
+        );
+    }
+
     return (
         <>
             <div className={styles.content}>
@@ -443,22 +466,14 @@ function CartContent({
                     </div>
                 )}
 
-                {showSuccessAnimation ? (
-                    <OrderConfirmed
-                        inline={true}
-                        onComplete={onAnimationComplete}
-                        orderId={lastOrderId}
-                    />
-                ) : (
-                    <button
-                        className={styles.checkoutBtn}
-                        disabled={subTotalCount > 4 || (!hasSubscription && !hasNormal) || isProcessing}
-                        onClick={handleCheckout}
-                        style={{ opacity: isProcessing ? 0.7 : 1 }}
-                    >
-                        {getButtonText()}
-                    </button>
-                )}
+                <button
+                    className={styles.checkoutBtn}
+                    disabled={subTotalCount > 4 || (!hasSubscription && !hasNormal) || isProcessing}
+                    onClick={handleCheckout}
+                    style={{ opacity: isProcessing ? 0.7 : 1 }}
+                >
+                    {getButtonText()}
+                </button>
             </footer>
         </>
     );

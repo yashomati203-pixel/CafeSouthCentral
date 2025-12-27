@@ -169,7 +169,7 @@ export async function createSubscriptionOrder(userId: string, items: CartItem[])
             }
         });
 
-        return { orderId: newOrder.id, status: 'SUCCESS' };
+        return { orderId: newOrder.id, displayId: newOrder.displayId, status: 'SUCCESS' };
     });
 }
 
@@ -232,6 +232,6 @@ export async function createNormalOrder(
             }
         });
 
-        return { orderId: newOrder.id, totalAmount, status: 'SUCCESS' };
+        return { orderId: newOrder.id, displayId: newOrder.displayId, totalAmount, status: 'SUCCESS' };
     });
 }

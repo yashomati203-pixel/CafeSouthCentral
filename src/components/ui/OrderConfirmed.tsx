@@ -6,9 +6,10 @@ interface OrderConfirmedProps {
     onComplete: () => void;
     inline?: boolean;
     orderId?: string;
+    displayId?: string;
 }
 
-export default function OrderConfirmed({ onComplete, inline = false, orderId }: OrderConfirmedProps) {
+export default function OrderConfirmed({ onComplete, inline = false, orderId, displayId }: OrderConfirmedProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [showQR, setShowQR] = useState(false);
 
@@ -50,7 +51,7 @@ export default function OrderConfirmed({ onComplete, inline = false, orderId }: 
                     borderRadius: '1rem',
                     textAlign: 'center',
                     width: '100%',
-                    height: '100%',
+                    // height: '100%', // Removed to allow natural height
                     animation: 'fadeIn 0.5s ease-out'
                 }}>
                     <style>{`
@@ -64,7 +65,7 @@ export default function OrderConfirmed({ onComplete, inline = false, orderId }: 
                     </div>
 
                     <p style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#333', marginBottom: '2rem' }}>
-                        ID: {orderId || '---'}
+                        Order #{displayId || '---'}
                     </p>
 
                     <button
