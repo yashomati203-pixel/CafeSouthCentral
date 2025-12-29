@@ -1,7 +1,7 @@
 // Force rebuild
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import ModeToggle from '@/components/ui/ModeToggle';
 import SubscriptionSummary from '@/components/dashboard/SubscriptionSummary';
 import { useCart } from '@/context/CartContext';
@@ -60,7 +60,7 @@ const MOCK_MENU: MenuItem[] = [
 
 const CATEGORY_ORDER = ['South Indian', 'Dosa', 'Rice', 'North Indian', 'Snacks', 'Beverages', 'Chaat', 'Dessert'];
 
-export default function DashboardPage() {
+function DashboardContent() {
     const router = useRouter();
     const [user, setUser] = useState<{ id?: string; name: string; phone: string; role?: string } | null>(null);
     const [loading, setLoading] = useState(true);
@@ -91,13 +91,26 @@ export default function DashboardPage() {
                 const data = await res.json();
                 if (Array.isArray(data) && data.length > 0) {
                     setMenuItems(data);
+                    // Cache the fresh menu for offline use
+                    localStorage.setItem('menu_cache', JSON.stringify(data));
                 } else {
                     setMenuItems(MOCK_MENU);
                 }
             }
         } catch (e) {
-            console.error("Failed to fetch menu", e);
-            setMenuItems(MOCK_MENU);
+            console.error("Failed to fetch menu, checking cache...", e);
+            // On failure (offline), try to load from cache
+            const cached = localStorage.getItem('menu_cache');
+            if (cached) {
+                try {
+                    setMenuItems(JSON.parse(cached));
+                    console.log("Loaded menu from offline cache");
+                } catch (parseError) {
+                    setMenuItems(MOCK_MENU);
+                }
+            } else {
+                setMenuItems(MOCK_MENU);
+            }
         } finally {
             setIsMenuLoading(false);
         }
@@ -156,6 +169,16 @@ export default function DashboardPage() {
 
     // Initial Data Fetch
     useEffect(() => {
+        // Optimistic UI: Load from cache immediately if available
+        const cached = localStorage.getItem('menu_cache');
+        if (cached) {
+            try {
+                setMenuItems(JSON.parse(cached));
+                // We don't set loading false here, we let the network request finish
+                // so we can update stock levels if online.
+            } catch (e) { /* Ignore cache errors */ }
+        }
+
         fetchMenu();
     }, []);
 
@@ -192,6 +215,69 @@ export default function DashboardPage() {
             setMode('NORMAL');
         }
     }, [user]);
+
+    // Offline Sync Logic
+    useEffect(() => {
+        const syncOfflineOrders = async () => {
+            if (typeof window === 'undefined') return;
+
+            const pendingStr = localStorage.getItem('pending_orders');
+            if (!pendingStr) return;
+
+            try {
+                const pending = JSON.parse(pendingStr);
+                if (!Array.isArray(pending) || pending.length === 0) return;
+
+                console.log(`Attempting to sync ${pending.length} offline orders...`);
+
+                const remaining = [];
+                let syncedCount = 0;
+
+                for (const order of pending) {
+                    try {
+                        const res = await fetch('/api/orders/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(order.payload)
+                        });
+
+                        if (res.ok) {
+                            syncedCount++;
+                        } else {
+                            // If it failed (e.g. out of stock), we currently keep it locally
+                            // In a real app, maybe flag it as 'Failed' for user to review
+                            console.error("Failed to sync order", await res.text());
+                            remaining.push(order);
+                        }
+                    } catch (e) {
+                        remaining.push(order); // Network fail again
+                    }
+                }
+
+                if (remaining.length !== pending.length) {
+                    localStorage.setItem('pending_orders', JSON.stringify(remaining));
+                    if (syncedCount > 0) {
+                        alert(`Back Online: Synced ${syncedCount} orders successfully!`);
+
+                        // Valid to use these because they are in scope
+                        if (user && mode === 'SUBSCRIPTION') fetchSubscriptionData();
+                        fetchMenu();
+                    }
+                }
+            } catch (e) {
+                console.error("Sync error", e);
+            }
+        };
+
+        window.addEventListener('online', syncOfflineOrders);
+
+        // Try once on mount if we think we are online
+        if (typeof navigator !== 'undefined' && navigator.onLine) {
+            syncOfflineOrders();
+        }
+
+        return () => window.removeEventListener('online', syncOfflineOrders);
+    }, [user, mode]); // Add dependencies needed for fetch hooks if called
 
     const handleLogin = async (userData: { name: string; phone: string }, stayLoggedIn: boolean) => {
         try {
@@ -784,5 +870,13 @@ export default function DashboardPage() {
                 }
             `}</style>
         </main >
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <DashboardContent />
+        </Suspense>
     );
 }

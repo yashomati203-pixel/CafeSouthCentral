@@ -122,3 +122,17 @@ Yes, your **GoDaddy domain will work perfectly**. You do *not* need to transfer 
 *   **Database**: ₹0 (Supabase/Neon)
 *   **Domain**: Purchased from GoDaddy (Yearly renewal cost only).
 *   **Total**: **Free** (excluding domain renewal).
+
+## 6. Offline Capabilities (PWA)
+
+This application is configured as a **Progressive Web App (PWA)** to ensure reliability even with poor or intermittent internet connections.
+
+### Features
+1.  **Installable**: Users can add the app to their home screen on iOS and Android. It opens without the browser UI, feeling like a native app.
+2.  **Offline Asset Caching**: `next-pwa` automatically caches static assets (CSS, JS, Images). If a user loses internet, the app UI will still load.
+3.  **Manifest**: Includes `manifest.json` for proper branding (icons, colors) on mobile devices.
+
+### Configuration
+*   **Library**: `next-pwa`
+*   **Config**: `next.config.js` with `skipWaiting: true` for instant updates.
+*   **Assets**: Icons located in `public/` (served via `manifest.json`).

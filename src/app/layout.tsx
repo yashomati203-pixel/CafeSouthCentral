@@ -6,8 +6,9 @@ import { CartProvider } from '@/context/CartContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'IIM Nagpur Food Outlet',
+    title: 'Cafe South Central',
     description: 'Premium Food Ordering Experience',
+    manifest: '/manifest.json',
 };
 
 export default function RootLayout({

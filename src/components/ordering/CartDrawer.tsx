@@ -54,6 +54,23 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
         if (onOrderSuccess) onOrderSuccess();
     };
 
+    const saveOfflineOrder = (payload: any, mode: 'SUBSCRIPTION' | 'NORMAL') => {
+        const offlineId = `OFFLINE-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const pendingOrder = {
+            payload,
+            mode,
+            tempId: offlineId,
+            createdAt: Date.now(),
+            status: 'PENDING_SYNC'
+        };
+
+        const existing = JSON.parse(localStorage.getItem('pending_orders') || '[]');
+        existing.push(pendingOrder);
+        localStorage.setItem('pending_orders', JSON.stringify(existing));
+
+        return { orderId: offlineId, displayId: 'WAITING-NET' };
+    };
+
     const handleCheckout = async () => {
         try {
             if (isProcessing) return;
@@ -63,28 +80,50 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 return;
             }
 
-            // Time slot check removed
+            // CHECK ONLINE STATUS FIRST
+            const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
+            const processOrder = async (payload: any, mode: 'SUBSCRIPTION' | 'NORMAL') => {
+                if (isOffline) {
+                    return saveOfflineOrder(payload, mode);
+                }
+
+                try {
+                    const response = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        let data;
+                        try { data = JSON.parse(text); } catch (e) { throw new Error('Server error'); }
+                        throw new Error(data.error || 'Request failed');
+                    }
+                    return await response.json();
+                } catch (e: any) {
+                    // If network error (fetch failed completely), treat as offline if likely network issue
+                    // Note: 'TypeError: Failed to fetch' is the standard network error message
+                    if (e.message === 'Failed to fetch' || e.message.includes('NetworkError')) {
+                        console.log("Network request failed, saving offline.");
+                        return saveOfflineOrder(payload, mode);
+                    }
+                    throw e;
+                }
+            };
 
             // 1. Process Subscription Part
             if (hasSubscription) {
-                const response = await fetch('/api/orders/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: user.id,
-                        items: subscriptionItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
-                        mode: 'SUBSCRIPTION',
-                    })
-                });
+                const subPayload = {
+                    userId: user.id,
+                    items: subscriptionItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
+                    mode: 'SUBSCRIPTION',
+                };
 
-                if (!response.ok) {
-                    const data = await response.json();
-                    setIsProcessing(false);
-                    throw new Error(data.error || 'Subscription Redemption failed');
-                }
-                const data = await response.json();
-                if (data.orderId) setLastOrderId(data.orderId);
-                if (data.displayId) setLastDisplayId(data.displayId);
+                const result = await processOrder(subPayload, 'SUBSCRIPTION');
+                if (result.orderId) setLastOrderId(result.orderId);
+                if (result.displayId) setLastDisplayId(result.displayId);
             }
 
             // 2. Process Normal Part (Payment + Order Creation)
@@ -94,52 +133,27 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     return;
                 }
 
-                // Simulate Payment Processing for UPI and SCAN
-                if (paymentMethod === 'UPI' || paymentMethod === 'SCAN') {
+                if (!isOffline && (paymentMethod === 'UPI' || paymentMethod === 'SCAN')) {
                     setIsProcessing(true);
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
 
-                // Call API for Normal Order
-                const response = await fetch('/api/orders/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: user.id,
-                        items: normalItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
-                        mode: 'NORMAL',
-                        paymentMethod: paymentMethod,
-                        upiId: paymentMethod === 'UPI' ? upiId : undefined,
-                    })
-                });
+                const normalPayload = {
+                    userId: user.id,
+                    items: normalItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
+                    mode: 'NORMAL',
+                    paymentMethod: paymentMethod,
+                    upiId: paymentMethod === 'UPI' ? upiId : undefined,
+                };
 
-                if (!response.ok) {
-                    const text = await response.text();
-                    let data;
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        console.error('API Error (Normal):', text);
-                        setIsProcessing(false);
-                        throw new Error('Server error: Please check console for details.');
-                    }
-
-                    setIsProcessing(false);
-                    throw new Error(data.error || 'Order Creation failed');
-                }
-
-                const data = await response.json();
-                setIsProcessing(false);
-                if (data.orderId) setLastOrderId(data.orderId);
-                if (data.displayId) setLastDisplayId(data.displayId);
+                const result = await processOrder(normalPayload, 'NORMAL');
+                if (result.orderId) setLastOrderId(result.orderId);
+                if (result.displayId) setLastDisplayId(result.displayId);
             }
 
-            // Success - Trigger Animation
+            // Success
+            setIsProcessing(false);
             setShowSuccessAnimation(true);
-            // clearCart(); -> Moved to animation completion
-            // onClose();
-            // if (onOrderSuccess) onOrderSuccess();
-            // alert("Order Placed Successfully!");
 
         } catch (err: any) {
             setIsProcessing(false);
