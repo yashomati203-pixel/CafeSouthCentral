@@ -177,7 +177,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     <div className={styles.drawer}>
                         <header className={styles.header}>
                             <h2>Your Order</h2>
-                            <button onClick={onClose} className={styles.closeBtn}>×</button>
+                            <button onClick={showSuccessAnimation ? handleAnimationComplete : onClose} className={styles.closeBtn}>×</button>
                         </header>
 
                         <CartContent
