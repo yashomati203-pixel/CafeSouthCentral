@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
+import { requestNotificationPermission, sendLocalNotification } from '@/lib/notifications';
 
 export default function OrderHistoryPage() {
     const router = useRouter();
@@ -22,17 +23,40 @@ export default function OrderHistoryPage() {
 
     useEffect(() => {
         if (user?.id) {
-            fetch(`/api/user/orders?userId=${user.id}`)
-                .then(res => res.json())
-                .then(data => {
-                    setOrders(Array.isArray(data) ? data : []);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error("Failed to fetch orders", err);
-                    setLoading(false);
-                });
+            const interval = setInterval(() => {
+                fetch(`/api/user/orders?userId=${user.id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            // Check for status updates
+                            data.forEach(newOrder => {
+                                const oldOrder = orders.find(o => o.id === newOrder.id);
+                                if (oldOrder && oldOrder.status !== 'DONE' && newOrder.status === 'DONE') {
+                                    sendLocalNotification(
+                                        "Order Ready! 🍽️",
+                                        `Order #${newOrder.displayId || newOrder.id.slice(0, 5)} is ready for pickup.`
+                                    );
+                                }
+                            });
+                            setOrders(data);
+                        }
+                        setLoading(false);
+                    })
+                    .catch(e => console.error(e));
+            }, 5000); // Poll every 5 seconds for updates
+
+            return () => clearInterval(interval);
         }
+    }, [user, orders]); // Depend on orders to compare
+
+    useEffect(() => {
+        // Initial Fetch
+        if (user?.id) {
+            fetch(`/api/user/orders?userId=${user.id}`).then(res => res.json()).then(setOrders);
+        }
+
+        // Request Permission
+        requestNotificationPermission();
     }, [user]);
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading history...</div>;
