@@ -11,6 +11,7 @@ import LoginPage from '@/components/auth/LoginPage';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
 import LandingPage from '@/components/marketing/LandingPage';
+import FeedbackModal from '@/components/feedback/FeedbackModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock Data for Display
@@ -79,6 +80,9 @@ function DashboardContent() {
 
     // Feature Loop: Subscription Hook
     const [showInvitation, setShowInvitation] = useState(false);
+
+    // Feature Loop: Feedback
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     // Feature Loop: Smart Inventory
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -418,6 +422,14 @@ function DashboardContent() {
                 onClose={() => setShowInvitation(false)}
             />
 
+            {user && (
+                <FeedbackModal
+                    isOpen={showFeedbackModal}
+                    onClose={() => setShowFeedbackModal(false)}
+                    userId={user.id || ''}
+                />
+            )}
+
             {/* Header Section */}
             <header style={{
                 display: 'flex',
@@ -558,6 +570,16 @@ function DashboardContent() {
                                         style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
                                     >
                                         <span>✨</span> Subscription Plans
+                                    </DropdownMenu.Item>
+
+                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
+
+                                    <DropdownMenu.Item
+                                        className="DropdownMenuItem"
+                                        onSelect={() => setShowFeedbackModal(true)}
+                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
+                                    >
+                                        <span>⭐</span> Feedback
                                     </DropdownMenu.Item>
 
                                     <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />

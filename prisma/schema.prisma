@@ -54,6 +54,16 @@ model User {
   subscriptions UserSubscription[]
   orders        Order[]
   dailyUsages   DailyUsage[]
+  feedbacks     Feedback[]
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
 }
 
 model MenuItem {

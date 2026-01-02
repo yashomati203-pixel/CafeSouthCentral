@@ -1,7 +1,7 @@
-import { MenuItem, User, UserSubscription, DailyUsage, Order, OrderItem, UserRole, MenuItemType, PlanType, OrderStatus, OrderMode } from '@prisma/client';
+import { MenuItem, User, UserSubscription, DailyUsage, Order, OrderItem, Feedback, UserRole, MenuItemType, PlanType, OrderStatus, OrderMode } from '@prisma/client';
 
 export { UserRole, MenuItemType, PlanType, OrderStatus, OrderMode };
-export type { MenuItem, User, UserSubscription, DailyUsage, Order, OrderItem };
+export type { MenuItem, User, UserSubscription, DailyUsage, Order, OrderItem, Feedback };
 
 // Ensure backwards compatibility if needed, or alias where names differ.
 // Previous: export interface MenuItem { ... }
