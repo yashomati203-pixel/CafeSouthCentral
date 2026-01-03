@@ -16,6 +16,10 @@ import FeedbackModal from '@/components/feedback/FeedbackModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMenu } from '@/hooks/useMenu';
 import MenuGrid from '@/components/dashboard/MenuGrid';
+import MobileHeader from '@/components/layout/MobileHeader';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import StickyCartSummary from '@/components/ordering/StickyCartSummary';
+import MobileProfileMenu from '@/components/layout/MobileProfileMenu';
 
 function DashboardContent() {
     const router = useRouter();
@@ -39,6 +43,7 @@ function DashboardContent() {
 
     // Feature Loop: Feedback
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     // Dark Mode
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -302,10 +307,9 @@ function DashboardContent() {
         }
 
         addToCart(item, mode);
-        // Auto-open drawer on mobile/tablet (if sidebar is likely hidden)
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-            setIsCartOpen(true);
-        }
+        // User requested to NOT auto-open cart on mobile (Step Id: 83)
+        // Only open if sidebar is visible (desktop) or let user explicitly open it
+
     };
 
     // Define styles here to ensure they are available
@@ -317,6 +321,13 @@ function DashboardContent() {
                 display: flex;
                 flex-direction: column;
                 gap: 2rem;
+                padding-bottom: 100px; /* Space for Bottom Nav */
+            }
+            
+            @media (min-width: 768px) {
+                .layout-content {
+                    padding-bottom: 0;
+                }
             }
             
                     @media (min-width: 768px) {
@@ -387,9 +398,25 @@ function DashboardContent() {
                 />
             )}
 
-            {/* Header Section */}
-            <header style={{
-                display: 'flex',
+            {/* Mobile Components */}
+            <MobileHeader
+                user={user}
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                onLoginClick={() => setShowLoginModal(true)}
+                onProfileClick={() => user ? setShowProfileMenu(true) : setShowLoginModal(true)}
+            />
+
+            <MobileProfileMenu
+                isOpen={showProfileMenu}
+                onClose={() => setShowProfileMenu(false)}
+                user={user}
+                onLogout={handleLogout}
+                onFeedback={() => setShowFeedbackModal(true)}
+            />
+
+            {/* Desktop Header Section (Hidden on Mobile) */}
+            <header className="hidden md:flex" style={{
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '2rem'
@@ -645,7 +672,7 @@ function DashboardContent() {
                 )}
             </div>
 
-            {/* Cart Drawer Overlay (Mobile) */}
+            {/* Cart Drawer Overlay (Mobile - now accessed via Bottom Nav or Sticky Bar) */}
             <div className="mobile-drawer-wrapper">
                 <CartDrawer
                     isOpen={isCartOpen}
@@ -658,6 +685,14 @@ function DashboardContent() {
                     variant="drawer"
                 />
             </div>
+
+            <StickyCartSummary onViewCart={() => setIsCartOpen(true)} />
+
+            <MobileBottomNav
+                user={user}
+                onCartClick={() => setIsCartOpen(true)}
+                onProfileClick={() => user ? setShowProfileMenu(true) : setShowLoginModal(true)}
+            />
             <style>{`
                 /* Desktop Sidebar: Hidden by default (Mobile), Block on Desktop */
                 .desktop-sidebar {
