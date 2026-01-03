@@ -43,6 +43,7 @@ function DashboardContent() {
 
     // Feature Loop: Feedback
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [feedbackOrderId, setFeedbackOrderId] = useState<string | null>(null);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     // Dark Mode
@@ -84,6 +85,46 @@ function DashboardContent() {
     };
 
     const searchParams = useSearchParams();
+
+    // Check for pending feedback on load
+    useEffect(() => {
+        if (user?.id) {
+            fetch(`/api/feedback/pending?userId=${user.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Check if pendingOrder exists
+                    if (data.pendingOrder) {
+                        setFeedbackOrderId(data.pendingOrder.id);
+                        setTimeout(() => setShowFeedbackModal(true), 2000);
+                    }
+                })
+                .catch(e => console.error("Feedback check failed", e));
+        }
+    }, [user]);
+
+    // Handle Feedback Submit
+    const handleFeedbackSubmit = async (rating: number, comment: string) => {
+        try {
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user?.id,
+                    orderId: feedbackOrderId,
+                    rating,
+                    comment
+                })
+            });
+
+            if (res.ok) {
+                setShowFeedbackModal(false);
+                setFeedbackOrderId(null);
+                // Optional: Show success toast
+            }
+        } catch (e) {
+            console.error("Feedback submit error", e);
+        }
+    };
 
     // Load user from storage with safety timeout
     useEffect(() => {
@@ -288,6 +329,7 @@ function DashboardContent() {
         setIsMember(false);
         setMode('NORMAL');
         setSubscriptionData(null);
+        setFeedbackOrderId(null);
 
         // Return to landing page cleanly
         router.push('/');
@@ -309,6 +351,7 @@ function DashboardContent() {
         addToCart(item, mode);
         // User requested to NOT auto-open cart on mobile (Step Id: 83)
         // Only open if sidebar is visible (desktop) or let user explicitly open it
+        // if (window.innerWidth < 768) setIsCartOpen(true); 
 
     };
 
@@ -330,12 +373,13 @@ function DashboardContent() {
                 }
             }
             
-                    @media (min-width: 768px) {
-                        .layout-content.with-sidebar {
-                            display: grid;
-                            grid-template-columns: minmax(0, 1fr) 400px;
-                        }
-                    }
+            /* Sidebar Layout for Desktop */
+            @media (min-width: 768px) {
+                .layout-content.with-sidebar {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) 400px;
+                }
+            }
         `}</style>
     );
 
@@ -393,8 +437,10 @@ function DashboardContent() {
             {user && (
                 <FeedbackModal
                     isOpen={showFeedbackModal}
-                    onClose={() => setShowFeedbackModal(false)}
-                    userId={user.id || ''}
+                    onClose={() => {
+                        setShowFeedbackModal(false);
+                    }}
+                    onSubmit={handleFeedbackSubmit}
                 />
             )}
 

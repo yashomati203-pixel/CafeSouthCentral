@@ -11,8 +11,26 @@ export async function PATCH(
 
         const updatedOrder = await prisma.order.update({
             where: { id: params.id },
-            data: { status: status as OrderStatus }
+            data: { status: status as OrderStatus },
+            include: { user: true }
         });
+
+        // Send Push Notification if Ready
+        if ((status === 'DONE' || status === 'READY') && updatedOrder.user?.fcmToken) {
+            try {
+                // Dynamically import to avoid build errors if lib is missing during dev
+                const { messaging } = await import('@/lib/firebase-admin');
+                await messaging.send({
+                    token: updatedOrder.user.fcmToken,
+                    notification: {
+                        title: 'Order Ready! 🍽️',
+                        body: `Order #${updatedOrder.displayId || updatedOrder.id.slice(0, 5)} is ready for pickup.`
+                    }
+                });
+            } catch (e) {
+                console.error("Failed to send push notification", e);
+            }
+        }
 
         return NextResponse.json(updatedOrder);
     } catch (error) {

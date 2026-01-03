@@ -82,6 +82,46 @@ export default function MobileProfileMenu({
                         <span className="font-medium">Send Feedback</span>
                     </button>
 
+                    <button
+                        onClick={async () => {
+                            const { requestNotificationPermission } = await import('@/lib/notifications');
+                            const granted = await requestNotificationPermission();
+                            if (granted) {
+                                try {
+                                    // Dynamically import to ensure client-side execution
+                                    const { getMessaging, getToken } = await import('firebase/messaging');
+                                    const { app } = await import('@/lib/firebase');
+
+                                    const messaging = getMessaging(app);
+                                    const token = await getToken(messaging, {
+                                        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+                                    });
+
+                                    if (token) {
+                                        await fetch('/api/notifications/register', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ userId: user.id, token })
+                                        });
+                                        alert('Notifications enabled! 🔔');
+                                    } else {
+                                        alert('Could not generate token. Try checking browser settings.');
+                                    }
+                                } catch (e) {
+                                    console.error("Token error", e);
+                                    alert(`Error enabling notifications: ${e.message}`);
+                                }
+                            } else {
+                                alert('Permission denied. Please enable notifications in browser settings.');
+                            }
+                            onClose();
+                        }}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        <span className="w-5 h-5 text-center">🔔</span>
+                        <span className="font-medium">Enable Notifications</span>
+                    </button>
+
                     <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
 
                     <button

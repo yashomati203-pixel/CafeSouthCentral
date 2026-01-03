@@ -1,40 +1,31 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // Assuming this is where prisma is exported
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-import { rateLimit } from '@/lib/rate-limit';
-
-export async function POST(req: Request) {
-    // Rate Limiting
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
-    if (!rateLimit(ip, { limit: 5, windowMs: 60000 })) { // 5 feedbacks per minute per IP
-        return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
-    }
-
+export async function POST(req: NextRequest) {
     try {
-        const body = await req.json();
-        const { userId, rating, comment } = body;
+        const { userId, rating, comment, orderId } = await req.json();
 
         if (!userId || !rating) {
-            return NextResponse.json(
-                { error: 'User ID and rating are required' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+        }
+
+        const data: any = {
+            userId,
+            rating,
+            comment,
+        };
+
+        if (orderId) {
+            data.orderId = orderId;
         }
 
         const feedback = await prisma.feedback.create({
-            data: {
-                userId,
-                rating,
-                comment,
-            },
+            data
         });
 
-        return NextResponse.json(feedback, { status: 201 });
+        return NextResponse.json(feedback);
     } catch (error) {
-        console.error('Error submitting feedback:', error);
-        return NextResponse.json(
-            { error: 'Failed to submit feedback' },
-            { status: 500 }
-        );
+        console.error("Error submitting feedback:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

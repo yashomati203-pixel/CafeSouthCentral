@@ -48,6 +48,7 @@ export default function AdminDashboard() {
 
     // Inventory State
     const [menuItems, setMenuItems] = useState<any[]>([]);
+    const [isInventoryLoading, setIsInventoryLoading] = useState(true);
 
     // Feedback State
     const [feedbacks, setFeedbacks] = useState<any[]>([]);
@@ -137,17 +138,24 @@ export default function AdminDashboard() {
         }
     };
 
+
+
+    // ... (inside fetchInventory)
     const fetchInventory = async () => {
         try {
-            const res = await fetch('/api/menu', { cache: 'no-store' }); // Force fresh data
+            const res = await fetch('/api/menu', { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 setMenuItems(data);
             }
         } catch (e) {
             console.error("Failed to fetch inventory", e);
+        } finally {
+            setIsInventoryLoading(false);
         }
     };
+
+
 
     const fetchUsers = async () => {
         try {
@@ -232,6 +240,30 @@ export default function AdminDashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#5C3A1A' }}>Admin Control Tower</h1>
                 <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button
+                        onClick={async () => {
+                            if (confirm('Send "Lunch Time" notification to all users?')) {
+                                try {
+                                    const res = await fetch('/api/admin/broadcast', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            title: "It's Lunch Time! 🍛",
+                                            body: "Avoid the queue! Pre-order your food now and pick it up fresh."
+                                        })
+                                    });
+                                    const data = await res.json();
+                                    if (data.success) alert(`Sent to ${data.sentCount} users!`);
+                                    else alert(`Failed to send: ${data.details || data.error || JSON.stringify(data)}`);
+                                } catch (e) {
+                                    alert('Error broadcasting');
+                                }
+                            }
+                        }}
+                        style={{ padding: '0.5rem 1rem', backgroundColor: '#eab308', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                        📢 Lunch Bell
+                    </button>
                     <button
                         onClick={() => window.location.href = '/admin-scan'}
                         style={{ padding: '0.5rem 1rem', backgroundColor: '#5C3A1A', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -488,7 +520,8 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     ))}
-                    {menuItems.length === 0 && <div style={{ padding: '2rem', textAlign: 'center' }}>Loading inventory...</div>}
+                    {menuItems.length === 0 && isInventoryLoading && <div style={{ padding: '2rem', textAlign: 'center' }}>Loading inventory...</div>}
+                    {menuItems.length === 0 && !isInventoryLoading && <div style={{ padding: '2rem', textAlign: 'center' }}>No items found in database (checked /api/menu).</div>}
                 </div>
             )}
 
