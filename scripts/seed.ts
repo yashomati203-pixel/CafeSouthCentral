@@ -90,7 +90,6 @@ async function seed() {
             data: {
                 userId: testUserId,
                 planType: PlanType.MONTHLY_MESS,
-                dailyLimit: 4,
                 monthlyQuota: 60,
                 mealsConsumedThisMonth: 0,
                 startDate: new Date(),

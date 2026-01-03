@@ -35,6 +35,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
     const [lastOrderId, setLastOrderId] = useState<string | undefined>(undefined);
     const [lastDisplayId, setLastDisplayId] = useState<string | undefined>(undefined);
+    const [note, setNote] = useState('');
+    const [orderType, setOrderType] = useState<'NOW' | 'LATER'>('NOW');
+    const [scheduledTime, setScheduledTime] = useState('');
 
     // Auto-close Effect REMOVED by user request
     // useEffect(() => { ... }, []);
@@ -43,6 +46,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     if (!isOpen && variant === 'drawer') return null;
     if (!isOpen && variant === 'sidebar') return null; // Logic for sidebar rendering is controlled by parent, but safer to check.
 
+
+
     const hasSubscription = subscriptionItems.length > 0;
     const hasNormal = normalItems.length > 0;
     const isMixed = hasSubscription && hasNormal;
@@ -50,6 +55,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     const handleAnimationComplete = () => {
         setShowSuccessAnimation(false);
         clearCart();
+        setNote('');
         onClose();
         if (onOrderSuccess) onOrderSuccess();
     };
@@ -80,6 +86,11 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 return;
             }
 
+            if (orderType === 'LATER' && !scheduledTime) {
+                alert('Please select a time for your scheduled order.');
+                return;
+            }
+
             // CHECK ONLINE STATUS FIRST
             const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
@@ -103,10 +114,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     }
                     return await response.json();
                 } catch (e: any) {
-                    // If network error (fetch failed completely), treat as offline if likely network issue
-                    // Note: 'TypeError: Failed to fetch' is the standard network error message
                     if (e.message === 'Failed to fetch' || e.message.includes('NetworkError')) {
-                        console.log("Network request failed, saving offline.");
+
                         return saveOfflineOrder(payload, mode);
                     }
                     throw e;
@@ -119,6 +128,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     userId: user.id,
                     items: subscriptionItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
                     mode: 'SUBSCRIPTION',
+                    note: note,
+                    timeSlot: orderType === 'LATER' ? scheduledTime : undefined
                 };
 
                 const result = await processOrder(subPayload, 'SUBSCRIPTION');
@@ -144,6 +155,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     mode: 'NORMAL',
                     paymentMethod: paymentMethod,
                     upiId: paymentMethod === 'UPI' ? upiId : undefined,
+                    note: note,
+                    timeSlot: orderType === 'LATER' ? scheduledTime : undefined
                 };
 
                 const result = await processOrder(normalPayload, 'NORMAL');
@@ -203,6 +216,12 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             onAnimationComplete={handleAnimationComplete}
                             lastOrderId={lastOrderId}
                             displayId={lastDisplayId}
+                            note={note}
+                            setNote={setNote}
+                            orderType={orderType}
+                            setOrderType={setOrderType}
+                            scheduledTime={scheduledTime}
+                            setScheduledTime={setScheduledTime}
                         />
                     </div>
                 </div>
@@ -237,6 +256,12 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             onAnimationComplete={handleAnimationComplete}
                             lastOrderId={lastOrderId}
                             displayId={lastDisplayId}
+                            note={note}
+                            setNote={setNote}
+                            orderType={orderType}
+                            setOrderType={setOrderType}
+                            scheduledTime={scheduledTime}
+                            setScheduledTime={setScheduledTime}
                         />
                     </div>
                 </div>
@@ -268,7 +293,13 @@ function CartContent({
     showSuccessAnimation,
     onAnimationComplete,
     lastOrderId,
-    displayId
+    displayId,
+    note,
+    setNote,
+    orderType,
+    setOrderType,
+    scheduledTime,
+    setScheduledTime
 }: any) {
     if (showSuccessAnimation) {
         return (
@@ -371,6 +402,78 @@ function CartContent({
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {/* Customization Note */}
+                {(hasSubscription || hasNormal) && (
+                    <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                            📝 Special Instructions
+                        </h3>
+                        <textarea
+                            placeholder="Add customization notes (e.g., 'Less Spicy', 'Extra Chutney')"
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            style={{
+                                width: '100%',
+                                minHeight: '60px',
+                                padding: '0.5rem',
+                                border: '1px solid #ddd',
+                                borderRadius: '0.5rem',
+                                fontFamily: 'inherit',
+                                fontSize: '0.9rem',
+                                resize: 'vertical'
+                            }}
+                        />
+                    </div>
+                )}
+
+                {/* Scheduling */}
+                {(hasSubscription || hasNormal) && (
+                    <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                            ⏰ Order Timing
+                        </h3>
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    checked={orderType === 'NOW'}
+                                    onChange={() => setOrderType('NOW')}
+                                    style={{ accentColor: '#5C3A1A' }}
+                                />
+                                <span style={{ fontWeight: 500 }}>Prepare Now</span>
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    checked={orderType === 'LATER'}
+                                    onChange={() => setOrderType('LATER')}
+                                    style={{ accentColor: '#5C3A1A' }}
+                                />
+                                <span style={{ fontWeight: 500 }}>Schedule for Later</span>
+                            </label>
+                        </div>
+                        {orderType === 'LATER' && (
+                            <input
+                                type="time"
+                                value={scheduledTime}
+                                onChange={(e) => setScheduledTime(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.5rem',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '0.5rem',
+                                    marginTop: '0.5rem'
+                                }}
+                            />
+                        )}
+                        {orderType === 'LATER' && scheduledTime && (
+                            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.2rem' }}>
+                                Order will be confirmed for around {scheduledTime}.
+                            </p>
+                        )}
                     </div>
                 )}
 

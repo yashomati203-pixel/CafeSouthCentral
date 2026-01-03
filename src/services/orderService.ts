@@ -29,7 +29,7 @@ async function generateOrderDisplayId(tx: any) {
     return `${prefix}-${nextNum.toString().padStart(4, '0')}`;
 }
 
-export async function createSubscriptionOrder(userId: string, items: CartItem[]) {
+export async function createSubscriptionOrder(userId: string, items: CartItem[], note?: string, timeSlot?: string) {
     // Date string for today: YYYY-MM-DD
     const today = new Date().toISOString().split('T')[0];
 
@@ -161,7 +161,8 @@ export async function createSubscriptionOrder(userId: string, items: CartItem[])
                 displayId,
                 status: OrderStatus.RECEIVED,
                 mode: OrderMode.SUBSCRIPTION,
-                // timeSlot, // Removed
+                note: note || undefined,
+                timeSlot: timeSlot || undefined,
                 totalAmount: 0,
                 items: {
                     create: orderItemsData
@@ -177,7 +178,9 @@ export async function createNormalOrder(
     userId: string,
     items: CartItem[],
     paymentMethod?: string,
-    upiId?: string
+    upiId?: string,
+    note?: string,
+    timeSlot?: string
 ) {
     // Transactional Order Creation
     return prisma.$transaction(async (tx) => {
@@ -225,7 +228,8 @@ export async function createNormalOrder(
                 totalAmount,
                 paymentMethod,
                 paymentDetails: upiId, // Map upiId to paymentDetails
-                // timeSlot, // Removed
+                note: note || undefined,
+                timeSlot: timeSlot || undefined,
                 items: {
                     create: orderItemsData
                 }

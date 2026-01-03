@@ -48,7 +48,15 @@ export default function FeedbackModal({ isOpen, onClose, userId }: FeedbackModal
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 10000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1rem' // Add padding to ensure not touching edges on small screens
+                }}>
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -56,31 +64,28 @@ export default function FeedbackModal({ isOpen, onClose, userId }: FeedbackModal
                         exit={{ opacity: 0 }}
                         onClick={onClose}
                         style={{
-                            position: 'fixed',
+                            position: 'absolute',
                             inset: 0,
                             backgroundColor: 'rgba(0,0,0,0.5)',
-                            zIndex: 9999,
                             backdropFilter: 'blur(4px)'
                         }}
                     />
 
                     {/* Modal */}
                     <motion.div
-                        initial={{ opacity: 0, y: 100, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         style={{
-                            position: 'fixed',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
+                            position: 'relative',
                             backgroundColor: 'white',
                             padding: '2rem',
                             borderRadius: '1rem',
                             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-                            zIndex: 10000,
-                            width: '90%',
+                            width: '100%',
                             maxWidth: '400px',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
                         }}
                     >
                         <button
@@ -172,7 +177,7 @@ export default function FeedbackModal({ isOpen, onClose, userId }: FeedbackModal
                             </form>
                         )}
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );

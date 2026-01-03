@@ -88,7 +88,6 @@ model UserSubscription {
   userId                 String
   user                   User     @relation(fields: [userId], references: [id])
   planType               PlanType
-  dailyLimit             Int      @default(4)
   monthlyQuota           Int
   mealsConsumedThisMonth Int      @default(0)
   startDate              DateTime
@@ -118,6 +117,7 @@ model Order {
   paymentMethod String?   // "CASH", "UPI", "SCAN"
   paymentDetails String?  // Stores UPI ID or other related info
   timeSlot    String?     // Selected pickup time slot
+  note        String?     // Customization note from customer
   createdAt   DateTime    @default(now())
   items       OrderItem[]
 }

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { SignJWT } from 'jose';
+import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
     try {
@@ -35,6 +37,26 @@ export async function POST(req: NextRequest) {
                     select: { orders: true }
                 }
             }
+        });
+
+        // Generate JWT
+        const secretStr = process.env.JWT_SECRET;
+        if (!secretStr) {
+            throw new Error('JWT_SECRET is not defined in environment variables');
+        }
+        const secret = new TextEncoder().encode(secretStr);
+        const token = await new SignJWT({ userId: user.id, role: user.role })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('24h')
+            .sign(secret);
+
+        // Set Cookie
+        cookies().set('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax', // Lax needed for top-level navigation often
+            maxAge: 60 * 60 * 24, // 1 day
+            path: '/'
         });
 
         return NextResponse.json(user, { status: 200 });

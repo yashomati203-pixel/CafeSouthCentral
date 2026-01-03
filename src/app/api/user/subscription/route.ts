@@ -1,5 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
+
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || ''); // Empty string will fail verification safely compared to a known default
+
+async function getAuthenticatedUser() {
+    if (!process.env.JWT_SECRET) return null; // Logic safely fails if secret missing
+    const token = cookies().get('token')?.value;
+    if (!token) return null;
+
+    try {
+        const { payload } = await jwtVerify(token, SECRET_KEY);
+        return payload as { userId: string; role: string };
+    } catch {
+        return null;
+    }
+}
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -7,6 +24,17 @@ export async function GET(req: NextRequest) {
 
     if (!userId) {
         return NextResponse.json({ error: 'UserId required' }, { status: 400 });
+    }
+
+    // Security Check: Verify User
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // IDOR Check: Ensure user is requesting their own data or is Admin
+    if (authUser.userId !== userId && authUser.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Forbidden: You can only view your own subscription' }, { status: 403 });
     }
 
     try {
@@ -31,7 +59,8 @@ export async function GET(req: NextRequest) {
             monthlyQuota: subscription.monthlyQuota,
             mealsConsumedThisMonth: subscription.mealsConsumedThisMonth,
             validUntil: subscription.endDate,
-            dailyLimit: subscription.dailyLimit
+            startDate: subscription.startDate,
+            planType: subscription.planType
         });
 
     } catch (error) {
@@ -39,7 +68,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
-// ... (GET method remains)
 
 export async function POST(req: NextRequest) {
     try {
@@ -50,27 +78,34 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing userId or planId' }, { status: 400 });
         }
 
+        // Security Check: Verify User
+        const authUser = await getAuthenticatedUser();
+        if (!authUser) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // IDOR Check: Ensure user is subscribing for themselves or is Admin
+        if (authUser.userId !== userId && authUser.role !== 'ADMIN') {
+            return NextResponse.json({ error: 'Forbidden: You can only subscribe for yourself' }, { status: 403 });
+        }
+
         // Logic to determine plan details
         // In a real app, fetch from DB. For now, hardcode matches frontend.
         let durationDays = 30;
         let monthlyQuota = 60; // Default
-        let dailyLimit = 4;
         let price = 3000;
 
         if (planId === 'monthly') {
             durationDays = 30;
             monthlyQuota = 60;
-            dailyLimit = 4;
             price = 3000;
         } else if (planId === 'student') {
             durationDays = 30;
             monthlyQuota = 45; // 3 items * 15 days? or just diff limit
-            dailyLimit = 3;
             price = 2500;
         } else if (planId === 'weekly') {
             durationDays = 7;
             monthlyQuota = 14;
-            dailyLimit = 4;
             price = 800;
         }
 
@@ -89,7 +124,6 @@ export async function POST(req: NextRequest) {
             data: {
                 userId,
                 planType: 'MONTHLY_MESS', // Enum restriction, mapping everything to this for now or need to update Enum
-                dailyLimit,
                 monthlyQuota,
                 mealsConsumedThisMonth: 0,
                 startDate,

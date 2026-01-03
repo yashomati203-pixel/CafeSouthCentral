@@ -23,41 +23,71 @@ export default function OrderHistoryPage() {
 
     useEffect(() => {
         if (user?.id) {
-            const interval = setInterval(() => {
+            requestNotificationPermission();
+
+            const poll = () => {
                 fetch(`/api/user/orders?userId=${user.id}`)
                     .then(res => res.json())
                     .then(data => {
                         if (Array.isArray(data)) {
-                            // Check for status updates
-                            data.forEach(newOrder => {
-                                const oldOrder = orders.find(o => o.id === newOrder.id);
-                                if (oldOrder && oldOrder.status !== 'DONE' && newOrder.status === 'DONE') {
-                                    sendLocalNotification(
-                                        "Order Ready! 🍽️",
-                                        `Order #${newOrder.displayId || newOrder.id.slice(0, 5)} is ready for pickup.`
-                                    );
+                            setOrders(prevOrders => {
+                                // Optimization: Only update if data actually changed
+                                // This prevents re-rendering the entire list (and re-generating QR codes) every 5 seconds
+                                if (JSON.stringify(data) === JSON.stringify(prevOrders)) {
+                                    return prevOrders;
                                 }
+
+                                // Check for status updates
+                                data.forEach(newOrder => {
+                                    const oldOrder = prevOrders.find(o => o.id === newOrder.id);
+                                    if (oldOrder && oldOrder.status !== 'DONE' && newOrder.status === 'DONE') {
+                                        sendLocalNotification(
+                                            "Order Ready! 🍽️",
+                                            `Order #${newOrder.displayId || newOrder.id.slice(0, 5)} is ready for pickup.`
+                                        );
+                                    }
+                                });
+                                return data;
                             });
-                            setOrders(data);
                         }
                         setLoading(false);
                     })
                     .catch(e => console.error(e));
-            }, 5000); // Poll every 5 seconds for updates
+            };
 
+            poll(); // Initial fetch
+            const interval = setInterval(poll, 5000); // Poll every 5s
             return () => clearInterval(interval);
         }
-    }, [user, orders]); // Depend on orders to compare
+    }, [user?.id]);
 
-    useEffect(() => {
-        // Initial Fetch
-        if (user?.id) {
-            fetch(`/api/user/orders?userId=${user.id}`).then(res => res.json()).then(setOrders);
+    const handleCancel = async (orderId: string) => {
+        if (!confirm('Are you sure you want to cancel this order?')) return;
+
+        try {
+            const res = await fetch('/api/user/orders/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, userId: user.id })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Order cancelled successfully');
+                // Refresh immediatelly
+                fetch(`/api/user/orders?userId=${user.id}`).then(r => r.json()).then(setOrders);
+            } else {
+                alert(data.error);
+            }
+        } catch (e) {
+            alert('Failed to cancel');
         }
+    };
 
-        // Request Permission
-        requestNotificationPermission();
-    }, [user]);
+    const isCancellable = (order: any) => {
+        if (order.status === 'CANCELLED' || order.status === 'SOLD' || order.status === 'DONE') return false;
+        const diff = Date.now() - new Date(order.createdAt).getTime();
+        return diff < 2 * 60 * 1000; // 2 minutes
+    };
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading history...</div>;
 
@@ -102,6 +132,7 @@ export default function OrderHistoryPage() {
                                 <th style={{ padding: '1rem', textAlign: 'left', fontSize: '0.9rem', color: '#6b7280' }}>Payment</th>
                                 <th style={{ padding: '1rem', textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>Total</th>
                                 <th style={{ padding: '1rem', textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>Status</th>
+                                <th style={{ padding: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -152,11 +183,33 @@ export default function OrderHistoryPage() {
                                             borderRadius: '999px',
                                             fontSize: '0.75rem',
                                             fontWeight: 'bold',
-                                            backgroundColor: order.status === 'DONE' ? '#dcfce7' : (order.status === 'SOLD' ? '#f3f4f6' : '#fef3c7'),
-                                            color: order.status === 'DONE' ? '#166534' : (order.status === 'SOLD' ? '#374151' : '#92400e')
+                                            backgroundColor: order.status === 'DONE' ? '#dcfce7' : (order.status === 'SOLD' ? '#f3f4f6' : (order.status === 'CANCELLED' ? '#fee2e2' : '#fef3c7')),
+                                            color: order.status === 'DONE' ? '#166534' : (order.status === 'SOLD' ? '#374151' : (order.status === 'CANCELLED' ? '#b91c1c' : '#92400e'))
                                         }}>
-                                            {order.status === 'DONE' ? 'Ready for Pickup' : (order.status === 'SOLD' ? 'Completed' : order.status)}
+                                            {order.status === 'DONE' ? 'Ready' : (order.status === 'SOLD' ? 'Completed' : order.status)}
                                         </span>
+                                    </td>
+                                    <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                        {isCancellable(order) && (
+                                            <button
+                                                onClick={() => handleCancel(order.id)}
+                                                style={{
+                                                    padding: '0.4rem 0.8rem',
+                                                    fontSize: '0.8rem',
+                                                    color: '#ef4444',
+                                                    backgroundColor: '#fee2e2',
+                                                    border: '1px solid #fecaca',
+                                                    borderRadius: '0.3rem',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold'
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                        <a href={`/receipt/${order.id}`} target="_blank" style={{ display: 'inline-block', marginLeft: '0.5rem', textDecoration: 'none', fontSize: '1.2rem', verticalAlign: 'middle' }} title="View Receipt">
+                                            📄
+                                        </a>
                                     </td>
                                 </tr>
                             ))}

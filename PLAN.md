@@ -1,124 +1,50 @@
-# System Architecture & Project Plan: IIM Nagpur Food Outlet
+# Project Roadmap & Status
 
-## 1. Technology Stack Proposition (Firebase Edition)
+This document outlines the current status of the **Cafe South Central** project and future development plans.
 
-### Core Philosophy
-Serverless, Real-time, and Scalable.
+## ✅ Completed Features
 
-### Frontend
-- **Framework**: **Next.js 14+ (App Router)**.
-- **Language**: **TypeScript**.
-- **State Management**: **React Context** (User User/Cart).
-- **Styling**: **Vanilla CSS / CSS Modules**.
+### Core Experience
+- [x] **Ordering**: Full cart system, normal/subscription modes, mixed orders.
+- [x] **Authentication**: Name/Phone login (Passwordless).
+- [x] **Menu**: Categorized display, search/filter, "Sold Out" handling.
+- [x] **PWA**: Installable web app with offline asset caching.
 
-### Backend (Serverless)
-- **Platform**: **Firebase**.
-- **Database**: **Cloud Firestore** (NoSQL).
-- **Authentication**: **Firebase Auth** (Google/Email).
-- **Functions**: **Firebase Cloud Functions** (for complex logic like daily limit resets or payment webhooks).
+### Ordering Enhancements
+- [x] **Scheduling**: Time slot selection for pickup.
+- [x] **Cancellation**: 2-minute undo window.
+- [x] **Digital Receipts**: Shareable receipt pages.
+- [x] **Dark Mode**: Fully supported visual themes.
 
----
+### Admin & Kitchen
+- [x] **Live Dashboard**: Real-time order incoming alerts (Sound + Visual).
+- [x] **Inventory**: Live stock management with immediate user-facing updates.
+- [x] **Kitchen Scanner**: QR code scanning workflow for order pickup.
 
-## 2. Order Logic Implementation (Current Focus)
-
-### `createSubscriptionOrder`
-Located in `src/services/orderService.ts`.
-This function handles the critical "Subscription" flow.
-
-**Validation Rules:**
-1. **User Authentication**: Must have valid UID.
-2. **Subscription Active**: User must have an active subscription with `monthlyQuota > 0`.
-3. **Item Limits**:
-   - For each item:
-     - If `double_allowed == false`, max quantity = 1.
-     - If `double_allowed == true`, max quantity = 2.
-     - Global max for any single item in one order is implicitly capped by daily limit (4), but specific item rules take precedence.
-
-**Transactional Steps:**
-1. Read User Subscription.
-2. Read Daily Usage.
-3. Read Menu Items (to check `double_allowed` and inventory).
-4. Perform Validations (Throw error if failed).
-5. **WRITE**:
-   - Decrement Menu Inventory.
-   - Increment Daily Usage `itemsRedeemed`.
-   - Increment Subscription `mealsConsumedThisMonth`.
-   - Create `orders` document.
+### Subscription System
+- [x] **Logic**: Plan-based monthly quotas.
+- [x] **User Dashboard**: "Active Plan" view with renewal reminders.
+- [x] **Billing**: Mock payment flow for plan purchase.
 
 ---
 
-## 3. Data Architecture (Firestore Collections)
+## 🚧 Future / Planned
 
-We will use root-level collections for scalability.
+### 1. Offline Order Sync (Visual Handshake)
+- **Goal**: Allow users to place orders even with **0% Internet Connectivity**.
+- **Concept**: User app generates a QR code containing the full order payload. Kitchen scanner parses this payload and uploads it to the server via the Admin's connection.
 
-### Collections
+### 2. Push Notifications
+- **Goal**: Real push notifications (FCM/OneSignal) instead of polling.
+- **Current**: App uses smart polling (5s interval) and local notifications while the tab is open.
 
-#### `users`
-- Document ID: `auth_uid`
-- Fields:
-  - `email`: string
-  - `role`: "CUSTOMER" | "KITCHEN" | "ADMIN"
-  - `wallet_balance`: number
-  - `createdAt`: timestamp
-
-#### `subscriptions`
-- Document ID: `auto-id`
-- Fields:
-  - `userId`: string (Ref to users)
-  - `planType`: string
-  - `dailyLimit`: number (e.g., 4)
-  - `monthlyQuota`: number
-  - `isActive`: boolean
-  - `startDate`: timestamp
-  - `endDate`: timestamp
-
-#### `daily_usage`
-- Document ID: `userId_YYYY-MM-DD` (Composite key for easy lookup)
-- Fields:
-  - `userId`: string
-  - `date`: string
-  - `itemsRedeemed`: number
-
-#### `menu_items`
-- Document ID: `auto-id`
-- Fields:
-  - `name`: string
-  - `price`: number
-  - `type`: "NORMAL" | "SUBSCRIPTION"
-  - `inventory`: number
-  - `isDoubleAllowed`: boolean
-  - `category`: string
-
-#### `orders`
-- Document ID: `auto-id`
-- Fields:
-  - `userId`: string
-  - `status`: "PENDING" | "CONFIRMED" | "READY" | "DELIVERED"
-  - `mode`: "NORMAL" | "SUBSCRIPTION"
-  - `totalAmount`: number
-  - `createdAt`: timestamp
-  - `items`: Array<{ id: string, name: string, qty: number, price: number }>
+### 3. Payment Gateway
+- **Goal**: Replace "Simulated" UPI/Cash with real Razorpay/Stripe integration.
+- **Current**: Mock delays and success states for testing.
 
 ---
 
-## 4. Project Structure
-
-```text
-/
-├── src/
-│   ├── app/
-│   │   ├── (auth)/
-│   │   └── (shop)/ 
-│   ├── lib/
-│   │   ├── firebase.ts     # Firebase Client SDK
-│   │   ├── firebaseAdmin.ts # Admin SDK (Server Actions)
-│   │   └── utils.ts
-│   ├── services/
-│   │   └── orderService.ts # Core Business Logic
-│   ├── types/
-│   │   └── index.ts        # TS Interfaces for Entities
-│   └── components/
-├── scripts/
-│   └── seed.ts             # Database Setup Script
-└── firebase.json
-```
+## 📚 Documentation
+For detailed architectural info, please refer to:
+- [APP_DOCUMENTATION.md](./APP_DOCUMENTATION.md): Technical Stack & Guide.
+- [FEATURES.md](./FEATURES.md): Functional usage guide.

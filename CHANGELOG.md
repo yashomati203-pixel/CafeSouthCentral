@@ -78,6 +78,31 @@ All notable changes to the **Cafe South Central** project will be documented in 
   - **Pastel Cards**: Enhanced urgency indicators with full pastel background colors (Red/Yellow/Green) for better readability.
 - **Order Management**: Synced "Ready for Pickup" status with the user-facing UI.
 
+## [2026-01-01]
+### Core Features
+- **Scheduling**: Added "Schedule for Later" option in checkout, allowing users to pick a time slot.
+- **Order Management**: 
+  - Enabled "Cancel Order" for users within 2 minutes of placement.
+  - Added "Special Instructions" field to the cart.
+- **Digital Receipts**: 
+  - Implemented shareable `/receipt/[id]` pages.
+  - Added "View Receipt" links in Order History.
+
+### UI/UX
+- **Dark Mode**: Complete dark mode support with a persistent toggle slider.
+- **Enhanced Polling**: Optimized the Order History page to reduce re-renders and lag.
+
+### Subscription
+- **Refinement**: 
+  - Removed confusing "Become a Member" popup for existing members.
+  - Updated Subscription Dashboard to show Active Plan and Renewal Reminders.
+  - Simplified subscription model (removed hard `dailyLimit` database constraint in favor of plan-based logic).
+
+### Admin
+- **Dashboard**:
+  - Added "Scheduled Time" and "Notes" columns.
+  - Filtered Admin accounts from the "Members" view.
+
 ---
 
 *Note: This changelog is reconstructed from development history and may not capture every minor commit.*

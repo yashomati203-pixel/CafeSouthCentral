@@ -4,7 +4,7 @@ import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dropdown-menu'; // Using simple overlay instead of full Dialog to keep deps low/consistent
 
 interface LoginPageProps {
-    onLogin: (user: { name: string; phone: string }, stayLoggedIn: boolean) => void;
+    onLogin: (user: { name: string; phone: string }, stayLoggedIn: boolean) => Promise<void>;
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
@@ -16,12 +16,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
     const [error, setError] = useState('');
     const [isAdminLogin, setIsAdminLogin] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [stayLoggedIn, setStayLoggedIn] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
 
-    const handleGetOtp = (e: React.FormEvent) => {
+    const handleGetOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
@@ -30,7 +31,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 setError('Please enter Admin ID');
                 return;
             }
-            onLogin({ name: 'Admin', phone }, false); // Admin no persistence usually
+            setIsLoading(true);
+            try {
+                await onLogin({ name: 'Admin', phone }, false); // Admin no persistence usually
+            } catch (e) {
+                // Error handling usually in onLogin alert, but we need to stop loading
+            } finally {
+                setIsLoading(false);
+            }
             return;
         }
 
@@ -56,7 +64,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         // alert(`Your OTP is ${mockOtp}`); // Optional: Simulate SMS
     };
 
-    const handleVerifyOtp = (e: React.FormEvent) => {
+    const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (otp !== tempOtp && otp !== '1234') { // Allow 1234 as master otp
@@ -64,7 +72,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             return;
         }
 
-        onLogin({ name, phone }, stayLoggedIn);
+        setIsLoading(true);
+        try {
+            await onLogin({ name, phone }, stayLoggedIn);
+        } catch (e) {
+            // Check
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleTermsClick = (e: React.MouseEvent) => {
@@ -306,7 +321,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                             ? phone.trim().length > 0
                             : (name.trim().length > 0 && phone.trim().length >= 10 && termsAccepted);
 
-                        const isDisabled = step === 'PHONE' && !isPhoneStepValid;
+                        const isDisabled = isLoading || (step === 'PHONE' && !isPhoneStepValid);
 
                         return (
                             <button
@@ -329,7 +344,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                     transition: 'background-color 0.2s'
                                 }}
                             >
-                                {isAdminLogin ? 'Login to Dashboard' : (step === 'PHONE' ? 'Get OTP ➔' : 'Verify & Login')}
+                                {isLoading ? 'Please wait...' : (isAdminLogin ? 'Login to Dashboard' : (step === 'PHONE' ? 'Get OTP ➔' : 'Verify & Login'))}
                             </button>
                         );
                     })()}

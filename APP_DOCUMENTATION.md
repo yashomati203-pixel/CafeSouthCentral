@@ -15,10 +15,7 @@ This application is a specialized food ordering system designed for high-traffic
     *   **Normal Mode**: Standard e-commerce flow. Add items -> Cart -> Pay (Cash/UPI) -> Order Confirmed.
     *   **Subscription Mode**:
         *   Valid only for subscribed users.
-        *   Monthly Quota enforcement.
-        *   Restricted menu items (some items may not be available on subscription).
-        *   Quantity limits (e.g., max 1 of a premium item).
-        *   Monthly Quota enforcement.
+        *   **Monthly Quota enforcement**.
         *   Restricted menu items (some items may not be available on subscription).
         *   Quantity limits (e.g., max 1 of a premium item).
 *   **Cart System**:
@@ -26,6 +23,7 @@ This application is a specialized food ordering system designed for high-traffic
     *   Add/Remove items.
     *   Real-time validation of subscription limits.
 *   **Order Tracking**: Live status updates (Received -> Preparing -> Ready for Pickup -> Completed).
+*   **Digital Receipts**: Shareable receipt pages with print support.
 
 ### For Administration
 *   **Dashboard**: Overview of orders and inventory.
@@ -54,7 +52,7 @@ This application is a specialized food ordering system designed for high-traffic
 
 #### Transactional Order Processing
 Located in `src/services/orderService.ts`, the application uses Prisma **Interactive Transactions** (`$transaction`) to ensure data integrity during high concurrency.
-*   **Subscription Order**: Atomically checks Subscription active status -> Locks Daily Usage row -> Decrements Inventory -> Creates Order.
+*   **Subscription Order**: Atomically checks Subscription active status and Monthly Quota -> Decrements Inventory -> Creates Order.
 *   **Normal Order**: Atomically Checks Inventory -> Decrements Inventory -> Creates Order.
 
 #### Authentication

@@ -35,6 +35,8 @@ This document provides a comprehensive overview of the features implemented in t
   - **Responsive Design**: Appears as a **Sidebar** on desktop (always visible) and a **Slide-up Grid** on mobile.
   - **Live Totals**: Calculates subtotal price and quota usage instantly.
   - **Preparation Notice**: Displays estimated prep time (Standard 10 mins) to manage expectations.
+  - **Special Instructions**: Setup allows users to add **Notes** (e.g., "Less Spicy") for the kitchen.
+  - **Scheduling**: Users can choose **"ASAP"** or select a **future time slot** for pickup.
 
 ### 4. **Checkout & Payments**
 - **Multiple Payment Options** (for Normal Orders):
@@ -45,7 +47,14 @@ This document provides a comprehensive overview of the features implemented in t
 - **Success Experience**:
   - Plays a rich **Order Confirmation Animation** (WebM video) with a manual "Done" button.
   - Generates a unique **Digital Token (QR Code)** for the order along with a friendly **Order ID** (e.g., `#DEC25-0026`).
+  - **Digital Receipts**: Persistent `/receipt/[id]` pages for proof of purchase.
+  - **Cancellation**: Users can cancel an order within **2 minutes** of placement if made in error.
   - This QR code is used for order verification at the counter.
+
+### 5. Visual Customization
+- **Theme Support**:
+  - Full **Dark Mode** toggle allow users to switch between Light and Dark themes.
+  - Persists preference across sessions.
 
 ---
 

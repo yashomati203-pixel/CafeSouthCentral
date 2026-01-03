@@ -16,10 +16,20 @@ export async function GET(request: Request) {
             where: {
                 userId: userId
             },
-            include: {
+            select: {
+                id: true,
+                displayId: true,
+                createdAt: true,
+                status: true,
+                mode: true,
+                paymentMethod: true,
+                totalAmount: true,
+                // Order items
                 items: {
-                    include: {
-                        menuItem: true
+                    select: {
+                        name: true,
+                        quantity: true,
+                        price: true // Might be useful, though totalAmount covers it
                     }
                 }
             },

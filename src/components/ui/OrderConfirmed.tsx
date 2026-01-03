@@ -21,7 +21,7 @@ export default function OrderConfirmed({ onComplete, inline = false, orderId, di
         video.play().catch(e => console.error("Video play failed:", e));
 
         const handleEnded = () => {
-            console.log("Video ended, showing QR");
+
             // Switch to QR view
             setShowQR(true);
         };
@@ -68,21 +68,41 @@ export default function OrderConfirmed({ onComplete, inline = false, orderId, di
                         Order #{displayId || '---'}
                     </p>
 
-                    <button
-                        onClick={onComplete}
-                        style={{
-                            padding: '0.75rem 2rem',
-                            backgroundColor: '#5C3A1A',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '0.5rem',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '1rem'
-                        }}
-                    >
-                        Done
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => {
+                                onComplete();
+                                window.location.href = '/orders'; // Use window.location for reliable navigation + drawer close
+                            }}
+                            style={{
+                                padding: '0.75rem 1.5rem',
+                                backgroundColor: 'white',
+                                color: '#5C3A1A',
+                                border: '1px solid #5C3A1A',
+                                borderRadius: '0.5rem',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                fontSize: '1rem'
+                            }}
+                        >
+                            Track Order
+                        </button>
+                        <button
+                            onClick={onComplete}
+                            style={{
+                                padding: '0.75rem 1.5rem',
+                                backgroundColor: '#5C3A1A',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '0.5rem',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                fontSize: '1rem'
+                            }}
+                        >
+                            Done
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

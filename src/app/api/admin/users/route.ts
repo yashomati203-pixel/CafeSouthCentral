@@ -6,11 +6,22 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         const users = await prisma.user.findMany({
-            include: {
+            where: {
+                role: {
+                    not: 'ADMIN'
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+                createdAt: true,
                 subscriptions: {
                     where: { isActive: true },
                     orderBy: { endDate: 'desc' },
-                    take: 1
+                    take: 1,
+                    select: { endDate: true, planType: true }
                 },
                 _count: {
                     select: { orders: true }

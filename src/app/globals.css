@@ -10,7 +10,7 @@
 
   /* 🌴 Accent Colors */
   --color-tropical-yellow: #F5B700;
-  
+
   /* Backgrounds & Text */
   --color-sand-beige: #F9F6F0;
   --color-charcoal-black: #1F1F1F;
@@ -19,7 +19,7 @@
   /* Semantic Mappings */
   --background: var(--color-sand-beige);
   --foreground: var(--color-charcoal-black);
-  
+
   --primary: var(--color-coconut-brown);
   --primary-foreground: var(--color-sand-beige);
 
@@ -33,7 +33,8 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', sans-serif; /* Assumes Inter is available or fallback */
+  font-family: 'Inter', sans-serif;
+  /* Assumes Inter is available or fallback */
 }
 
 /* Toggle Switch Utility */
@@ -41,6 +42,44 @@ body {
   right: 0;
   border-color: var(--color-palm-green-dark);
 }
-.toggle-checkbox:checked + .toggle-label {
+
+.toggle-checkbox:checked+.toggle-label {
   background-color: var(--color-palm-green-dark);
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --background: #121212;
+  --foreground: #ededed;
+  --color-sand-beige: #121212;
+  --color-charcoal-black: #ededed;
+}
+
+/* Helper to override inline white backgrounds in Dark Mode */
+.dark div[style*="background-color: white"],
+.dark div[style*="background-color:white"],
+.dark div[style*="background: white"],
+.dark div[style*="background:white"],
+.dark header[style*="background-color: white"],
+.dark main[style*="background-color: white"],
+.dark section[style*="background-color: #FFFFFF"],
+.dark section[style*="background-color: white"] {
+  background-color: #1e1e1e !important;
+  color: #ededed !important;
+  border-color: #333 !important;
+}
+
+.dark button {
+  border-color: #555 !important;
+}
+
+/* Fix for light grey pills in dark mode */
+.dark button[style*="background-color: #EEE"],
+.dark button[style*="background-color:#EEE"] {
+  background-color: #333 !important;
+  color: #ccc !important;
+}
+
+.dark button {
+  border-color: #555 !important;
 }

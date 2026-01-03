@@ -3,6 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import StockItem from '@/components/admin/StockItem';
 
+const formatTime = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':');
+    const h = parseInt(hours, 10);
+    if (isNaN(h)) return timeStr;
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${minutes} ${suffix}`;
+};
+
 // Ensure the sound file path is correct. If doesn't exist, it might silent fail or error.
 // Assuming a sound exists or ignoring error for now. 
 // Standard strategy: Use a public URL or ensure file existence.
@@ -26,17 +36,21 @@ interface Order {
     createdAt: string;
     timeSlot?: string;
     mode?: string;
+    note?: string;
 }
 
 export default function AdminDashboard() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock' | 'members'>('active');
+    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock' | 'members' | 'feedback'>('active');
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [users, setUsers] = useState<any[]>([]);
 
     // Inventory State
     const [menuItems, setMenuItems] = useState<any[]>([]);
+
+    // Feedback State
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
 
     // Sound
     // const [play] = useSound('/notification.mp3'); // Requires file
@@ -90,6 +104,7 @@ export default function AdminDashboard() {
         fetchOrders(); // Initial fetch
         fetchInventory(); // Inventory fetch
         fetchUsers(); // Fetch users
+        fetchFeedback(); // Fetch feedback
 
         const interval = setInterval(() => {
             fetchOrders();
@@ -146,6 +161,18 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchFeedback = async () => {
+        try {
+            const res = await fetch('/api/admin/feedback');
+            if (res.ok) {
+                const data = await res.json();
+                setFeedbacks(data);
+            }
+        } catch (e) {
+            console.error("Failed to fetch feedback", e);
+        }
+    };
+
     const updateStatus = async (id: string, newStatus: string) => {
         // Optimistic update
         setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus } : o));
@@ -170,8 +197,8 @@ export default function AdminDashboard() {
     const STATUS_OPTIONS = ['RECEIVED', 'PREPARING', 'DONE', 'SOLD'];
 
     // Filter and Group Orders
-    const activeOrders = orders.filter(o => o.status !== 'SOLD');
-    const soldOrders = orders.filter(o => o.status === 'SOLD');
+    const activeOrders = orders.filter(o => o.status !== 'SOLD' && o.status !== 'CANCELLED');
+    const soldOrders = orders.filter(o => o.status === 'SOLD' || o.status === 'CANCELLED');
 
     // Group sold orders by date
     const soldOrdersByDate = soldOrders.reduce((acc, order) => {
@@ -234,6 +261,9 @@ export default function AdminDashboard() {
                 <button onClick={() => setActiveTab('sold')} style={{ padding: '1rem', borderBottom: activeTab === 'sold' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'sold' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
                     📜 History
                 </button>
+                <button onClick={() => { setActiveTab('feedback'); fetchFeedback(); }} style={{ padding: '1rem', borderBottom: activeTab === 'feedback' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'feedback' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
+                    ⭐ Feedback
+                </button>
             </div>
 
             {/* LIVE ORDERS TAB */}
@@ -253,12 +283,16 @@ export default function AdminDashboard() {
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                     <div>
-                                        <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>#{order.displayId || order.id.slice(0, 5)}</div>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            #{order.displayId || order.id.slice(0, 5)}
+                                            <a href={`/receipt/${order.id}`} target="_blank" title="View Receipt" style={{ textDecoration: 'none', fontSize: '1rem', cursor: 'pointer' }}>📄</a>
+                                        </div>
                                         <div style={{ fontSize: '0.9rem', color: '#666' }}>{order.user?.name}</div>
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: '#666', textAlign: 'right' }}>
                                         {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         <div>{Math.floor((new Date().getTime() - new Date(order.createdAt).getTime()) / 60000)}m ago</div>
+
                                     </div>
                                 </div>
 
@@ -269,6 +303,28 @@ export default function AdminDashboard() {
                                         </div>
                                     ))}
                                 </div>
+
+                                {order.timeSlot && (
+                                    <div style={{
+                                        backgroundColor: '#fffbeb',
+                                        color: '#b45309',
+                                        padding: '0.75rem',
+                                        borderRadius: '0.5rem',
+                                        border: '1px solid #fcd34d',
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                        fontSize: '1.1rem'
+                                    }}>
+                                        ⏰ Scheduled: {formatTime(order.timeSlot!)}
+                                    </div>
+                                )}
+
+                                {order.note && (
+                                    <div style={{ backgroundColor: '#fff7ed', color: '#c2410c', padding: '0.5rem', borderRadius: '0.25rem', fontSize: '0.9rem', border: '1px dashed #fdba74' }}>
+                                        📝 <strong>Note:</strong> {order.note}
+                                    </div>
+                                )}
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ fontWeight: 'bold' }}>₹{order.totalAmount}</div>
@@ -460,6 +516,11 @@ export default function AdminDashboard() {
                                         <td style={{ padding: '1rem', fontWeight: 'bold' }}>#{order.displayId || order.id.slice(0, 5)}</td>
                                         <td style={{ padding: '1rem', color: '#666' }}>
                                             {new Date(order.createdAt).toLocaleString()}
+                                            {order.timeSlot && (
+                                                <div style={{ color: '#d97706', fontWeight: 'bold', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                                                    ⏰ {formatTime(order.timeSlot)}
+                                                </div>
+                                            )}
                                         </td>
                                         <td style={{ padding: '1rem' }}>
                                             <div style={{ fontWeight: '500' }}>{order.user?.name}</div>
@@ -492,29 +553,41 @@ export default function AdminDashboard() {
                                                     {item.quantity}x {item.name}
                                                 </div>
                                             ))}
+                                            {order.note && (
+                                                <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#c2410c', backgroundColor: '#fff7ed', padding: '0.2rem 0.4rem', borderRadius: '4px', display: 'inline-block' }}>
+                                                    📝 {order.note}
+                                                </div>
+                                            )}
                                         </td>
                                         <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold' }}>
                                             ₹{order.totalAmount}
                                         </td>
                                         <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => updateStatus(order.id, 'DONE')}
-                                                style={{
-                                                    padding: '0.4rem 0.8rem',
-                                                    backgroundColor: 'white',
-                                                    border: '1px solid #d1d5db',
-                                                    borderRadius: '0.375rem',
-                                                    color: '#374151',
-                                                    cursor: 'pointer',
-                                                    fontSize: '0.8rem',
-                                                    transition: 'all 0.2s',
-                                                    display: 'inline-flex', alignItems: 'center', gap: '0.3rem'
-                                                }}
-                                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-                                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                                            >
-                                                ↩ Undo
-                                            </button>
+                                            {order.status === 'CANCELLED' ? (
+                                                <span style={{ color: '#ef4444', backgroundColor: '#fee2e2', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                                    CANCELLED
+                                                </span>
+                                            ) : (
+                                                <button
+                                                    onClick={() => updateStatus(order.id, 'DONE')}
+                                                    style={{
+                                                        padding: '0.4rem 0.8rem',
+                                                        backgroundColor: 'white',
+                                                        border: '1px solid #d1d5db',
+                                                        borderRadius: '0.375rem',
+                                                        color: '#374151',
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.8rem',
+                                                        transition: 'all 0.2s',
+                                                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem'
+                                                    }}
+                                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                                >
+                                                    ↩ Undo
+                                                </button>
+                                            )}
+                                            <a href={`/receipt/${order.id}`} target="_blank" title="View Receipt" style={{ marginLeft: '0.5rem', textDecoration: 'none', fontSize: '1.2rem', verticalAlign: 'middle' }}>📄</a>
                                         </td>
                                     </tr>
                                 ))}
@@ -522,7 +595,53 @@ export default function AdminDashboard() {
                         </table>
                     )}
                 </div>
-            )}
-        </div>
+            )
+            }
+
+            {/* FEEDBACK TAB */}
+            {
+                activeTab === 'feedback' && (
+                    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                        {feedbacks.length === 0 ? (
+                            <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>No feedback received yet</div>
+                        ) : (
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead style={{ backgroundColor: '#f3f4f6' }}>
+                                    <tr>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Date</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Customer</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Rating</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {feedbacks.map(item => (
+                                        <tr key={item.id} style={{ borderTop: '1px solid #eee' }}>
+                                            <td style={{ padding: '1rem', color: '#666' }}>
+                                                {new Date(item.createdAt).toLocaleString()}
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ fontWeight: 'bold' }}>{item.user?.name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#666' }}>{item.user?.phone}</div>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ display: 'flex', gap: '2px' }}>
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <span key={i} style={{ color: i < item.rating ? '#fbbf24' : '#e5e7eb', fontSize: '1.2rem' }}>★</span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '1rem', maxWidth: '400px', lineHeight: '1.5' }}>
+                                                {item.comment || <span style={{ color: '#ccc', fontStyle: 'italic' }}>No comment</span>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                )
+            }
+        </div >
     );
 }

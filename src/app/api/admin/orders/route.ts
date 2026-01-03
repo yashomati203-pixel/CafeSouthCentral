@@ -5,20 +5,32 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        console.log("API: Fetching orders...");
+
         const orders = await prisma.order.findMany({
-            include: {
+            select: {
+                id: true,
+                displayId: true,
+                status: true,
+                totalAmount: true,
+                createdAt: true,
+                timeSlot: true,
+                mode: true,
+                note: true,
                 user: {
-                    include: {
+                    select: {
+                        name: true,
+                        phone: true,
                         subscriptions: {
                             where: { isActive: true },
+                            select: { id: true }, // Sufficient to check length > 0
                             take: 1
                         }
                     }
                 },
                 items: {
-                    include: {
-                        menuItem: true
+                    select: {
+                        name: true,
+                        quantity: true
                     }
                 }
             },
@@ -26,7 +38,7 @@ export async function GET() {
                 createdAt: 'desc'
             }
         });
-        console.log(`API: Fetched ${orders.length} orders`);
+
         return NextResponse.json(orders);
     } catch (error) {
         console.error("Failed to fetch orders:", error);

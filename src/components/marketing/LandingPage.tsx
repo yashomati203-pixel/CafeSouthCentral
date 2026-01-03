@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 
 interface LandingPageProps {
     onExplore: () => void;
+    onViewPlans?: () => void;
     onCategorySelect?: (category: string) => void;
 }
 
@@ -17,7 +18,7 @@ const CATEGORIES = [
     { name: 'Desserts', dataCategory: 'Dessert', icon: '🍦', color: '#ffe4e6', image: '/images/cat-sweet.jpg' },
 ];
 
-export default function LandingPage({ onExplore, onCategorySelect }: LandingPageProps) {
+export default function LandingPage({ onExplore, onCategorySelect, onViewPlans }: LandingPageProps) {
     return (
         <div style={{
             minHeight: '100vh',
@@ -47,31 +48,56 @@ export default function LandingPage({ onExplore, onCategorySelect }: LandingPage
                     <p style={{ fontSize: '1.2rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2rem' }}>
                         Experience the authentic taste of tradition. Freshly prepared, served with love at IIM Nagpur.
                     </p>
-                    <button
-                        onClick={onExplore}
-                        style={{
-                            padding: '1rem 3rem',
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                            color: '#5C3A1A',
-                            backgroundColor: 'white',
-                            border: 'none',
-                            borderRadius: '50px',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-                        }}
-                    >
-                        Explore Full Menu 🍽️
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button
+                            onClick={onExplore}
+                            style={{
+                                padding: '1rem 3rem',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                color: '#5C3A1A',
+                                backgroundColor: 'white',
+                                border: 'none',
+                                borderRadius: '50px',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+                            }}
+                        >
+                            Explore Menu 🍽️
+                        </button>
+                        <button
+                            onClick={onViewPlans}
+                            style={{
+                                padding: '1rem 3rem',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                color: 'white',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                border: '2px solid white',
+                                borderRadius: '50px',
+                                cursor: 'pointer',
+                                backdropFilter: 'blur(10px)',
+                                transition: 'background-color 0.2s',
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                            }}
+                        >
+                            View Plans 🌟
+                        </button>
+                    </div>
                 </motion.div>
             </header>
 
