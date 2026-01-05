@@ -656,6 +656,20 @@ function DashboardContent() {
 
                                     <DropdownMenu.Item
                                         className="DropdownMenuItem"
+                                        onSelect={async () => {
+                                            if (!user.id) return;
+                                            const { enableNotifications } = await import('@/lib/notifications');
+                                            enableNotifications({ ...user, id: user.id });
+                                        }}
+                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
+                                    >
+                                        <span>🔔</span> Enable Notifications
+                                    </DropdownMenu.Item>
+
+                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
+
+                                    <DropdownMenu.Item
+                                        className="DropdownMenuItem"
                                         onSelect={() => setShowFeedbackModal(true)}
                                         style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
                                     >

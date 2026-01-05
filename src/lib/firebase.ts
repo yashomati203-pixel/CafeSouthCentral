@@ -1,7 +1,7 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getMessaging, Messaging, isSupported } from "firebase/messaging";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/messaging';
 
-// TODO: Replace with your actual Firebase Configuration
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,19 +11,24 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app;
-let messaging: Messaging | null = null;
+let app: firebase.app.App | null = null;
+let messaging: firebase.messaging.Messaging | null = null;
 
 if (typeof window !== "undefined") {
     // Client-side initialization
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    if (!firebase.apps.length) {
+        app = firebase.initializeApp(firebaseConfig);
+    } else {
+        app = firebase.app();
+    }
 
-    // Check if messaging is supported (e.g., specific browsers, not usually in standard PWA on iOS unless configured carefully)
-    isSupported().then(supported => {
-        if (supported) {
-            messaging = getMessaging(app);
-        }
-    });
+    // Get messaging instance
+    try {
+        messaging = firebase.messaging();
+    } catch (e) {
+        console.error("Messaging not supported:", e);
+        messaging = null;
+    }
 }
 
 export { app, messaging };
