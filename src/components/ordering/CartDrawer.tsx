@@ -567,6 +567,26 @@ function CartContent({
                             <p style={{ margin: 0 }}>Orders are usually done within 10 minutes after preparation starts.</p>
                         </div>
                     </div>
+
+                    {/* Cancellation Policy Notice */}
+                    <div style={{
+                        backgroundColor: '#f8d7da',
+                        color: '#721c24',
+                        padding: '0.75rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.9rem',
+                        border: '1px solid #f5c6cb',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginTop: '0.75rem'
+                    }}>
+                        <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
+                        <div>
+                            <strong>Cancellation Policy:</strong>
+                            <p style={{ margin: 0 }}>Orders can only be cancelled within 2 minutes after placement.</p>
+                        </div>
+                    </div>
                 </div>
 
                 {!hasSubscription && !hasNormal && (

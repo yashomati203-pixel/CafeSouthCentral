@@ -42,11 +42,10 @@ export async function enableNotifications(user: { id: string }) {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
         try {
-            // Register service worker first
+            // Wait for the PWA service worker to be ready (next-pwa auto-registers it)
             if ('serviceWorker' in navigator) {
-                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                await navigator.serviceWorker.ready; // Wait for it to be ready
-                console.log('Service Worker registered:', registration);
+                await navigator.serviceWorker.ready;
+                console.log('Service Worker ready');
             }
 
             const { messaging } = await import('@/lib/firebase');

@@ -49,3 +49,5 @@ ts-debug.log*
 *_error.txt
 Adobe Premiere Pro Captured Audio/
 *.prproj
+
+.vercel

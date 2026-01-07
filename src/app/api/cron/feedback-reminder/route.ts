@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { messaging } from "@/lib/firebase-admin";
 
+export const dynamic = 'force-dynamic';
+
 // This endpoint matches orders picked up > 30 minutes ago
 // And sends a Push Notification asking for feedback.
 // It is meant to be called by a Cron Service every 10-15 minutes.

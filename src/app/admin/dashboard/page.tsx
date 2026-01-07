@@ -183,17 +183,26 @@ export default function AdminDashboard() {
 
     const updateStatus = async (id: string, newStatus: string) => {
         // Optimistic update
+        const previousOrders = [...orders];
         setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus } : o));
 
         try {
-            await fetch(`/api/admin/orders/${id}`, {
+            const res = await fetch(`/api/admin/orders/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
+
+            if (!res.ok) {
+                throw new Error('Failed to update');
+            }
+
+            // Refresh from server to get the confirmed state
+            await fetchOrders();
         } catch (e) {
             console.error("Failed to update status", e);
-            fetchOrders(); // Revert on error
+            // Revert to previous state on error
+            setOrders(previousOrders);
         }
     };
 
