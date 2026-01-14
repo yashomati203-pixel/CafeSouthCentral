@@ -367,15 +367,64 @@ export default function AdminDashboard() {
                                     </div>
                                 )}
 
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div style={{ fontWeight: 'bold' }}>₹{order.totalAmount}</div>
-                                    <select
-                                        value={order.status}
-                                        onChange={(e) => updateStatus(order.id, e.target.value)}
-                                        style={{ padding: '0.3rem', borderRadius: '0.3rem', borderColor: '#ddd' }}
-                                    >
-                                        {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                                    </select>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', minWidth: '140px' }}>
+                                        {STATUS_OPTIONS.map((status, idx) => {
+                                            const statusIndex = STATUS_OPTIONS.indexOf(order.status);
+                                            const currentIndex = idx;
+                                            const isCompleted = currentIndex <= statusIndex;
+                                            const isClickable = currentIndex >= statusIndex;
+
+                                            return (
+                                                <div
+                                                    key={status}
+                                                    onClick={() => isClickable && updateStatus(order.id, status)}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.5rem',
+                                                        cursor: isClickable ? 'pointer' : 'not-allowed',
+                                                        opacity: isClickable ? 1 : 0.5,
+                                                        padding: '0.3rem 0.5rem',
+                                                        borderRadius: '0.25rem',
+                                                        transition: 'background-color 0.2s',
+                                                        backgroundColor: isCompleted ? '#f0fdf4' : 'transparent'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (isClickable) e.currentTarget.style.backgroundColor = '#f3f4f6';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (isClickable) e.currentTarget.style.backgroundColor = isCompleted ? '#f0fdf4' : 'transparent';
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        width: '18px',
+                                                        height: '18px',
+                                                        borderRadius: '50%',
+                                                        border: isCompleted ? '2px solid #10b981' : '2px solid #d1d5db',
+                                                        backgroundColor: isCompleted ? '#10b981' : 'white',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexShrink: 0
+                                                    }}>
+                                                        {isCompleted && (
+                                                            <span style={{ color: 'white', fontSize: '12px', lineHeight: '1' }}>✓</span>
+                                                        )}
+                                                    </div>
+                                                    <span style={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: isCompleted ? '600' : '400',
+                                                        color: isCompleted ? '#059669' : '#6b7280',
+                                                        textDecoration: isCompleted ? 'line-through' : 'none'
+                                                    }}>
+                                                        {status}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
 
                                 {order.status !== 'DONE' && (

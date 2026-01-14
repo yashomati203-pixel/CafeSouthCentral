@@ -31,7 +31,7 @@ export default function AdminScanPage() {
             const res = await fetch('/api/orders/update-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, status: 'PICKED_UP' })
+                body: JSON.stringify({ orderId, status: 'SOLD' })
             });
 
             if (!res.ok) {
@@ -40,14 +40,12 @@ export default function AdminScanPage() {
             }
 
             setStatus('SUCCESS');
-            setMessage(`Order ${orderId} Marked as PICKED UP! ✅`);
+            setMessage(`Order ${orderId} Marked as SOLD! ✅`);
 
-            // Reset after 3 seconds to scan next
+            // Redirect to admin dashboard after 2 seconds
             setTimeout(() => {
-                setData('No result');
-                setStatus('IDLE');
-                setMessage('');
-            }, 3000);
+                router.push('/admin/dashboard');
+            }, 2000);
 
         } catch (e: any) {
             setStatus('ERROR');
