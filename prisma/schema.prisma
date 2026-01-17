@@ -1,11 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id            String             @id @default(uuid())
+  name          String?
+  phone         String             @unique
+  email         String?            @unique
+  role          UserRole           @default(CUSTOMER)
+  walletBalance Float              @default(0.0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  fcmToken      String?
+  dailyUsages   DailyUsage[]
+  feedbacks     Feedback[]
+  orders        Order[]
+  subscriptions UserSubscription[]
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  orderId   String?  @unique
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  order     Order?   @relation(fields: [orderId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model MenuItem {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  price           Float
+  type            MenuItemType
+  category        String
+  imageUrl        String?
+  inventoryCount  Int          @default(0)
+  isDoubleAllowed Boolean      @default(false)
+  isAvailable     Boolean      @default(true)
+  isVeg           Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  orderItems      OrderItem[]
+}
+
+model UserSubscription {
+  id                     String   @id @default(uuid())
+  userId                 String
+  planType               PlanType
+  monthlyQuota           Int
+  mealsConsumedThisMonth Int      @default(0)
+  startDate              DateTime
+  endDate                DateTime
+  isActive               Boolean  @default(true)
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+model DailyUsage {
+  id                 String @id @default(uuid())
+  userId             String
+  date               String
+  itemsRedeemedCount Int    @default(0)
+  user               User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model Order {
+  id                       String      @id @default(uuid())
+  userId                   String
+  status                   OrderStatus @default(PENDING)
+  mode                     OrderMode
+  totalAmount              Float       @default(0)
+  createdAt                DateTime    @default(now())
+  displayId                String?
+  feedbackNotificationSent Boolean     @default(false)
+  note                     String?
+  paymentDetails           String?
+  paymentMethod            String?
+  timeSlot                 String?
+  updatedAt                DateTime    @updatedAt
+  feedback                 Feedback?
+  user                     User        @relation(fields: [userId], references: [id])
+  items                    OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  menuItemId String
+  name       String
+  price      Float
+  quantity   Int
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id])
 }
 
 enum UserRole {
@@ -34,108 +130,11 @@ enum OrderStatus {
   COMPLETED
   CANCELLED
   RECEIVED
-  DONE // Alias for READY/COMPLETED, requested by user
-  SOLD // Requested by user
+  DONE
+  SOLD
 }
 
 enum OrderMode {
   NORMAL
   SUBSCRIPTION
-}
-
-model User {
-  id            String             @id @default(uuid())
-  name          String?
-  phone         String             @unique
-  email         String?            @unique
-  fcmToken      String?
-  role          UserRole           @default(CUSTOMER)
-  walletBalance Float              @default(0.0)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  subscriptions UserSubscription[]
-  orders        Order[]
-  dailyUsages   DailyUsage[]
-  feedbacks     Feedback[]
-}
-
-model Feedback {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  orderId   String?  @unique
-  order     Order?   @relation(fields: [orderId], references: [id])
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-}
-
-model MenuItem {
-  id              String       @id @default(uuid())
-  name            String
-  description     String?
-  price           Float
-  type            MenuItemType
-  category        String
-  imageUrl        String?
-  inventoryCount  Int          @default(0)
-  isDoubleAllowed Boolean      @default(false)
-  isAvailable     Boolean      @default(true)
-  isVeg           Boolean      @default(true)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  orderItems      OrderItem[]
-}
-
-model UserSubscription {
-  id                     String   @id @default(uuid())
-  userId                 String
-  user                   User     @relation(fields: [userId], references: [id])
-  planType               PlanType
-  monthlyQuota           Int
-  mealsConsumedThisMonth Int      @default(0)
-  startDate              DateTime
-  endDate                DateTime
-  isActive               Boolean  @default(true)
-}
-
-model DailyUsage {
-  id                 String @id @default(uuid())
-  userId             String
-  user               User   @relation(fields: [userId], references: [id])
-  date               String // YYYY-MM-DD
-  itemsRedeemedCount Int    @default(0)
-
-  // Use a composite unique constraint to ensure one record per user per day
-  @@unique([userId, date])
-}
-
-model Order {
-  id          String      @id @default(uuid())
-  displayId   String?     // Custom Readable ID like DEC-0001
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  status      OrderStatus @default(PENDING)
-  mode        OrderMode
-  totalAmount Float       @default(0)
-  paymentMethod String?   // "CASH", "UPI", "SCAN"
-  paymentDetails String?  // Stores UPI ID or other related info
-  timeSlot    String?     // Selected pickup time slot
-  note        String?     // Customization note from customer
-  createdAt   DateTime    @default(now())
-  items       OrderItem[]
-  feedback    Feedback?
-  updatedAt   DateTime    @updatedAt // Tracks when status changes (e.g. to DONE)
-  feedbackNotificationSent Boolean @default(false)
-}
-
-model OrderItem {
-  id         String   @id @default(uuid())
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id])
-  menuItemId String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  name       String   // Snapshot of name
-  price      Float    // Snapshot of price
-  quantity   Int
 }

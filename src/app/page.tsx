@@ -391,6 +391,24 @@ function DashboardContent() {
         `}</style>
     );
 
+    // LOGIN MODAL (Rendered on top if open)
+    if (showLoginModal && !user) {
+        return (
+            <>
+                {layoutStyles}
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'white' }}>
+                    <button
+                        onClick={() => setShowLoginModal(false)}
+                        style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10000, padding: '0.5rem', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.5rem' }}
+                    >
+                        ×
+                    </button>
+                    <LoginPage onLogin={handleLogin} />
+                </div>
+            </>
+        );
+    }
+
     // LANDING PAGE VIEW
     if (!user && !hasExplored) {
         return (
@@ -411,24 +429,6 @@ function DashboardContent() {
                     }}
                     onLogin={() => setShowLoginModal(true)}
                 />
-            </>
-        );
-    }
-
-    // LOGIN MODAL (Rendered on top if open)
-    if (showLoginModal && !user) {
-        return (
-            <>
-                {layoutStyles}
-                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'white' }}>
-                    <button
-                        onClick={() => setShowLoginModal(false)}
-                        style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10000, padding: '0.5rem', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.5rem' }}
-                    >
-                        ×
-                    </button>
-                    <LoginPage onLogin={handleLogin} />
-                </div>
             </>
         );
     }

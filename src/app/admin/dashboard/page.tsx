@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import StockItem from '@/components/admin/StockItem';
+import { printKOT } from '@/lib/printer';
 
 const formatTime = (timeStr: string) => {
     if (!timeStr) return '';
@@ -42,7 +43,7 @@ interface Order {
 export default function AdminDashboard() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock' | 'members' | 'feedback' | 'analytics'>('active');
+    const [activeTab, setActiveTab] = useState<'active' | 'sold' | 'stock' | 'members' | 'feedback' | 'analytics' | 'pos'>('active');
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [users, setUsers] = useState<any[]>([]);
 
@@ -55,6 +56,13 @@ export default function AdminDashboard() {
 
     // Analytics State
     const [analytics, setAnalytics] = useState<any>(null);
+
+    // POS State
+    const [posCart, setPosCart] = useState<{ item: any; qty: number }[]>([]);
+    const [posPhone, setPosPhone] = useState('');
+    const [posName, setPosName] = useState('');
+    const [posSearch, setPosSearch] = useState('');
+    const [posLoading, setPosLoading] = useState(false);
 
     // Sound
     // const [play] = useSound('/notification.mp3'); // Requires file
@@ -254,6 +262,82 @@ export default function AdminDashboard() {
         return { borderLeft: '6px solid #10b981', backgroundColor: '#dcfce7' };
     };
 
+    // POS Functions
+    const addToPosCart = (item: any) => {
+        setPosCart(prev => {
+            const existing = prev.find(i => i.item.id === item.id);
+            if (existing) {
+                return prev.map(i => i.item.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+            }
+            return [...prev, { item, qty: 1 }];
+        });
+    };
+
+    const updatePosQty = (itemId: string, delta: number) => {
+        setPosCart(prev => prev.map(i => {
+            if (i.item.id === itemId) {
+                const newQty = Math.max(1, i.qty + delta);
+                return { ...i, qty: newQty };
+            }
+            return i;
+        }));
+    };
+
+    const removeFromPosCart = (itemId: string) => {
+        setPosCart(prev => prev.filter(i => i.item.id !== itemId));
+    };
+
+    const placePosOrder = async () => {
+        if (!posPhone || posCart.length === 0) {
+            alert('Phone and Items are required');
+            return;
+        }
+        setPosLoading(true);
+        try {
+            const res = await fetch('/api/admin/orders/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: posPhone,
+                    name: posName,
+                    items: posCart.map(i => ({ menuItemId: i.item.id, qty: i.qty })),
+                    paymentMethod: 'CASH',
+                    note: 'Counter Order'
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setPosCart([]);
+                setPosPhone('');
+                setPosName('');
+                fetchOrders();
+
+                // Construct pseudo-order for printing immediately
+                // We need to fetch the fresh order or mock it. Mocking is faster for UI response.
+                const printableOrder = {
+                    id: data.orderId,
+                    displayId: data.displayId,
+                    user: { name: posName || 'Walk-in', phone: posPhone },
+                    createdAt: new Date().toISOString(),
+                    items: posCart.map(i => ({ quantity: i.qty, name: i.item.name })),
+                    // totalAmount not returned by createNormalOrder unless we update it? 
+                    // createNormalOrder returns { orderId, displayId, totalAmount, status }
+                    // So data.totalAmount should be there.
+                };
+                printKOT(printableOrder);
+                alert('Order Placed & Print Sent!');
+                setActiveTab('active');
+            } else {
+                alert('Failed: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error placing order');
+        } finally {
+            setPosLoading(false);
+        }
+    };
+
     return (
         <div style={{ padding: '2rem', backgroundColor: '#f9fafb', minHeight: '100vh', fontFamily: 'sans-serif' }}>
             <style>{`
@@ -315,6 +399,9 @@ export default function AdminDashboard() {
                 <button onClick={() => setActiveTab('active')} style={{ padding: '1rem', borderBottom: activeTab === 'active' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'active' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     ⚡ Live Orders <span style={{ backgroundColor: '#f3f4f6', padding: '0.1rem 0.5rem', borderRadius: '99px', fontSize: '0.8rem' }}>{activeOrders.length}</span>
                 </button>
+                <button onClick={() => { setActiveTab('pos'); fetchInventory(); }} style={{ padding: '1rem', borderBottom: activeTab === 'pos' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'pos' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
+                    🍔 New Order (POS)
+                </button>
                 <button onClick={() => { setActiveTab('members'); fetchUsers(); }} style={{ padding: '1rem', borderBottom: activeTab === 'members' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'members' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
                     👥 Members
                 </button>
@@ -351,6 +438,13 @@ export default function AdminDashboard() {
                                     <div>
                                         <div style={{ fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                             #{order.displayId || order.id.slice(0, 5)}
+                                            <button
+                                                onClick={() => printKOT(order)}
+                                                title="Print Kitchen Ticket"
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}
+                                            >
+                                                🖨️
+                                            </button>
                                             <a href={`/receipt/${order.id}`} target="_blank" title="View Receipt" style={{ textDecoration: 'none', fontSize: '1rem', cursor: 'pointer' }}>📄</a>
                                         </div>
                                         <div style={{ fontSize: '0.9rem', color: '#666' }}>{order.user?.name}</div>
@@ -703,6 +797,13 @@ export default function AdminDashboard() {
                                                     ↩ Undo
                                                 </button>
                                             )}
+                                            <button
+                                                onClick={() => printKOT(order)}
+                                                title="Print Kitchen Ticket"
+                                                style={{ marginLeft: '0.5rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', verticalAlign: 'middle', padding: 0 }}
+                                            >
+                                                🖨️
+                                            </button>
                                             <a href={`/receipt/${order.id}`} target="_blank" title="View Receipt" style={{ marginLeft: '0.5rem', textDecoration: 'none', fontSize: '1.2rem', verticalAlign: 'middle' }}>📄</a>
                                         </td>
                                     </tr>
@@ -899,6 +1000,148 @@ export default function AdminDashboard() {
                             </table>
                         </>
                     )}
+                </div>
+            )}
+            {/* POS TAB */}
+            {activeTab === 'pos' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', height: 'calc(100vh - 200px)' }}>
+                    {/* Left: Menu Items */}
+                    <div style={{ overflowY: 'auto', paddingRight: '1rem' }}>
+                        <div style={{ position: 'sticky', top: 0, backgroundColor: '#f9fafb', paddingBottom: '1rem', zIndex: 10 }}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search items..."
+                                value={posSearch}
+                                onChange={(e) => setPosSearch(e.target.value)}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #ddd', marginBottom: '1rem' }}
+                            />
+                            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                                {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '999px',
+                                            border: 'none',
+                                            backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#e5e7eb',
+                                            color: selectedCategory === cat ? 'white' : '#666',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.85rem',
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+                            {menuItems
+                                .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
+                                .filter(item => item.name.toLowerCase().includes(posSearch.toLowerCase()))
+                                .map(item => (
+                                    <div
+                                        key={item.id}
+                                        onClick={() => addToPosCart(item)}
+                                        style={{
+                                            backgroundColor: 'white',
+                                            padding: '1rem',
+                                            borderRadius: '0.5rem',
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                            cursor: 'pointer',
+                                            border: '2px solid transparent',
+                                            transition: 'all 0.1s'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.borderColor = '#5C3A1A'}
+                                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                                    >
+                                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>{item.name}</div>
+                                        <div style={{ color: '#666', fontSize: '0.9rem' }}>₹{item.price}</div>
+                                        <div style={{ fontSize: '0.8rem', color: item.inventoryCount > 0 ? '#10b981' : '#ef4444', marginTop: '0.5rem' }}>
+                                            {item.inventoryCount > 0 ? `${item.inventoryCount} in stock` : 'Out of Stock'}
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+
+                    {/* Right: Cart */}
+                    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', backgroundColor: '#5C3A1A', color: 'white', borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}>
+                            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>New Order</h2>
+                        </div>
+
+                        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+                            {posCart.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '3rem' }}>Cart is empty</div>
+                            ) : (
+                                posCart.map((line, idx) => (
+                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #f3f4f6', paddingBottom: '0.5rem' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 'bold' }}>{line.item.name}</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>₹{line.item.price * line.qty}</div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, -1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>-</button>
+                                            <span style={{ fontWeight: 'bold', width: '20px', textAlign: 'center' }}>{line.qty}</span>
+                                            <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, 1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>+</button>
+                                            <button onClick={() => removeFromPosCart(line.item.id)} style={{ marginLeft: '0.5rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', backgroundColor: '#f9fafb' }}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Phone *</label>
+                                <input
+                                    type="tel"
+                                    value={posPhone}
+                                    onChange={(e) => setPosPhone(e.target.value)}
+                                    placeholder="Enter 10-digit number"
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
+                                />
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Name (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={posName}
+                                    onChange={(e) => setPosName(e.target.value)}
+                                    placeholder="e.g. John Doe"
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111' }}>
+                                <span>Total</span>
+                                <span>₹{posCart.reduce((sum, i) => sum + (i.item.price * i.qty), 0)}</span>
+                            </div>
+
+                            <button
+                                onClick={placePosOrder}
+                                disabled={posLoading || posCart.length === 0 || !posPhone}
+                                style={{
+                                    width: '100%',
+                                    padding: '1rem',
+                                    backgroundColor: posLoading ? '#9ca3af' : '#10b981',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '0.5rem',
+                                    fontWeight: 'bold',
+                                    fontSize: '1.1rem',
+                                    cursor: posLoading ? 'not-allowed' : 'pointer',
+                                    opacity: (posCart.length === 0 || !posPhone) ? 0.5 : 1
+                                }}
+                            >
+                                {posLoading ? 'Processing...' : '✅ Place Counter Order'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div >

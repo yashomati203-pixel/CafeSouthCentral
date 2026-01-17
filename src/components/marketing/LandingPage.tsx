@@ -47,7 +47,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
             position: 'relative'
         }}>
             {/* Antigravity Particle Background */}
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.3 }}>
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.3, pointerEvents: 'none' }}>
                 <Antigravity
                     count={50}
                     magnetRadius={6}
@@ -139,8 +139,13 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
 
                     {/* Right: Login Button */}
                     <button
-                        onClick={onLogin}
+                        onClick={(e) => {
+                            console.log('Login button clicked');
+                            if (onLogin) onLogin();
+                            else console.error('onLogin prop is missing');
+                        }}
                         style={{
+
                             padding: '0.75rem 2rem',
                             backgroundColor: '#3C2A21',
                             color: 'white',
