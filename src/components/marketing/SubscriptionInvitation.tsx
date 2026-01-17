@@ -98,7 +98,7 @@ export default function SubscriptionInvitation({ isOpen, onClose }: Subscription
                                     width: '100%',
                                     height: '8px',
                                     borderRadius: '5px',
-                                    backgroundColor: '#ddd',
+                                    backgroundColor: '#eee8e8ff',
                                     accentColor: '#5C3A1A',
                                     cursor: 'pointer',
                                     outline: 'none',

@@ -80,8 +80,8 @@ export default function SubscriptionPage() {
         try {
             const storedUser = localStorage.getItem('cafe_user') || sessionStorage.getItem('cafe_user');
             if (!storedUser) {
-                alert("Please login first");
-                router.push('/');
+                // Redirect to home page where login modal can be triggered
+                router.push('/?login=true');
                 return;
             }
             const user = JSON.parse(storedUser);

@@ -144,10 +144,18 @@ function DashboardContent() {
                 } else {
                     // No user, check URL params for guest mode
                     const mode = searchParams.get('mode');
+                    const shouldLogin = searchParams.get('login');
+
                     if (mode === 'guest') {
                         setHasExplored(true);
                     } else {
                         setHasExplored(false);
+                    }
+
+                    // If login parameter is present, show login modal
+                    if (shouldLogin === 'true') {
+                        setHasExplored(true); // Show the main page
+                        setTimeout(() => setShowLoginModal(true), 500);
                     }
                 }
             } catch (e) {
@@ -401,6 +409,7 @@ function DashboardContent() {
                         router.push('?mode=guest'); // Also sync URL here
                         setHasExplored(true);
                     }}
+                    onLogin={() => setShowLoginModal(true)}
                 />
             </>
         );

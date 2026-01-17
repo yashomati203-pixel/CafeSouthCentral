@@ -144,6 +144,19 @@ export default function OrderHistoryPage() {
                                     <td style={{ padding: '1rem', fontSize: '0.9rem', color: '#666' }}>
                                         <div>{new Date(order.createdAt).toLocaleDateString()}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#999' }}>{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                        {order.timeSlot && (
+                                            <div style={{
+                                                backgroundColor: '#fef3c7',
+                                                color: '#92400e',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '0.25rem',
+                                                fontSize: '0.75rem',
+                                                marginTop: '0.25rem',
+                                                display: 'inline-block'
+                                            }}>
+                                                ⏰ Scheduled: {order.timeSlot}
+                                            </div>
+                                        )}
                                     </td>
                                     <td style={{ padding: '1rem', fontSize: '0.9rem' }}>
                                         {order.items.map((item: any, idx: number) => (

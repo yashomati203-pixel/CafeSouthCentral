@@ -1,6 +1,8 @@
 import { MenuItem, MenuItemType } from '@/types/db';
 import { CATEGORY_ORDER } from '@/hooks/useMenu';
 import { CartItem } from '@/context/CartContext';
+import { useState, useEffect } from 'react';
+import { AnimatedItem } from '@/components/ui/AnimatedList';
 
 interface MenuGridProps {
     menuItems: MenuItem[];
@@ -23,6 +25,23 @@ export default function MenuGrid({
     cartItems,
     mockMenu
 }: MenuGridProps) {
+    const [popularItemIds, setPopularItemIds] = useState<Set<string>>(new Set());
+    const [topSellingItems, setTopSellingItems] = useState<any[]>([]);
+
+    // Fetch popular items from analytics
+    useEffect(() => {
+        fetch('/api/admin/analytics?public=true')
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data?.topSelling) {
+                    const topIds = new Set<string>(data.topSelling.map((item: { id: string }) => item.id));
+                    setPopularItemIds(topIds);
+                    setTopSellingItems(data.topSelling.slice(0, 3)); // Store top 3 for bestsellers section
+                }
+            })
+            .catch(() => { }); // Silent fail
+    }, []);
+
     return (
         <>
             <section style={{
@@ -73,6 +92,158 @@ export default function MenuGrid({
                     ))}
                 </div>
 
+                {/* Bestsellers Section */}
+                {topSellingItems.length > 0 && selectedCategory === 'All' && (
+                    <div style={{
+                        marginBottom: '2.5rem',
+                        padding: '1.5rem',
+                        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                        borderRadius: '1rem',
+                        border: '2px solid #f59e0b'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <span style={{ fontSize: '1.5rem' }}>🔥</span>
+                            <h3 style={{
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                color: '#92400e',
+                                margin: 0
+                            }}>
+                                Bestsellers
+                            </h3>
+                        </div>
+                        <p style={{ color: '#78350f', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                            Our most loved dishes - handpicked by your favorites!
+                        </p>
+                        <div className="menu-grid">
+                            {topSellingItems.map((statsItem, idx) => {
+                                const item = (menuItems.length > 0 ? menuItems : mockMenu).find(m => m.id === statsItem.id);
+                                if (!item) return null;
+
+                                // Filter logic (same as main menu)
+                                const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
+                                if (mode === 'SUBSCRIPTION' && !isAvailableInSub) return null;
+
+                                const cartItem = cartItems.find(i =>
+                                    i.id === item.id &&
+                                    (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
+                                );
+
+                                return (
+                                    <AnimatedItem key={item.id} index={idx} delay={idx * 0.05}>
+                                        <div className="menu-card" style={{
+                                            backgroundColor: '#fffbeb',
+                                            border: '2px solid #fbbf24',
+                                            position: 'relative',
+                                            opacity: item.inventoryCount === 0 ? 0.6 : 1,
+                                        }}>
+                                            {/* Rank Badge */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '0.5rem',
+                                                left: '0.5rem',
+                                                backgroundColor: '#92400e',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                width: '28px',
+                                                height: '28px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontWeight: 'bold',
+                                                fontSize: '1rem',
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                            }}>
+                                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
+                                            </div>
+                                            <div>
+                                                <div className="menu-image">
+                                                    [Image: {item.name}]
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                                    <h3 className="menu-title">{item.name}</h3>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                                        <span style={{
+                                                            fontSize: '0.75rem',
+                                                            padding: '2px 6px',
+                                                            border: item.isVeg ? '1px solid green' : '1px solid red',
+                                                            color: item.isVeg ? 'green' : 'red',
+                                                            borderRadius: '4px'
+                                                        }}>
+                                                            {item.isVeg ? 'VEG' : 'NON-VEG'}
+                                                        </span>
+                                                        {item.inventoryCount === 0 ? (
+                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
+                                                                SOLD OUT
+                                                            </span>
+                                                        ) : item.inventoryCount <= 5 ? (
+                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
+                                                                Running Out!
+                                                            </span>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                <p className="menu-desc">
+                                                    {item.description}
+                                                </p>
+                                            </div>
+
+                                            <div style={{ marginTop: '1rem' }}>
+                                                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#92400e' }}>
+                                                    {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
+                                                </p>
+
+                                                {cartItem ? (
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        backgroundColor: '#f3f4f6',
+                                                        borderRadius: '0.5rem',
+                                                        padding: '0.25rem'
+                                                    }}>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
+                                                            style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#92400e', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
+                                                        >
+                                                            -
+                                                        </button>
+                                                        <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
+                                                            style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#92400e', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => onAddToCart(item)}
+                                                        disabled={item.inventoryCount === 0}
+                                                        style={{
+                                                            width: '100%',
+                                                            padding: '0.75rem',
+                                                            backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#92400e',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '0.5rem',
+                                                            cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
+                                                            fontWeight: 600,
+                                                            transition: 'opacity 0.2s'
+                                                        }}
+                                                    >
+                                                        {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </AnimatedItem>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* Grouped Menu Sections */}
                 {Object.entries(
                     (menuItems.length > 0 ? menuItems : mockMenu).reduce((acc, item) => {
@@ -107,104 +278,121 @@ export default function MenuGrid({
                                 {category}
                             </h3>
                             <div className="menu-grid">
-                                {categoryItems.map((item) => (
-                                    <div key={item.id} className="menu-card" style={{
-                                        backgroundColor: mode === 'SUBSCRIPTION' ? '#f0fdf4' : 'white',
-                                        opacity: item.inventoryCount === 0 ? 0.6 : 1,
-                                    }}>
-                                        <div>
-                                            <div className="menu-image">
-                                                [Image: {item.name}]
-                                            </div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-
-                                                <h3 className="menu-title">{item.name}</h3>
-                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                                                    <span style={{
-                                                        fontSize: '0.75rem',
-                                                        padding: '2px 6px',
-                                                        border: item.isVeg ? '1px solid green' : '1px solid red',
-                                                        color: item.isVeg ? 'green' : 'red',
-                                                        borderRadius: '4px'
-                                                    }}>
-                                                        {item.isVeg ? 'VEG' : 'NON-VEG'}
-                                                    </span>
-                                                    {item.inventoryCount === 0 ? (
-                                                        <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
-                                                            SOLD OUT
-                                                        </span>
-                                                    ) : item.inventoryCount <= 5 ? (
-                                                        <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
-                                                            Running Out!
-                                                        </span>
-                                                    ) : null}
+                                {categoryItems.map((item, idx) => (
+                                    <AnimatedItem key={item.id} index={idx} delay={idx * 0.03}>
+                                        <div className="menu-card" style={{
+                                            backgroundColor: mode === 'SUBSCRIPTION' ? '#f0fdf4' : 'white',
+                                            opacity: item.inventoryCount === 0 ? 0.6 : 1,
+                                        }}>
+                                            <div>
+                                                <div className="menu-image">
+                                                    [Image: {item.name}]
                                                 </div>
-                                            </div>
-                                            <p className="menu-desc">
-                                                {item.description}
-                                            </p>
-                                        </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
 
-                                        <div style={{ marginTop: '1rem' }}>
-                                            <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#5C3A1A' }}>
-                                                {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
-                                            </p>
-
-                                            {(() => {
-                                                const cartItem = cartItems.find(i =>
-                                                    i.id === item.id &&
-                                                    (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
-                                                );
-
-                                                if (cartItem) {
-                                                    return (
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'space-between',
-                                                            backgroundColor: '#f3f4f6',
-                                                            borderRadius: '0.5rem',
-                                                            padding: '0.25rem'
+                                                    <h3 className="menu-title">{item.name}</h3>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                                        <span style={{
+                                                            fontSize: '0.75rem',
+                                                            padding: '2px 6px',
+                                                            border: item.isVeg ? '1px solid green' : '1px solid red',
+                                                            color: item.isVeg ? 'green' : 'red',
+                                                            borderRadius: '4px'
                                                         }}>
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
-                                                                style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                            >
-                                                                -
-                                                            </button>
-                                                            <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
-                                                                style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
-                                                    );
-                                                }
+                                                            {item.isVeg ? 'VEG' : 'NON-VEG'}
+                                                        </span>
+                                                        {popularItemIds.has(item.id) && (
+                                                            <span style={{
+                                                                fontSize: '0.65rem',
+                                                                fontWeight: 'bold',
+                                                                color: '#d97706',
+                                                                backgroundColor: '#fef3c7',
+                                                                padding: '2px 6px',
+                                                                borderRadius: '99px',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '2px'
+                                                            }}>
+                                                                🔥 POPULAR
+                                                            </span>
+                                                        )}
+                                                        {item.inventoryCount === 0 ? (
+                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
+                                                                SOLD OUT
+                                                            </span>
+                                                        ) : item.inventoryCount <= 5 ? (
+                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
+                                                                Running Out!
+                                                            </span>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                <p className="menu-desc">
+                                                    {item.description}
+                                                </p>
+                                            </div>
 
-                                                return (
-                                                    <button
-                                                        onClick={() => onAddToCart(item)}
-                                                        disabled={item.inventoryCount === 0}
-                                                        style={{
-                                                            width: '100%',
-                                                            padding: '0.75rem',
-                                                            backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#5C3A1A',
-                                                            color: 'white',
-                                                            border: 'none',
-                                                            borderRadius: '0.5rem',
-                                                            cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
-                                                            fontWeight: 600,
-                                                            transition: 'opacity 0.2s'
-                                                        }}
-                                                    >
-                                                        {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
-                                                    </button>
-                                                );
-                                            })()}
+                                            <div style={{ marginTop: '1rem' }}>
+                                                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#5C3A1A' }}>
+                                                    {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
+                                                </p>
+
+                                                {(() => {
+                                                    const cartItem = cartItems.find(i =>
+                                                        i.id === item.id &&
+                                                        (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
+                                                    );
+
+                                                    if (cartItem) {
+                                                        return (
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'space-between',
+                                                                backgroundColor: '#f3f4f6',
+                                                                borderRadius: '0.5rem',
+                                                                padding: '0.25rem'
+                                                            }}>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
+                                                                    style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
+                                                                >
+                                                                    -
+                                                                </button>
+                                                                <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
+                                                                    style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <button
+                                                            onClick={() => onAddToCart(item)}
+                                                            disabled={item.inventoryCount === 0}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '0.75rem',
+                                                                backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#5C3A1A',
+                                                                color: 'white',
+                                                                border: 'none',
+                                                                borderRadius: '0.5rem',
+                                                                cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
+                                                                fontWeight: 600,
+                                                                transition: 'opacity 0.2s'
+                                                            }}
+                                                        >
+                                                            {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                                                        </button>
+                                                    );
+                                                })()}
+                                            </div>
                                         </div>
-                                    </div>
+                                    </AnimatedItem>
                                 ))}
                             </div>
                         </div>

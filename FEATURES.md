@@ -101,3 +101,110 @@ This document provides a comprehensive overview of the features implemented in t
 - **Serverless Architecture**: Built on Next.js and potential Firebase/Serverless backend integration (simulated via API routes in this version).
 - **Responsive Animations**: Smooth transitions for cart drawers, badges, and success states.
 - **Optimistic UI**: Admin status updates reflect immediately while processing in the background.
+
+---
+
+## 📊 Analytics & Reporting
+
+### Item Analytics
+**Location:** Admin Dashboard → Analytics Tab
+
+**Features:**
+- Real-time tracking of item performance
+- Metrics tracked:
+  - Total quantity sold
+  - Number of orders containing the item
+  - Total revenue generated
+- Rankings with medals (🥇🥈🥉) for top 3
+- "POPULAR" badges highlight top 5 sellers
+
+### Sales Reports
+**Location:** Admin Dashboard → Analytics Tab → Generate Reports
+
+**Report Types:**
+- 📅 **Daily** - Today's sales
+- 📆 **Weekly** - Last 7 days
+- 🗓️ **Monthly** - Last 30 days
+- 📊 **Yearly** - Last 365 days
+
+**Report Contents:**
+- Summary statistics (revenue, orders, average)
+- Top 10 items with quantities and revenue
+- Payment method breakdown
+- Downloadable as .csv file
+
+## 🔥 Bestsellers
+
+### User-Facing Bestsellers Section
+**Location:** User Menu (top of page when "All" category selected)
+
+**Design:**
+- Yellow gradient background
+- Displays top 3 selling items
+- Medal rankings (🥇🥈🥉)
+- Matches regular menu card functionality
+
+### Popular Item Badges
+**Location:** Throughout user menu
+
+**Display:**
+- Small orange "🔥 POPULAR" badge
+- Shows on top 3 selling items
+- Subtle but effective social proof
+
+## 🛠️ Admin Improvements
+
+### Enhanced Stock Management
+**Location:** Admin Dashboard → Stock Tab
+
+**Improvements:**
+- Direct number input (type "50" instead of clicking 50 times)
+- Retains +/- buttons for small adjustments
+- Auto-saves after 1 second
+- Validation prevents negative numbers
+
+### Reliable Order Status Updates
+**Location:** Admin Dashboard → Live Orders
+
+**Fix:**
+- Single-click status updates (was double-click)
+- Improved timing to prevent race conditions
+- Optimistic UI updates for instant feedback
+
+### Improved Logout
+**Location:** Admin Dashboard → Logout Button
+
+**Fix:**
+- Clears both localStorage and sessionStorage
+- Properly redirects to home page
+- No more stuck sessions
+
+## ⏰ Time Slot Improvements
+
+### Smart Time Filtering
+**Location:** User Cart → Schedule for Later
+
+**Features:**
+- Dropdown shows only future times
+- 30-minute intervals
+- Next 8 hours available
+- User-friendly format (e.g., "07:00 PM")
+
+### Order History Enhancement
+**Location:** User → Order History
+
+**Fix:**
+- Scheduled orders now appear immediately
+- Shows scheduled pickup time
+- All orders visible regardless of timing
+
+## 🔧 Technical Improvements
+
+### Database Configuration
+- Added `directUrl` support for Supabase
+- Separate pooler and direct connections
+
+### API Updates
+- Public analytics endpoint (with authentication option)
+- New reports generation endpoint
+

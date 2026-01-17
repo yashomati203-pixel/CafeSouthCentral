@@ -103,6 +103,58 @@ All notable changes to the **Cafe South Central** project will be documented in 
   - Added "Scheduled Time" and "Notes" columns.
   - Filtered Admin accounts from the "Members" view.
 
+## [2026-01-09]
+### Features
+- **Item Analytics System**:
+  - New Analytics tab in Admin Dashboard
+  - Tracks quantity sold, order count, and revenue per item
+  - Rankings with medals (🥇🥈🥉) for top items
+  - Visual "POPULAR" badges for top sellers
+- **Bestsellers Section**:
+  - Prominent display of top 3 selling items on user menu
+  - Yellow gradient styling with medal rankings
+  - Auto-updates based on sales data
+- **Sales Reports**:
+  - Generate downloadable reports for Day/Week/Month/Year
+  - Includes total revenue, orders, average order value
+  - Top 10 items breakdown with quantities and revenue
+  - Payment method analytics
+- **Editable Stock Inventory**:
+  - Inventory count can now be typed directly
+  - Retains +/- buttons for small adjustments
+  - Auto-saves with 1-second debounce
+
+### Bug Fixes
+- **Admin Logout**: Fixed logout not working - now clears both localStorage and sessionStorage
+- **Order Status Updates**: Increased delay to 500ms to prevent polling race conditions (no more double-clicking required)
+- **Analytics Loading**: Made analytics API publicly accessible to fix infinite loading state
+- **Order History**: Added `timeSlot` field so scheduled orders appear correctly in history
+- **Time Slot Selection**: Now only shows future time slots in 30-minute intervals (past times filtered out)
+
+### Technical
+- **Database Configuration**: Updated Prisma schema with `directUrl` for Supabase pgbouncer support
+- **New API Endpoints**:
+  - `/api/admin/analytics` - Item statistics
+  - `/api/admin/reports` - Sales report generation
+- **Improved Status Update Logic**: Changed from 300ms to 500ms delay for better stability
+
+### Changed
+- **Bestsellers Count**: Reduced from top 5 to top 3 for more exclusivity
+- **Time Slot UI**: Changed from time input to dropdown for better UX and validation
+
+### Fixed (Evening Session - January 9, 2026)
+- **Report Format**: Changed from .txt to .csv with proper table structure for Excel compatibility
+- **Report Spelling**: Fixed "Dayly" → "Daily" in report button labels
+- **Scheduled Order Indicator**: Added yellow badge showing "⏰ Scheduled: [time]" in order history
+- **QR Scanner Validation**: Prevents pickup of orders not marked as DONE/READY, shows helpful error messages
+- **Time Input Validation**: Reverted to native time picker with `min` attribute and validation to prevent past times
+- **Scheduled Order Crash**: Fixed `TypeError: P is not a function` by adding missing validation props to CartContent
+
+## [2026-01-14]
+### Documentation
+- **Consolidation**: Merged `FEATURES_UPDATE_JAN2026.md` into `FEATURES.md` for a single source of truth.
+- **Updates**: Updated `APP_DOCUMENTATION.md` and `PLAN.md` to reflect recent feature additions (Analytics, Reports, Push Notifications).
+
 ---
 
 *Note: This changelog is reconstructed from development history and may not capture every minor commit.*

@@ -178,26 +178,43 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                     {step === 'PHONE' ? 'Please login to continue ordering' : `Enter OTP sent to +91 ${phone}`}
                 </p>
 
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsAdminLogin(!isAdminLogin);
-                            setError('');
-                            setStep('PHONE');
-                        }}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#5C3A1A',
-                            textDecoration: 'underline',
-                            cursor: 'pointer',
-                            fontSize: '0.9rem'
-                        }}
-                    >
-                        {isAdminLogin ? '← Back to User Login' : 'Login as Admin'}
-                    </button>
-                </div>
+                {/* Admin Login Toggle - More Prominent */}
+                {step === 'PHONE' && (
+                    <div style={{
+                        marginBottom: '2rem',
+                        padding: '1rem',
+                        backgroundColor: '#f9fafb',
+                        borderRadius: '0.75rem',
+                        border: '1px solid #e5e7eb'
+                    }}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsAdminLogin(!isAdminLogin);
+                                setError('');
+                                setStep('PHONE');
+                            }}
+                            style={{
+                                width: '100%',
+                                background: 'none',
+                                border: 'none',
+                                color: '#5C3A1A',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                fontSize: '0.95rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.2rem' }}>
+                                {isAdminLogin ? '← ' : '🔐 '}
+                            </span>
+                            {isAdminLogin ? 'Back to User Login' : 'Admin Login'}
+                        </button>
+                    </div>
+                )}
 
                 <form onSubmit={step === 'PHONE' ? handleGetOtp : handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 

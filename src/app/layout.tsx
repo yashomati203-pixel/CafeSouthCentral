@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
+import ClickSpark from '@/components/ui/ClickSpark';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,10 +19,19 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <body className={inter.className} style={{ background: '#fefaef', minHeight: '100vh' }}>
                 <CartProvider>
                     {children}
                 </CartProvider>
+                <ClickSpark
+                    sparkColor="#D4AF37"
+                    sparkSize={8}
+                    sparkRadius={20}
+                    sparkCount={8}
+                    duration={500}
+                    easing="ease-out"
+                    extraScale={1.2}
+                />
             </body>
         </html>
     );

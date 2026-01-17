@@ -112,7 +112,27 @@ export default function StockItem({ item, onUpdate }: StockItemProps) {
                         onClick={() => updateCount(count - 1)}
                         style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}
                     >-</button>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 'bold', minWidth: '30px', textAlign: 'center' }}>{count}</span>
+                    <input
+                        type="number"
+                        value={count}
+                        onChange={(e) => {
+                            const newVal = parseInt(e.target.value) || 0;
+                            updateCount(newVal);
+                        }}
+                        onBlur={(e) => {
+                            const newVal = Math.max(0, parseInt(e.target.value) || 0);
+                            setCount(newVal);
+                        }}
+                        style={{
+                            fontSize: '1.1rem',
+                            fontWeight: 'bold',
+                            width: '50px',
+                            textAlign: 'center',
+                            border: '1px solid #ddd',
+                            borderRadius: '0.25rem',
+                            padding: '0.25rem'
+                        }}
+                    />
                     <button
                         onClick={() => updateCount(count + 1)}
                         style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}

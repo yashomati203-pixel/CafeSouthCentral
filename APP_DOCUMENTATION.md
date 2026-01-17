@@ -29,6 +29,7 @@ This application is a specialized food ordering system designed for high-traffic
 *   **Dashboard**: Overview of orders and inventory.
 *   **Order Management**: Update status of active orders.
 *   **Inventory Control**: Manage stock levels.
+*   **Analytics & Reports**: View bestsellers, sales trends, and download CSV reports.
 
 ## 3. Technical Architecture
 

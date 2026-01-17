@@ -111,14 +111,21 @@ This document maps out the specific steps for every key action within the applic
 *   **Action**: Check user details.
 *   **Location**: Admin Dashboard -> Members Tab.
 *   **Flow**:
-    1.  View list of subscribed users.
     2.  Check `Meals Consumed` vs `Monthly Quota`.
     3.  Check Plan Expiry.
+
+### 5. Analytics & Review
+*   **Action**: Review business performance.
+*   **Location**: Admin Dashboard -> Analytics Tab.
+*   **Flow**:
+    1.  View **Item Analytics**: Check rankings (🥇🥈🥉) and sales counts.
+    2.  Check **Charts**: Visual breakdown of revenue.
+    3.  **Generate Reports**: Download CSV for daily/weekly reconciliation.
 
 ---
 
 ## 🤖 System Automations
 
-*   **Stock Sync**: Whenever an order is confirmed (Normal OR Subscription), the system *atomically* decrements inventory. If inventory hits 0 mid-transaction, the order fails.
+*   **Stock Sync**: Whenever an order is confirmed (Normal OR Subscription), the system *automatically* decrements inventory. If inventory hits 0 mid-transaction, the order fails.
 *   **Quota Management**: Subscription orders automatically increment the user's `mealsConsumedThisMonth` counter.
 *   **Polling**: The User App polls for updates every 5 seconds to show "Ready for Pickup" status without manual refresh.

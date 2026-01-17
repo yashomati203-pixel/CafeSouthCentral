@@ -38,6 +38,62 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     const [note, setNote] = useState('');
     const [orderType, setOrderType] = useState<'NOW' | 'LATER'>('NOW');
     const [scheduledTime, setScheduledTime] = useState('');
+    const [timeError, setTimeError] = useState('');
+
+    // Generate available time slots (filter out past times)
+    const generateAvailableTimeSlots = () => {
+        const now = new Date();
+        const slots = [];
+
+        // Start from next 30-minute interval
+        let current = new Date(now);
+        const currentMinutes = current.getMinutes();
+        if (currentMinutes < 30) {
+            current.setMinutes(30);
+        } else {
+            current.setHours(current.getHours() + 1);
+            current.setMinutes(0);
+        }
+        current.setSeconds(0);
+        current.setMilliseconds(0);
+
+        // Generate slots for next 8 hours (16 slots of 30 min each)
+        for (let i = 0; i < 16; i++) {
+            const hours = current.getHours();
+            const minutes = current.getMinutes();
+            const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            const label = current.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            slots.push({ value: timeStr, label });
+            current.setMinutes(current.getMinutes() + 30);
+        }
+        return slots;
+    };
+
+    // Get current time in HH:MM format for min attribute
+    const getCurrentTime = () => {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
+    // Validate selected time is in the future
+    const validateTime = (time: string) => {
+        if (!time) return true;
+
+        const now = new Date();
+        const [hours, minutes] = time.split(':').map(Number);
+        const selectedTime = new Date();
+        selectedTime.setHours(hours, minutes, 0, 0);
+
+        if (selectedTime <= now) {
+            setTimeError('Please select a future time');
+            return false;
+        }
+
+        setTimeError('');
+        return true;
+    };
 
     // Auto-close Effect REMOVED by user request
     // useEffect(() => { ... }, []);
@@ -86,10 +142,21 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 return;
             }
 
-            if (orderType === 'LATER' && !scheduledTime) {
-                alert('Please select a time for your scheduled order.');
-                return;
+            // Validate scheduled time if "Schedule for Later" is selected
+            if (orderType === 'LATER') {
+                if (!scheduledTime) {
+                    alert('Please select a time for your scheduled order');
+                    return;
+                }
+
+                const isValid = validateTime(scheduledTime);
+                if (!isValid) {
+                    alert('Please select a future time for your order');
+                    return;
+                }
             }
+
+            setIsProcessing(true);
 
             // CHECK ONLINE STATUS FIRST
             const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
@@ -222,6 +289,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             setOrderType={setOrderType}
                             scheduledTime={scheduledTime}
                             setScheduledTime={setScheduledTime}
+                            validateTime={validateTime}
+                            timeError={timeError}
+                            getCurrentTime={getCurrentTime}
                         />
                     </div>
                 </div>
@@ -262,6 +332,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             setOrderType={setOrderType}
                             scheduledTime={scheduledTime}
                             setScheduledTime={setScheduledTime}
+                            validateTime={validateTime}
+                            timeError={timeError}
+                            getCurrentTime={getCurrentTime}
                         />
                     </div>
                 </div>
@@ -299,7 +372,10 @@ function CartContent({
     orderType,
     setOrderType,
     scheduledTime,
-    setScheduledTime
+    setScheduledTime,
+    validateTime,
+    timeError,
+    getCurrentTime
 }: any) {
     if (showSuccessAnimation) {
         return (
@@ -456,18 +532,35 @@ function CartContent({
                             </label>
                         </div>
                         {orderType === 'LATER' && (
-                            <input
-                                type="time"
-                                value={scheduledTime}
-                                onChange={(e) => setScheduledTime(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.5rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '0.5rem',
-                                    marginTop: '0.5rem'
-                                }}
-                            />
+                            <>
+                                <input
+                                    type="time"
+                                    value={scheduledTime}
+                                    min={getCurrentTime()}
+                                    onChange={(e) => {
+                                        setScheduledTime(e.target.value);
+                                        validateTime(e.target.value);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.5rem',
+                                        border: timeError ? '2px solid #dc2626' : '1px solid #ddd',
+                                        borderRadius: '0.5rem',
+                                        marginTop: '0.5rem',
+                                        fontSize: '0.9rem'
+                                    }}
+                                />
+                                {timeError && (
+                                    <p style={{
+                                        fontSize: '0.75rem',
+                                        color: '#dc2626',
+                                        marginTop: '0.25rem',
+                                        marginBottom: 0
+                                    }}>
+                                        {timeError}
+                                    </p>
+                                )}
+                            </>
                         )}
                         {orderType === 'LATER' && scheduledTime && (
                             <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.2rem' }}>

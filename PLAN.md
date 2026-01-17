@@ -20,6 +20,7 @@ This document outlines the current status of the **Cafe South Central** project 
 - [x] **Live Dashboard**: Real-time order incoming alerts (Sound + Visual).
 - [x] **Inventory**: Live stock management with immediate user-facing updates.
 - [x] **Kitchen Scanner**: QR code scanning workflow for order pickup.
+- [x] **Analytics**: Bestsellers view, Sales Reports (CSV), and Item Performance tracking.
 
 ### Subscription System
 - [x] **Logic**: Plan-based monthly quotas.
@@ -35,8 +36,7 @@ This document outlines the current status of the **Cafe South Central** project 
 - **Concept**: User app generates a QR code containing the full order payload. Kitchen scanner parses this payload and uploads it to the server via the Admin's connection.
 
 ### 2. Push Notifications
-- **Goal**: Real push notifications (FCM/OneSignal) instead of polling.
-- **Current**: App uses smart polling (5s interval) and local notifications while the tab is open.
+- [x] **Implemented**: Local notifications and Firebase Cloud Messaging (FCM) integration for "Order Ready" alerts and Cron-based reminders.
 
 ### 3. Payment Gateway
 - **Goal**: Replace "Simulated" UPI/Cash with real Razorpay/Stripe integration.

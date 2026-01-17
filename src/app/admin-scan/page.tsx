@@ -25,9 +25,32 @@ export default function AdminScanPage() {
 
     const processOrder = async (orderId: string) => {
         setStatus('PROCESSING');
-        setMessage(`Processing Order: ${orderId}...`);
+        setMessage(`Checking Order: ${orderId}...`);
 
         try {
+            // First, fetch the order to check its status
+            const orderRes = await fetch(`/api/admin/orders?orderId=${orderId}`);
+            if (!orderRes.ok) {
+                throw new Error('Order not found');
+            }
+
+            const orderData = await orderRes.json();
+            const order = Array.isArray(orderData) ? orderData[0] : orderData;
+
+            // Check if order is ready for pickup
+            if (order.status !== 'DONE' && order.status !== 'READY') {
+                setStatus('ERROR');
+                setMessage(`⚠️ Order ${order.displayId || orderId.slice(0, 8)} is still being prepared.\n\nCurrent Status: ${order.status}\n\nPlease wait until the order is marked as READY before scanning for pickup.`);
+
+                // Reset after 5 seconds
+                setTimeout(() => {
+                    setStatus('IDLE');
+                    setMessage('Scan customer QR code to mark order as picked up');
+                }, 5000);
+                return;
+            }
+
+            // Proceed with marking as SOLD
             const res = await fetch('/api/orders/update-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -40,7 +63,7 @@ export default function AdminScanPage() {
             }
 
             setStatus('SUCCESS');
-            setMessage(`Order ${orderId} Marked as SOLD! ✅`);
+            setMessage(`Order ${order.displayId || orderId.slice(0, 8)} Marked as SOLD! ✅`);
 
             // Redirect to admin dashboard after 2 seconds
             setTimeout(() => {

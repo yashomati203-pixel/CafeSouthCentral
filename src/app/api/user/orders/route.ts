@@ -24,6 +24,7 @@ export async function GET(request: Request) {
                 mode: true,
                 paymentMethod: true,
                 totalAmount: true,
+                timeSlot: true,
                 // Order items
                 items: {
                     select: {
