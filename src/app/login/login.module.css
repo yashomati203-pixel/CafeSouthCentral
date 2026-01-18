@@ -1,0 +1,168 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Logo Header - Top Left */
+.logoHeader {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 10;
+}
+
+/* Content Wrapper - Centers the login card */
+.contentWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 2rem;
+}
+
+/* Login Card */
+.loginCard {
+    width: 100%;
+    max-width: 450px;
+    padding: 3rem 2.5rem;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+/* --- WELCOME TEXT --- */
+.welcomeText {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #5C3A1A;
+    margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+/* --- THE FACE (SVG) --- */
+.faceSvg {
+    width: 200px;
+    height: 150px;
+    margin: 0 auto 2rem;
+    overflow: visible;
+}
+
+/* Styles for the drawing lines */
+.faceStroke {
+    fill: none;
+    stroke: #000;
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* The Eye Groups (We animate these) */
+.eyeGroup {
+    transition: transform 0.1s ease-out;
+}
+
+/* --- ADMIN TOGGLE --- */
+.adminToggle {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+}
+
+.adminButton {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #5C3A1A;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0;
+}
+
+.adminButton:hover {
+    opacity: 0.8;
+}
+
+/* --- FORM STYLES --- */
+.input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    margin: 0.75rem 0;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    color: #1f1f1f;
+    background: white;
+}
+
+.input:focus {
+    border-color: #5C3A1A;
+}
+
+.button {
+    width: 100%;
+    padding: 0.875rem;
+    background: #5C3A1A;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    background: #4a2e15;
+}
+
+.backLink {
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    padding: 0;
+}
+
+.backLink:hover {
+    color: #5C3A1A;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logoHeader {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .loginCard {
+        padding: 2rem 1.5rem;
+    }
+
+    .welcomeText {
+        font-size: 1.5rem;
+    }
+}
