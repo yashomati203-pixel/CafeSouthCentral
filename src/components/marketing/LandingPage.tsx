@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { AnimatedText } from "@/components/ui/animated-underline-text-one";
 import { useScroll, useTransform } from 'motion/react';
 import Antigravity from '@/components/ui/Antigravity';
+import FeaturesSection from './FeaturesSection';
+import Footer from '../layout/Footer';
+import ScrollParallax from './ScrollParallax';
 
 interface LandingPageProps {
     onExplore: () => void;
@@ -28,6 +31,15 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
 
     // Scroll-based carousel movement
     const carouselX = useTransform(scrollY, [0, 500], [0, -600]);
+    
+    // Parallax transforms for floating coffee cup elements
+    const floatingY1 = useTransform(scrollY, [0, 800], [0, -150]);
+    const floatingY2 = useTransform(scrollY, [0, 800], [0, 150]);
+    const floatingY3 = useTransform(scrollY, [0, 800], [0, -120]);
+    const floatingX1 = useTransform(scrollY, [0, 800], [0, -80]);
+    const floatingX2 = useTransform(scrollY, [0, 800], [0, 80]);
+    const rotate1 = useTransform(scrollY, [0, 800], [0, -20]);
+    const rotate2 = useTransform(scrollY, [0, 800], [0, 20]);
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -183,6 +195,109 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                 background: 'transparent',
                 zIndex: 1
             }}>
+                {/* Floating Coffee Cup Elements with Parallax */}
+                <motion.div
+                    style={{
+                        position: 'absolute',
+                        top: '5%',
+                        left: '10%',
+                        y: floatingY1,
+                        x: floatingX1,
+                        rotate: rotate1,
+                        zIndex: 0
+                    }}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 0.8, scale: 1 }}
+                    transition={{ duration: 1, delay: 0.3 }}
+                >
+                    <div style={{
+                        width: '150px',
+                        height: '150px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
+                        background: '#fff'
+                    }}>
+                        <img
+                            src="/images/hero/filter-coffee.png"
+                            alt="Filter Coffee"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    style={{
+                        position: 'absolute',
+                        top: '20%',
+                        right: '8%',
+                        y: floatingY2,
+                        x: floatingX2,
+                        rotate: rotate2,
+                        zIndex: 0
+                    }}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 0.8, scale: 1 }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                >
+                    <div style={{
+                        width: '130px',
+                        height: '130px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
+                        background: '#fff'
+                    }}>
+                        <img
+                            src="/images/hero/latte.png"
+                            alt="Latte"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    style={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: '12%',
+                        y: floatingY3,
+                        rotate: rotate1,
+                        zIndex: 0
+                    }}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 0.7, scale: 1 }}
+                    transition={{ duration: 1, delay: 0.7 }}
+                >
+                    <div style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
+                        background: '#fff'
+                    }}>
+                        <img
+                            src="/images/hero/dosa.png"
+                            alt="Dosa"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    </div>
+                </motion.div>
+
+                {/* Center Content */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -289,8 +404,8 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                             {[...Array(3)].map((_, setIndex) => (
                                 <React.Fragment key={setIndex}>
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1, rotate: -48.66 }}
+                                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: -48.66, y: 0 }}
                                         transition={{ duration: 0.8, delay: 0.2 }}
                                         style={{
                                             minWidth: '280px',
@@ -312,8 +427,8 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                                         />
                                     </motion.div>
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1, rotate: 48.66 }}
+                                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: 48.66, y: 0 }}
                                         transition={{ duration: 0.8, delay: 0.3 }}
                                         style={{
                                             minWidth: '280px',
@@ -335,8 +450,8 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                                         />
                                     </motion.div>
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1, rotate: -48.66 }}
+                                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: -48.66, y: 0 }}
                                         transition={{ duration: 0.8, delay: 0.4 }}
                                         style={{
                                             minWidth: '280px',
@@ -358,8 +473,8 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                                         />
                                     </motion.div>
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1, rotate: 48.66 }}
+                                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: 48.66, y: 0 }}
                                         transition={{ duration: 0.8, delay: 0.5 }}
                                         style={{
                                             minWidth: '280px',
@@ -388,67 +503,51 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
             </header>
 
             {/* Visual Category Grid */}
-            <main style={{ flex: 1, padding: '12rem 2rem 3rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-                <h2 style={{
-                    fontSize: '2.5rem',
-                    fontWeight: '800',
-                    color: '#3C2A21',
-                    marginBottom: '3rem',
-                    textAlign: 'center'
-                }}>
-                    OUR MENU
-                </h2>
+            {/* Spacer for Carousel overflow */}
+            <div style={{ height: '300px' }}></div>
 
+            {/* Parallax Scroll Section */}
+            <section style={{
+                position: 'relative',
+                width: '100%',
+                minHeight: '60vh',
+                background: 'linear-gradient(180deg, #fefaef 0%, #f5ede2 100%)',
+                padding: '2rem 2rem',
+                overflow: 'hidden'
+            }}>
+                {/* Title for Parallax Section */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                    gap: '1.5rem',
+                    textAlign: 'center',
+                    marginBottom: '1.5rem',
+                    position: 'relative',
+                    zIndex: 20
                 }}>
-                    {CATEGORIES.map((cat, index) => (
-                        <motion.div
-                            key={cat.name}
-                            onClick={() => onCategorySelect && onCategorySelect(cat.dataCategory)}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.05 }}
-                            whileHover={{ scale: 1.05 }}
-                            style={{
-                                backgroundColor: cat.color,
-                                borderRadius: '1rem',
-                                padding: '1.5rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                                transition: 'box-shadow 0.2s'
-                            }}
-                        >
-                            <div style={{
-                                fontSize: '3rem',
-                                marginBottom: '1rem',
-                                filter: 'drop-shadow(2px 2px 0px rgba(0,0,0,0.1))'
-                            }}>
-                                {cat.icon}
-                            </div>
-                            <span style={{
-                                fontWeight: '700',
-                                color: '#4b5563',
-                                fontSize: '1rem'
-                            }}>
-                                {cat.name}
-                            </span>
-                        </motion.div>
-                    ))}
+                    <h2 style={{
+                        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                        fontWeight: 800,
+                        color: '#3C2A21',
+                        marginBottom: '0.5rem',
+                        letterSpacing: '-0.02em'
+                    }}>
+                        We Serve You With
+                    </h2>
+                    <p style={{
+                        fontSize: '1rem',
+                        color: '#6B5B52',
+                        maxWidth: '500px',
+                        margin: '0 auto'
+                    }}>
+                        South Indian, Dosa, Rice Bowls, North Indian, Snacks, Beverages, Chaat & Desserts
+                    </p>
                 </div>
 
-                {/* Additional Info / Footer tease */}
-                <div style={{ marginTop: '4rem', textAlign: 'center', color: '#6B5B52', borderTop: '1px solid #E5DDD8', paddingTop: '2rem' }}>
-                    <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>Open daily from 8:00 AM to 10:00 PM</p>
-                    <p style={{ fontSize: '0.95rem', marginTop: '0.5rem' }}>📍 Located at Food Court, IIM Nagpur</p>
-                </div>
-            </main>
+                {/* Parallax Items Container */}
+                <ScrollParallax />
+            </section>
+
+            {/* New Features and Footer Sections */}
+            <FeaturesSection />
+            <Footer />
         </div>
     );
 }

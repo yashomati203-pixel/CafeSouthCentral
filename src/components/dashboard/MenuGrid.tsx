@@ -3,6 +3,37 @@ import { CATEGORY_ORDER } from '@/hooks/useMenu';
 import { CartItem } from '@/context/CartContext';
 import { useState, useEffect } from 'react';
 import { AnimatedItem } from '@/components/ui/AnimatedList';
+import { Search, ShoppingCart, Plus, Minus, Trash2, Sparkles } from 'lucide-react';
+import SectionDivider from '@/components/ui/SectionDivider';
+
+const FOOD_IMAGES: Record<string, string> = {
+    'dosa': 'https://images.unsplash.com/photo-1668236543090-d2f896b0101d?q=80&w=800&auto=format&fit=crop',
+    'idli': 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop',
+    'coffee': 'https://images.unsplash.com/photo-1596933580749-0d3381a8f602?q=80&w=800&auto=format&fit=crop',
+    'tea': 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?q=80&w=800&auto=format&fit=crop',
+    'rice': 'https://images.unsplash.com/photo-1516685018646-549198525c1b?q=80&w=800&auto=format&fit=crop',
+    'meals': 'https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=800&auto=format&fit=crop',
+    'vada': 'https://images.unsplash.com/photo-1630409351241-e90e7f5e4785?q=80&w=800&auto=format&fit=crop',
+    'pongal': 'https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=800&auto=format&fit=crop', // Fallback to meals for now
+    'biryani': 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop',
+    'sweet': 'https://images.unsplash.com/photo-1569584627042-49d8c3639d67?q=80&w=800&auto=format&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop'
+};
+
+function getFoodImage(name: string): string {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('dosa') || lowerName.includes('roast')) return FOOD_IMAGES.dosa;
+    if (lowerName.includes('idli')) return FOOD_IMAGES.idli;
+    if (lowerName.includes('coffee')) return FOOD_IMAGES.coffee;
+    if (lowerName.includes('tea') || lowerName.includes('chai')) return FOOD_IMAGES.tea;
+    if (lowerName.includes('rice') || lowerName.includes('bath') || lowerName.includes('pulao')) return FOOD_IMAGES.rice;
+    if (lowerName.includes('thali') || lowerName.includes('meal')) return FOOD_IMAGES.meals;
+    if (lowerName.includes('vada') || lowerName.includes('vadai')) return FOOD_IMAGES.vada;
+    if (lowerName.includes('pongal')) return FOOD_IMAGES.pongal;
+    if (lowerName.includes('biryani')) return FOOD_IMAGES.biryani;
+    if (lowerName.includes('mysore pak') || lowerName.includes('halwa')) return FOOD_IMAGES.sweet;
+    return FOOD_IMAGES.default;
+}
 
 interface MenuGridProps {
     menuItems: MenuItem[];
@@ -27,6 +58,7 @@ export default function MenuGrid({
 }: MenuGridProps) {
     const [popularItemIds, setPopularItemIds] = useState<Set<string>>(new Set());
     const [topSellingItems, setTopSellingItems] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch popular items from analytics
     useEffect(() => {
@@ -36,93 +68,102 @@ export default function MenuGrid({
                 if (data?.topSelling) {
                     const topIds = new Set<string>(data.topSelling.map((item: { id: string }) => item.id));
                     setPopularItemIds(topIds);
-                    setTopSellingItems(data.topSelling.slice(0, 3)); // Store top 3 for bestsellers section
+                    setTopSellingItems(data.topSelling.slice(0, 3));
                 }
             })
-            .catch(() => { }); // Silent fail
+            .catch(() => { });
     }, []);
+
+    const activeMenu = menuItems.length > 0 ? menuItems : mockMenu;
+
+    // Filter items based on search query
+    const filteredItems = activeMenu.filter(item => {
+        const matchesSearch = searchQuery === '' ||
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+
+        const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
+        const matchesMode = mode === 'NORMAL' || isAvailableInSub;
+
+        return matchesSearch && matchesCategory && matchesMode;
+    });
 
     return (
         <>
-            <section style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '1rem',
-                padding: '2rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>
-                        {mode === 'NORMAL' ? '🍔 Normal Menu' : '🥗 Subscription Plan'}
-                    </h2>
+            <section className="p-0 md:p-0">
+                {/* Header */}
+                {/* New Centered Header */}
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-primary p-2.5 rounded-xl flex items-center justify-center">
+                        <ShoppingCart className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                            {mode === 'NORMAL' ? 'Our Menu' : 'Subscription Menu'}
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                            {mode === 'NORMAL'
+                                ? 'Authentic South Indian delicacies made fresh daily'
+                                : 'Select items for your daily meal quota'}
+                        </p>
+                    </div>
                 </div>
 
-                <p style={{ color: '#666', marginBottom: '2rem' }}>
-                    {mode === 'NORMAL'
-                        ? 'Order anything from our wide range of delicacies. Pay per order.'
-                        : 'Select items for your daily meal quota. No payment required at checkout.'}
-                </p>
+                {/* Search Bar */}
+                <div className="mb-8 max-w-2xl">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Search className="w-5 h-5 text-primary/40" />
+                        </div>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="block w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border-none rounded-2xl shadow-sm ring-1 ring-primary/5 focus:ring-2 focus:ring-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+                            placeholder="Search for ghee idli, filter coffee, or crispy dosas..."
+                        />
+                    </div>
+                </div>
 
-                {/* Category Filter Pills */}
-                <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    overflowX: 'auto',
-                    paddingBottom: '1rem',
-                    marginBottom: '1rem',
-                    scrollbarWidth: 'none'
-                }}>
+                {/* Category Chips */}
+                <div className="mb-8 flex flex-wrap gap-3 overflow-x-auto pb-2 scrollbar-hide">
                     {['All', ...CATEGORY_ORDER.filter(c => mockMenu.some(i => i.category === c))].map(cat => (
                         <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            style={{
-                                padding: '0.5rem 1.5rem',
-                                borderRadius: '999px',
-                                border: 'none',
-                                backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#EEE',
-                                color: selectedCategory === cat ? 'white' : '#666',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap',
-                                transition: 'all 0.2s'
-                            }}
+                            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
+                                ? 'bg-[#5C3A1A] text-white shadow-lg shadow-stone-400/50 scale-105'
+                                : 'bg-stone-200 dark:bg-slate-700 text-stone-700 dark:text-slate-300 hover:bg-stone-300 dark:hover:bg-slate-600 hover:scale-105'
+                                }`}
                         >
                             {cat}
                         </button>
                     ))}
                 </div>
 
+                <div className="mb-8">
+                    <SectionDivider />
+                </div>
+
                 {/* Bestsellers Section */}
-                {topSellingItems.length > 0 && selectedCategory === 'All' && (
-                    <div style={{
-                        marginBottom: '2.5rem',
-                        padding: '1.5rem',
-                        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                        borderRadius: '1rem',
-                        border: '2px solid #f59e0b'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <span style={{ fontSize: '1.5rem' }}>🔥</span>
-                            <h3 style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                color: '#92400e',
-                                margin: 0
-                            }}>
+                {topSellingItems.length > 0 && selectedCategory === 'All' && searchQuery === '' && (
+                    <div className="mb-10 p-6 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-2xl border-2 border-amber-400 dark:border-amber-600">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="w-6 h-6 text-amber-700 dark:text-amber-500" />
+                            <h3 className="text-2xl font-extrabold text-amber-900 dark:text-amber-100">
                                 Bestsellers
                             </h3>
                         </div>
-                        <p style={{ color: '#78350f', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        <p className="text-amber-800 dark:text-amber-200 mb-6 text-sm">
                             Our most loved dishes - handpicked by your favorites!
                         </p>
                         <div className="menu-grid">
                             {topSellingItems.map((statsItem, idx) => {
-                                const item = (menuItems.length > 0 ? menuItems : mockMenu).find(m => m.id === statsItem.id);
+                                const item = activeMenu.find(m => m.id === statsItem.id);
                                 if (!item) return null;
-
-                                // Filter logic (same as main menu)
-                                const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
-                                if (mode === 'SUBSCRIPTION' && !isAvailableInSub) return null;
 
                                 const cartItem = cartItems.find(i =>
                                     i.id === item.id &&
@@ -131,111 +172,20 @@ export default function MenuGrid({
 
                                 return (
                                     <AnimatedItem key={item.id} index={idx} delay={idx * 0.05}>
-                                        <div className="menu-card" style={{
-                                            backgroundColor: '#fffbeb',
-                                            border: '2px solid #fbbf24',
-                                            position: 'relative',
-                                            opacity: item.inventoryCount === 0 ? 0.6 : 1,
-                                        }}>
+                                        <div className="group menu-card bg-amber-50/50 dark:bg-amber-900/10 border-2 border-amber-300 dark:border-amber-600 relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                             {/* Rank Badge */}
-                                            <div style={{
-                                                position: 'absolute',
-                                                top: '0.5rem',
-                                                left: '0.5rem',
-                                                backgroundColor: '#92400e',
-                                                color: 'white',
-                                                borderRadius: '50%',
-                                                width: '28px',
-                                                height: '28px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontWeight: 'bold',
-                                                fontSize: '1rem',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                            }}>
-                                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
-                                            </div>
-                                            <div>
-                                                <div className="menu-image">
-                                                    [Image: {item.name}]
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                                                    <h3 className="menu-title">{item.name}</h3>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                                                        <span style={{
-                                                            fontSize: '0.75rem',
-                                                            padding: '2px 6px',
-                                                            border: item.isVeg ? '1px solid green' : '1px solid red',
-                                                            color: item.isVeg ? 'green' : 'red',
-                                                            borderRadius: '4px'
-                                                        }}>
-                                                            {item.isVeg ? 'VEG' : 'NON-VEG'}
-                                                        </span>
-                                                        {item.inventoryCount === 0 ? (
-                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
-                                                                SOLD OUT
-                                                            </span>
-                                                        ) : item.inventoryCount <= 5 ? (
-                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
-                                                                Running Out!
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                                <p className="menu-desc">
-                                                    {item.description}
-                                                </p>
+                                            <div className="absolute top-3 left-3 z-10 bg-amber-900 dark:bg-amber-700 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold text-base shadow-lg">
+                                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
                                             </div>
 
-                                            <div style={{ marginTop: '1rem' }}>
-                                                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#92400e' }}>
-                                                    {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
-                                                </p>
-
-                                                {cartItem ? (
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'space-between',
-                                                        backgroundColor: '#f3f4f6',
-                                                        borderRadius: '0.5rem',
-                                                        padding: '0.25rem'
-                                                    }}>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
-                                                            style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#92400e', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                        >
-                                                            -
-                                                        </button>
-                                                        <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
-                                                            style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#92400e', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                        >
-                                                            +
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => onAddToCart(item)}
-                                                        disabled={item.inventoryCount === 0}
-                                                        style={{
-                                                            width: '100%',
-                                                            padding: '0.75rem',
-                                                            backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#92400e',
-                                                            color: 'white',
-                                                            border: 'none',
-                                                            borderRadius: '0.5rem',
-                                                            cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
-                                                            fontWeight: 600,
-                                                            transition: 'opacity 0.2s'
-                                                        }}
-                                                    >
-                                                        {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
-                                                    </button>
-                                                )}
-                                            </div>
+                                            <MenuItemCard
+                                                item={item}
+                                                cartItem={cartItem}
+                                                onAddToCart={onAddToCart}
+                                                onDecreaseQty={onDecreaseQty}
+                                                mode={mode}
+                                                isBestseller={true}
+                                            />
                                         </div>
                                     </AnimatedItem>
                                 );
@@ -246,14 +196,7 @@ export default function MenuGrid({
 
                 {/* Grouped Menu Sections */}
                 {Object.entries(
-                    (menuItems.length > 0 ? menuItems : mockMenu).reduce((acc, item) => {
-                        // Filter Logic
-                        const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
-                        if (mode === 'SUBSCRIPTION' && !isAvailableInSub) return acc;
-
-                        // Category Filter Logic
-                        if (selectedCategory !== 'All' && item.category !== selectedCategory) return acc;
-
+                    filteredItems.reduce((acc, item) => {
                         if (!acc[item.category]) acc[item.category] = [];
                         acc[item.category].push(item);
                         return acc;
@@ -264,207 +207,186 @@ export default function MenuGrid({
                     const safeIndexA = indexA === -1 ? 999 : indexA;
                     const safeIndexB = indexB === -1 ? 999 : indexB;
                     return safeIndexA - safeIndexB;
-                })
-                    .map(([category, categoryItems]) => (
-                        <div key={category} style={{ marginBottom: '2rem' }}>
-                            <h3 style={{
-                                fontSize: '1.25rem',
-                                fontWeight: 'bold',
-                                marginBottom: '1rem',
-                                color: '#5C3A1A',
-                                borderBottom: '2px solid #EEE',
-                                paddingBottom: '0.5rem'
-                            }}>
-                                {category}
-                            </h3>
-                            <div className="menu-grid">
-                                {categoryItems.map((item, idx) => (
+                }).map(([category, categoryItems]) => (
+                    <div key={category} className="mb-8">
+                        <h3 className="text-xl font-bold mb-6 text-primary dark:text-primary/90 border-b-2 border-slate-100 dark:border-slate-700 pb-3">
+                            {category}
+                        </h3>
+                        <div className="menu-grid">
+                            {categoryItems.map((item, idx) => {
+                                const cartItem = cartItems.find(i =>
+                                    i.id === item.id &&
+                                    (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
+                                );
+
+                                return (
                                     <AnimatedItem key={item.id} index={idx} delay={idx * 0.03}>
-                                        <div className="menu-card" style={{
-                                            backgroundColor: mode === 'SUBSCRIPTION' ? '#f0fdf4' : 'white',
-                                            opacity: item.inventoryCount === 0 ? 0.6 : 1,
-                                        }}>
-                                            <div>
-                                                <div className="menu-image">
-                                                    [Image: {item.name}]
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-
-                                                    <h3 className="menu-title">{item.name}</h3>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                                                        <span style={{
-                                                            fontSize: '0.75rem',
-                                                            padding: '2px 6px',
-                                                            border: item.isVeg ? '1px solid green' : '1px solid red',
-                                                            color: item.isVeg ? 'green' : 'red',
-                                                            borderRadius: '4px'
-                                                        }}>
-                                                            {item.isVeg ? 'VEG' : 'NON-VEG'}
-                                                        </span>
-                                                        {popularItemIds.has(item.id) && (
-                                                            <span style={{
-                                                                fontSize: '0.65rem',
-                                                                fontWeight: 'bold',
-                                                                color: '#d97706',
-                                                                backgroundColor: '#fef3c7',
-                                                                padding: '2px 6px',
-                                                                borderRadius: '99px',
-                                                                display: 'inline-flex',
-                                                                alignItems: 'center',
-                                                                gap: '2px'
-                                                            }}>
-                                                                🔥 POPULAR
-                                                            </span>
-                                                        )}
-                                                        {item.inventoryCount === 0 ? (
-                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red', border: '1px solid red', padding: '1px 4px', borderRadius: '4px' }}>
-                                                                SOLD OUT
-                                                            </span>
-                                                        ) : item.inventoryCount <= 5 ? (
-                                                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: '#ef4444', padding: '2px 6px', borderRadius: '99px' }}>
-                                                                Running Out!
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                                <p className="menu-desc">
-                                                    {item.description}
-                                                </p>
-                                            </div>
-
-                                            <div style={{ marginTop: '1rem' }}>
-                                                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#5C3A1A' }}>
-                                                    {mode === 'NORMAL' ? `₹ ${item.price}` : 'Included in Plan'}
-                                                </p>
-
-                                                {(() => {
-                                                    const cartItem = cartItems.find(i =>
-                                                        i.id === item.id &&
-                                                        (mode === 'NORMAL' ? i.type === MenuItemType.NORMAL : i.type === MenuItemType.SUBSCRIPTION)
-                                                    );
-
-                                                    if (cartItem) {
-                                                        return (
-                                                            <div style={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'space-between',
-                                                                backgroundColor: '#f3f4f6',
-                                                                borderRadius: '0.5rem',
-                                                                padding: '0.25rem'
-                                                            }}>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
-                                                                    style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                                >
-                                                                    -
-                                                                </button>
-                                                                <span style={{ fontWeight: 'bold' }}>{cartItem.qty}</span>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
-                                                                    style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', backgroundColor: '#5C3A1A', color: 'white', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }}
-                                                                >
-                                                                    +
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    }
-
-                                                    return (
-                                                        <button
-                                                            onClick={() => onAddToCart(item)}
-                                                            disabled={item.inventoryCount === 0}
-                                                            style={{
-                                                                width: '100%',
-                                                                padding: '0.75rem',
-                                                                backgroundColor: item.inventoryCount === 0 ? '#ccc' : '#5C3A1A',
-                                                                color: 'white',
-                                                                border: 'none',
-                                                                borderRadius: '0.5rem',
-                                                                cursor: item.inventoryCount === 0 ? 'not-allowed' : 'pointer',
-                                                                fontWeight: 600,
-                                                                transition: 'opacity 0.2s'
-                                                            }}
-                                                        >
-                                                            {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
-                                                        </button>
-                                                    );
-                                                })()}
-                                            </div>
+                                        <div className="group menu-card bg-white dark:bg-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                            <MenuItemCard
+                                                item={item}
+                                                cartItem={cartItem}
+                                                onAddToCart={onAddToCart}
+                                                onDecreaseQty={onDecreaseQty}
+                                                mode={mode}
+                                                isPopular={popularItemIds.has(item.id)}
+                                            />
                                         </div>
                                     </AnimatedItem>
-                                ))}
-                            </div>
+                                );
+                            })}
                         </div>
-                    ))}
+                    </div>
+                ))}
+
+                {/* Empty State */}
+                {filteredItems.length === 0 && (
+                    <div className="text-center py-16">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">
+                            No items found
+                        </h3>
+                        <p className="text-slate-500 dark:text-slate-400">
+                            Try adjusting your search or filters
+                        </p>
+                    </div>
+                )}
             </section>
-            <style>{`
-            .menu-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr); /* Mobile: 2 items fixed */
-                gap: 1rem;
-            }
 
-            .menu-card {
-                border: 1px solid #eee;
-                border-radius: 0.5rem;
-                padding: 0.75rem; /* Reduced padding */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-
-            .menu-image {
-                height: 120px; /* Smaller image on mobile */
-                background-color: #eee;
-                border-radius: 0.25rem;
-                margin-bottom: 0.75rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #aaa;
-                font-size: 0.8rem;
-                text-align: center;
-                overflow: hidden;
-            }
-
-            .menu-title {
-                font-weight: bold;
-                font-size: 0.95rem; /* Smaller title */
-                line-height: 1.2;
-            }
-
-            .menu-desc {
-                font-size: 0.8rem;
-                color: #666;
-                margin-top: 0.25rem;
-                display: -webkit-box;
-                -webkit-line-clamp: 2; /* Limit text lines */
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-
-            /* Desktop Overrides */
-            @media (min-width: 768px) {
+            <style jsx>{`
                 .menu-grid {
-                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    display: grid;
+                    grid-template-columns: 1fr;
                     gap: 1.5rem;
                 }
+
+                @media (min-width: 640px) {
+                    .menu-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (min-width: 1280px) {
+                    .menu-grid {
+                        grid-template-columns: repeat(5, 1fr);
+                    }
+                }
+
                 .menu-card {
-                    padding: 1rem;
+                    border-radius: 1rem;
+                    overflow: hidden;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    border: 1px solid rgba(0, 0, 0, 0.05);
                 }
-                .menu-title {
-                    font-size: 1.1rem;
+
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
                 }
-                .menu-image {
-                    height: 150px;
+
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
                 }
-                .menu-desc {
-                   -webkit-line-clamp: 3;
-                }
-            }
-        `}</style>
+            `}</style>
         </>
+    );
+}
+
+// Separate MenuItemCard component for better organization
+function MenuItemCard({
+    item,
+    cartItem,
+    onAddToCart,
+    onDecreaseQty,
+    mode,
+    isBestseller = false,
+    isPopular = false
+}: {
+    item: MenuItem;
+    cartItem?: CartItem;
+    onAddToCart: (item: MenuItem) => void;
+    onDecreaseQty: (itemId: string) => void;
+    mode: 'NORMAL' | 'SUBSCRIPTION';
+    isBestseller?: boolean;
+    isPopular?: boolean;
+}) {
+    return (
+        <div className={`flex flex-col h-full ${item.inventoryCount === 0 ? 'opacity-60' : ''}`}>
+            {/* Image */}
+            <div className="relative aspect-square w-full overflow-hidden bg-slate-100 dark:bg-slate-700">
+                {!isBestseller && isPopular && (
+                    <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full px-3 py-1 text-xs font-bold text-[#5C3A1A] shadow-sm">
+                        Bestseller
+                    </div>
+                )}
+                <img
+                    src={getFoodImage(item.name)}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+            </div>
+
+            {/* Content */}
+            <div className="p-6 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white flex-1">
+                        {item.name}
+                    </h3>
+                    <div className="flex flex-col items-end gap-1 ml-2">
+                        <span className={`text-xs px-2 py-0.5 rounded border ${item.isVeg
+                            ? 'border-green-500 text-green-600 dark:text-green-400'
+                            : 'border-red-500 text-red-600 dark:text-red-400'
+                            }`}>
+                            {item.isVeg ? 'VEG' : 'NON-VEG'}
+                        </span>
+                        {item.inventoryCount === 0 ? (
+                            <span className="text-xs font-bold text-red-600 border border-red-600 px-2 py-0.5 rounded">
+                                SOLD OUT
+                            </span>
+                        ) : item.inventoryCount <= 5 ? (
+                            <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                                Running Out!
+                            </span>
+                        ) : null}
+                    </div>
+                </div>
+
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 line-clamp-2">
+                    {item.description}
+                </p>
+
+                <div className="mt-auto">
+                    <p className="text-lg font-extrabold mb-3 text-[#5C3A1A] dark:text-amber-500">
+                        {mode === 'NORMAL' ? `₹${item.price}` : 'Included in Plan'}
+                    </p>
+
+                    {cartItem ? (
+                        <div className="flex items-center justify-between bg-stone-100 dark:bg-slate-700 rounded-xl p-1">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
+                                className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
+                            >
+                                <Minus className="w-5 h-5" />
+                            </button>
+                            <span className="font-bold text-[#5C3A1A] dark:text-white px-2">{cartItem.qty}</span>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
+                                className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
+                            >
+                                <Plus className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => onAddToCart(item)}
+                            disabled={item.inventoryCount === 0}
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-stone-100 hover:bg-[#5C3A1A] text-[#5C3A1A] hover:text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+                        >
+                            <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                            {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 }

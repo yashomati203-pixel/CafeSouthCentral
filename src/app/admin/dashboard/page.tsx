@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import StockItem from '@/components/admin/StockItem';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import { printKOT } from '@/lib/printer';
 
 const formatTime = (timeStr: string) => {
@@ -414,7 +415,7 @@ export default function AdminDashboard() {
                 <button onClick={() => { setActiveTab('feedback'); fetchFeedback(); }} style={{ padding: '1rem', borderBottom: activeTab === 'feedback' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'feedback' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
                     ⭐ Feedback
                 </button>
-                <button onClick={() => { setActiveTab('analytics'); fetchAnalytics(); }} style={{ padding: '1rem', borderBottom: activeTab === 'analytics' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'analytics' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
+                <button onClick={() => { setActiveTab('analytics'); }} style={{ padding: '1rem', borderBottom: activeTab === 'analytics' ? '3px solid #5C3A1A' : '3px solid transparent', color: activeTab === 'analytics' ? '#5C3A1A' : '#6b7280', fontWeight: 'bold', cursor: 'pointer', background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', fontSize: '1rem' }}>
                     📊 Analytics
                 </button>
             </div>
@@ -810,10 +811,17 @@ export default function AdminDashboard() {
                                 ))}
                             </tbody>
                         </table>
-                    )}
-                </div>
+                    )
+                    }
+                </div >
             )
             }
+
+
+            {/* ANALYTICS TAB */}
+            {activeTab === 'analytics' && (
+                <AnalyticsDashboard />
+            )}
 
             {/* FEEDBACK TAB */}
             {
@@ -861,289 +869,293 @@ export default function AdminDashboard() {
             }
 
             {/* ANALYTICS TAB */}
-            {activeTab === 'analytics' && (
-                <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-                    {!analytics ? (
-                        <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Loading analytics...</div>
-                    ) : analytics.stats.length === 0 ? (
-                        <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>No sales data yet</div>
-                    ) : (
-                        <>
-                            <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.5rem' }}>📊 Item Analytics</h2>
-                                <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>Total Orders Analyzed: {analytics.totalOrders}</p>
+            {
+                activeTab === 'analytics' && (
+                    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                        {!analytics ? (
+                            <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Loading analytics...</div>
+                        ) : analytics.stats.length === 0 ? (
+                            <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>No sales data yet</div>
+                        ) : (
+                            <>
+                                <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.5rem' }}>📊 Item Analytics</h2>
+                                    <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>Total Orders Analyzed: {analytics.totalOrders}</p>
 
-                                {/* Reports Section */}
-                                <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e5e7eb' }}>
-                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.75rem' }}>📄 Generate Reports</h3>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                        {['day', 'week', 'month', 'year'].map(period => (
-                                            <button
-                                                key={period}
-                                                onClick={async () => {
-                                                    try {
-                                                        const res = await fetch(`/api/admin/reports?period=${period}`);
-                                                        const data = await res.json();
+                                    {/* Reports Section */}
+                                    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e5e7eb' }}>
+                                        <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.75rem' }}>📄 Generate Reports</h3>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            {['day', 'week', 'month', 'year'].map(period => (
+                                                <button
+                                                    key={period}
+                                                    onClick={async () => {
+                                                        try {
+                                                            const res = await fetch(`/api/admin/reports?period=${period}`);
+                                                            const data = await res.json();
 
-                                                        // Create CSV report
-                                                        const csvRows = [
-                                                            [`Sales Report - ${period.toUpperCase()}`],
-                                                            [`Generated`, new Date().toLocaleDateString()],
-                                                            [],
-                                                            [`Period`, `Start Date`, `End Date`],
-                                                            [`Summary`, new Date(data.startDate).toLocaleDateString(), new Date(data.endDate).toLocaleDateString()],
-                                                            [],
-                                                            [`Metric`, `Value`],
-                                                            [`Total Revenue`, `₹${data.totalRevenue.toFixed(2)}`],
-                                                            [`Total Orders`, data.totalOrders],
-                                                            [`Average Order Value`, `₹${data.averageOrderValue.toFixed(2)}`],
-                                                            [],
-                                                            [`TOP 10 ITEMS`],
-                                                            [`Rank`, `Item Name`, `Quantity Sold`, `Revenue`],
-                                                            ...data.topItems.map((item: any, i: number) =>
-                                                                [`${i + 1}`, item.name, item.quantity, `₹${item.revenue.toFixed(2)}`]
-                                                            ),
-                                                            [],
-                                                            [`PAYMENT BREAKDOWN`],
-                                                            [`Payment Method`, `Order Count`],
-                                                            ...Object.entries(data.paymentBreakdown).map(([method, count]) =>
-                                                                [method, count]
-                                                            )
-                                                        ];
+                                                            // Create CSV report
+                                                            const csvRows = [
+                                                                [`Sales Report - ${period.toUpperCase()}`],
+                                                                [`Generated`, new Date().toLocaleDateString()],
+                                                                [],
+                                                                [`Period`, `Start Date`, `End Date`],
+                                                                [`Summary`, new Date(data.startDate).toLocaleDateString(), new Date(data.endDate).toLocaleDateString()],
+                                                                [],
+                                                                [`Metric`, `Value`],
+                                                                [`Total Revenue`, `₹${data.totalRevenue.toFixed(2)}`],
+                                                                [`Total Orders`, data.totalOrders],
+                                                                [`Average Order Value`, `₹${data.averageOrderValue.toFixed(2)}`],
+                                                                [],
+                                                                [`TOP 10 ITEMS`],
+                                                                [`Rank`, `Item Name`, `Quantity Sold`, `Revenue`],
+                                                                ...data.topItems.map((item: any, i: number) =>
+                                                                    [`${i + 1}`, item.name, item.quantity, `₹${item.revenue.toFixed(2)}`]
+                                                                ),
+                                                                [],
+                                                                [`PAYMENT BREAKDOWN`],
+                                                                [`Payment Method`, `Order Count`],
+                                                                ...Object.entries(data.paymentBreakdown).map(([method, count]) =>
+                                                                    [method, count]
+                                                                )
+                                                            ];
 
-                                                        // Convert to CSV string
-                                                        const csvContent = csvRows.map(row => row.join(',')).join('\n');
+                                                            // Convert to CSV string
+                                                            const csvContent = csvRows.map(row => row.join(',')).join('\n');
 
-                                                        // Download as CSV file
-                                                        const blob = new Blob([csvContent], { type: 'text/csv' });
-                                                        const url = URL.createObjectURL(blob);
-                                                        const a = document.createElement('a');
-                                                        a.href = url;
-                                                        a.download = `sales-report-${period}-${Date.now()}.csv`;
-                                                        a.click();
-                                                        URL.revokeObjectURL(url);
-                                                    } catch (e) {
-                                                        alert('Failed to generate report');
-                                                    }
-                                                }}
-                                                style={{
-                                                    padding: '0.5rem 1rem',
-                                                    backgroundColor: '#5C3A1A',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '0.5rem',
-                                                    fontWeight: 'bold',
-                                                    cursor: 'pointer',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'background 0.2s'
-                                                }}
-                                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3d2612'}
-                                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#5C3A1A'}
-                                            >
-                                                {period === 'day' && '📅'}
-                                                {period === 'week' && '📆'}
-                                                {period === 'month' && '🗓️'}
-                                                {period === 'year' && '📊'}
-                                                {' '}
-                                                {period === 'day' ? 'Daily' : period === 'week' ? 'Weekly' : period === 'month' ? 'Monthly' : 'Yearly'} Report
-                                            </button>
-                                        ))}
+                                                            // Download as CSV file
+                                                            const blob = new Blob([csvContent], { type: 'text/csv' });
+                                                            const url = URL.createObjectURL(blob);
+                                                            const a = document.createElement('a');
+                                                            a.href = url;
+                                                            a.download = `sales-report-${period}-${Date.now()}.csv`;
+                                                            a.click();
+                                                            URL.revokeObjectURL(url);
+                                                        } catch (e) {
+                                                            alert('Failed to generate report');
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        padding: '0.5rem 1rem',
+                                                        backgroundColor: '#5C3A1A',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '0.5rem',
+                                                        fontWeight: 'bold',
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.9rem',
+                                                        transition: 'background 0.2s'
+                                                    }}
+                                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3d2612'}
+                                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#5C3A1A'}
+                                                >
+                                                    {period === 'day' && '📅'}
+                                                    {period === 'week' && '📆'}
+                                                    {period === 'month' && '🗓️'}
+                                                    {period === 'year' && '📊'}
+                                                    {' '}
+                                                    {period === 'day' ? 'Daily' : period === 'week' ? 'Weekly' : period === 'month' ? 'Monthly' : 'Yearly'} Report
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ backgroundColor: '#f3f4f6' }}>
-                                    <tr>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Rank</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Item Name</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Category</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Qty Sold</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Orders</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Revenue</th>
-                                        <th style={{ padding: '1rem', textAlign: 'center' }}>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {analytics.stats.map((item: any, idx: number) => (
-                                        <tr key={item.id} style={{ borderTop: '1px solid #eee', backgroundColor: idx < 5 ? '#fffbeb' : 'white' }}>
-                                            <td style={{ padding: '1rem', fontWeight: 'bold', fontSize: '1.2rem', color: idx < 3 ? '#d97706' : '#666' }}>
-                                                {idx === 0 && '🥇'}
-                                                {idx === 1 && '🥈'}
-                                                {idx === 2 && '🥉'}
-                                                {idx > 2 && `#${idx + 1}`}
-                                            </td>
-                                            <td style={{ padding: '1rem', fontWeight: '600' }}>{item.name}</td>
-                                            <td style={{ padding: '1rem', color: '#666', fontSize: '0.9rem' }}>{item.category}</td>
-                                            <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem' }}>{item.totalQuantity}</td>
-                                            <td style={{ padding: '1rem', textAlign: 'right', color: '#666' }}>{item.orderCount}</td>
-                                            <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#059669' }}>₹{item.totalRevenue.toFixed(2)}</td>
-                                            <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                {idx < 5 && (
-                                                    <span style={{
-                                                        backgroundColor: '#fef3c7',
-                                                        color: '#d97706',
-                                                        padding: '0.25rem 0.75rem',
-                                                        borderRadius: '999px',
-                                                        fontSize: '0.75rem',
-                                                        fontWeight: 'bold',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.25rem'
-                                                    }}>
-                                                        🔥 POPULAR
-                                                    </span>
-                                                )}
-                                            </td>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead style={{ backgroundColor: '#f3f4f6' }}>
+                                        <tr>
+                                            <th style={{ padding: '1rem', textAlign: 'left' }}>Rank</th>
+                                            <th style={{ padding: '1rem', textAlign: 'left' }}>Item Name</th>
+                                            <th style={{ padding: '1rem', textAlign: 'left' }}>Category</th>
+                                            <th style={{ padding: '1rem', textAlign: 'right' }}>Qty Sold</th>
+                                            <th style={{ padding: '1rem', textAlign: 'right' }}>Orders</th>
+                                            <th style={{ padding: '1rem', textAlign: 'right' }}>Revenue</th>
+                                            <th style={{ padding: '1rem', textAlign: 'center' }}>Status</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </>
-                    )}
-                </div>
-            )}
-            {/* POS TAB */}
-            {activeTab === 'pos' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', height: 'calc(100vh - 200px)' }}>
-                    {/* Left: Menu Items */}
-                    <div style={{ overflowY: 'auto', paddingRight: '1rem' }}>
-                        <div style={{ position: 'sticky', top: 0, backgroundColor: '#f9fafb', paddingBottom: '1rem', zIndex: 10 }}>
-                            <input
-                                type="text"
-                                placeholder="🔍 Search items..."
-                                value={posSearch}
-                                onChange={(e) => setPosSearch(e.target.value)}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #ddd', marginBottom: '1rem' }}
-                            />
-                            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                                {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        style={{
-                                            padding: '0.5rem 1rem',
-                                            borderRadius: '999px',
-                                            border: 'none',
-                                            backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#e5e7eb',
-                                            color: selectedCategory === cat ? 'white' : '#666',
-                                            fontWeight: 'bold',
-                                            fontSize: '0.85rem',
-                                            cursor: 'pointer',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
-                            {menuItems
-                                .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
-                                .filter(item => item.name.toLowerCase().includes(posSearch.toLowerCase()))
-                                .map(item => (
-                                    <div
-                                        key={item.id}
-                                        onClick={() => addToPosCart(item)}
-                                        style={{
-                                            backgroundColor: 'white',
-                                            padding: '1rem',
-                                            borderRadius: '0.5rem',
-                                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                            cursor: 'pointer',
-                                            border: '2px solid transparent',
-                                            transition: 'all 0.1s'
-                                        }}
-                                        onMouseOver={(e) => e.currentTarget.style.borderColor = '#5C3A1A'}
-                                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'transparent'}
-                                    >
-                                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>{item.name}</div>
-                                        <div style={{ color: '#666', fontSize: '0.9rem' }}>₹{item.price}</div>
-                                        <div style={{ fontSize: '0.8rem', color: item.inventoryCount > 0 ? '#10b981' : '#ef4444', marginTop: '0.5rem' }}>
-                                            {item.inventoryCount > 0 ? `${item.inventoryCount} in stock` : 'Out of Stock'}
-                                        </div>
-                                    </div>
-                                ))}
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {analytics.stats.map((item: any, idx: number) => (
+                                            <tr key={item.id} style={{ borderTop: '1px solid #eee', backgroundColor: idx < 5 ? '#fffbeb' : 'white' }}>
+                                                <td style={{ padding: '1rem', fontWeight: 'bold', fontSize: '1.2rem', color: idx < 3 ? '#d97706' : '#666' }}>
+                                                    {idx === 0 && '🥇'}
+                                                    {idx === 1 && '🥈'}
+                                                    {idx === 2 && '🥉'}
+                                                    {idx > 2 && `#${idx + 1}`}
+                                                </td>
+                                                <td style={{ padding: '1rem', fontWeight: '600' }}>{item.name}</td>
+                                                <td style={{ padding: '1rem', color: '#666', fontSize: '0.9rem' }}>{item.category}</td>
+                                                <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem' }}>{item.totalQuantity}</td>
+                                                <td style={{ padding: '1rem', textAlign: 'right', color: '#666' }}>{item.orderCount}</td>
+                                                <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#059669' }}>₹{item.totalRevenue.toFixed(2)}</td>
+                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                                    {idx < 5 && (
+                                                        <span style={{
+                                                            backgroundColor: '#fef3c7',
+                                                            color: '#d97706',
+                                                            padding: '0.25rem 0.75rem',
+                                                            borderRadius: '999px',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 'bold',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '0.25rem'
+                                                        }}>
+                                                            🔥 POPULAR
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </>
+                        )}
                     </div>
-
-                    {/* Right: Cart */}
-                    <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', backgroundColor: '#5C3A1A', color: 'white', borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}>
-                            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>New Order</h2>
-                        </div>
-
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
-                            {posCart.length === 0 ? (
-                                <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '3rem' }}>Cart is empty</div>
-                            ) : (
-                                posCart.map((line, idx) => (
-                                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #f3f4f6', paddingBottom: '0.5rem' }}>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 'bold' }}>{line.item.name}</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>₹{line.item.price * line.qty}</div>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, -1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>-</button>
-                                            <span style={{ fontWeight: 'bold', width: '20px', textAlign: 'center' }}>{line.qty}</span>
-                                            <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, 1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>+</button>
-                                            <button onClick={() => removeFromPosCart(line.item.id)} style={{ marginLeft: '0.5rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', backgroundColor: '#f9fafb' }}>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Phone *</label>
-                                <input
-                                    type="tel"
-                                    value={posPhone}
-                                    onChange={(e) => setPosPhone(e.target.value)}
-                                    placeholder="Enter 10-digit number"
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Name (Optional)</label>
+                )
+            }
+            {/* POS TAB */}
+            {
+                activeTab === 'pos' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', height: 'calc(100vh - 200px)' }}>
+                        {/* Left: Menu Items */}
+                        <div style={{ overflowY: 'auto', paddingRight: '1rem' }}>
+                            <div style={{ position: 'sticky', top: 0, backgroundColor: '#f9fafb', paddingBottom: '1rem', zIndex: 10 }}>
                                 <input
                                     type="text"
-                                    value={posName}
-                                    onChange={(e) => setPosName(e.target.value)}
-                                    placeholder="e.g. John Doe"
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
+                                    placeholder="🔍 Search items..."
+                                    value={posSearch}
+                                    onChange={(e) => setPosSearch(e.target.value)}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #ddd', marginBottom: '1rem' }}
                                 />
+                                <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                                    {['All', ...Array.from(new Set(menuItems.map(i => i.category || 'Uncategorized')))].map(cat => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setSelectedCategory(cat)}
+                                            style={{
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '999px',
+                                                border: 'none',
+                                                backgroundColor: selectedCategory === cat ? '#5C3A1A' : '#e5e7eb',
+                                                color: selectedCategory === cat ? 'white' : '#666',
+                                                fontWeight: 'bold',
+                                                fontSize: '0.85rem',
+                                                cursor: 'pointer',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111' }}>
-                                <span>Total</span>
-                                <span>₹{posCart.reduce((sum, i) => sum + (i.item.price * i.qty), 0)}</span>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+                                {menuItems
+                                    .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
+                                    .filter(item => item.name.toLowerCase().includes(posSearch.toLowerCase()))
+                                    .map(item => (
+                                        <div
+                                            key={item.id}
+                                            onClick={() => addToPosCart(item)}
+                                            style={{
+                                                backgroundColor: 'white',
+                                                padding: '1rem',
+                                                borderRadius: '0.5rem',
+                                                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                                cursor: 'pointer',
+                                                border: '2px solid transparent',
+                                                transition: 'all 0.1s'
+                                            }}
+                                            onMouseOver={(e) => e.currentTarget.style.borderColor = '#5C3A1A'}
+                                            onMouseOut={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                                        >
+                                            <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>{item.name}</div>
+                                            <div style={{ color: '#666', fontSize: '0.9rem' }}>₹{item.price}</div>
+                                            <div style={{ fontSize: '0.8rem', color: item.inventoryCount > 0 ? '#10b981' : '#ef4444', marginTop: '0.5rem' }}>
+                                                {item.inventoryCount > 0 ? `${item.inventoryCount} in stock` : 'Out of Stock'}
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+
+                        {/* Right: Cart */}
+                        <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div style={{ padding: '1.5rem', borderBottom: '1px solid #eee', backgroundColor: '#5C3A1A', color: 'white', borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}>
+                                <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>New Order</h2>
                             </div>
 
-                            <button
-                                onClick={placePosOrder}
-                                disabled={posLoading || posCart.length === 0 || !posPhone}
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem',
-                                    backgroundColor: posLoading ? '#9ca3af' : '#10b981',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '0.5rem',
-                                    fontWeight: 'bold',
-                                    fontSize: '1.1rem',
-                                    cursor: posLoading ? 'not-allowed' : 'pointer',
-                                    opacity: (posCart.length === 0 || !posPhone) ? 0.5 : 1
-                                }}
-                            >
-                                {posLoading ? 'Processing...' : '✅ Place Counter Order'}
-                            </button>
+                            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+                                {posCart.length === 0 ? (
+                                    <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '3rem' }}>Cart is empty</div>
+                                ) : (
+                                    posCart.map((line, idx) => (
+                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #f3f4f6', paddingBottom: '0.5rem' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontWeight: 'bold' }}>{line.item.name}</div>
+                                                <div style={{ fontSize: '0.9rem', color: '#666' }}>₹{line.item.price * line.qty}</div>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, -1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>-</button>
+                                                <span style={{ fontWeight: 'bold', width: '20px', textAlign: 'center' }}>{line.qty}</span>
+                                                <button onClick={(e) => { e.stopPropagation(); updatePosQty(line.item.id, 1); }} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #ddd', backgroundColor: 'white', cursor: 'pointer' }}>+</button>
+                                                <button onClick={() => removeFromPosCart(line.item.id)} style={{ marginLeft: '0.5rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', backgroundColor: '#f9fafb' }}>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Phone *</label>
+                                    <input
+                                        type="tel"
+                                        value={posPhone}
+                                        onChange={(e) => setPosPhone(e.target.value)}
+                                        placeholder="Enter 10-digit number"
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#374151' }}>Customer Name (Optional)</label>
+                                    <input
+                                        type="text"
+                                        value={posName}
+                                        onChange={(e) => setPosName(e.target.value)}
+                                        placeholder="e.g. John Doe"
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #d1d5db' }}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111' }}>
+                                    <span>Total</span>
+                                    <span>₹{posCart.reduce((sum, i) => sum + (i.item.price * i.qty), 0)}</span>
+                                </div>
+
+                                <button
+                                    onClick={placePosOrder}
+                                    disabled={posLoading || posCart.length === 0 || !posPhone}
+                                    style={{
+                                        width: '100%',
+                                        padding: '1rem',
+                                        backgroundColor: posLoading ? '#9ca3af' : '#10b981',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '0.5rem',
+                                        fontWeight: 'bold',
+                                        fontSize: '1.1rem',
+                                        cursor: posLoading ? 'not-allowed' : 'pointer',
+                                        opacity: (posCart.length === 0 || !posPhone) ? 0.5 : 1
+                                    }}
+                                >
+                                    {posLoading ? 'Processing...' : '✅ Place Counter Order'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 }
