@@ -30,7 +30,7 @@ export default function MobileBottomNav({ user, onCartClick, onProfileClick }: M
         // Cart is a special action
         { label: 'Cart', icon: BackpackIcon, path: '#cart', action: onCartClick, badge: cartCount },
         { label: 'Plans', icon: StarIcon, path: '/subscription', action: () => router.push('/subscription') },
-        { label: 'Profile', icon: PersonIcon, path: '/profile', action: onProfileClick }
+        { label: 'Profile', icon: PersonIcon, path: '/account', action: () => router.push('/account') }
     ];
 
     return (

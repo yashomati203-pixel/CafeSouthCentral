@@ -22,6 +22,7 @@ model User {
   feedbacks     Feedback[]
   orders        Order[]
   subscriptions UserSubscription[]
+  profilePicture String?
 }
 
 model Feedback {

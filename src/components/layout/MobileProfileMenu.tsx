@@ -5,7 +5,8 @@ import {
     ExitIcon,
     ReaderIcon,
     StarIcon,
-    ChatBubbleIcon
+    ChatBubbleIcon,
+    PersonIcon
 } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 
@@ -59,19 +60,19 @@ export default function MobileProfileMenu({
 
                 <nav className="flex flex-col gap-4">
                     <button
-                        onClick={() => { router.push('/orders'); onClose(); }}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                        <ReaderIcon className="w-5 h-5" />
-                        <span className="font-medium">Order History</span>
-                    </button>
-
-                    <button
                         onClick={() => { router.push('/subscription'); onClose(); }}
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                         <StarIcon className="w-5 h-5" />
-                        <span className="font-medium">Subscription Plans</span>
+                        <span className="font-medium">Subscriptions</span>
+                    </button>
+
+                    <button
+                        onClick={() => { router.push('/account'); onClose(); }}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                        <PersonIcon className="w-5 h-5" />
+                        <span className="font-medium">My Account</span>
                     </button>
 
                     <button

@@ -32,6 +32,8 @@ body {
   background-color: var(--background);
   font-family: 'Inter', sans-serif;
   /* Assumes Inter is available or fallback */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Toggle Switch Utility */

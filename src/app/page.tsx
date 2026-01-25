@@ -20,6 +20,7 @@ import MobileHeader from '@/components/layout/MobileHeader';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import StickyCartSummary from '@/components/ordering/StickyCartSummary';
 import MobileProfileMenu from '@/components/layout/MobileProfileMenu';
+import StaggeredMenu from '@/components/ui/StaggeredMenu';
 
 function DashboardContent() {
     const router = useRouter();
@@ -500,7 +501,7 @@ function DashboardContent() {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                     <div
                         onClick={toggleTheme}
                         style={{
@@ -608,106 +609,36 @@ function DashboardContent() {
                         )}
                     </button>
 
-                    {/* Options Dropdown - Only if User */}
                     {user && (
-                        <DropdownMenu.Root>
-                            <DropdownMenu.Trigger asChild>
-                                <button
-                                    style={{
-                                        padding: '0.5rem',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '0.5rem',
-                                        background: 'white',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                >
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="1" />
-                                        <circle cx="19" cy="12" r="1" />
-                                        <circle cx="5" cy="12" r="1" />
-                                    </svg>
-                                </button>
-                            </DropdownMenu.Trigger>
-
-                            <DropdownMenu.Portal>
-                                <DropdownMenu.Content
-                                    style={{
-                                        backgroundColor: 'white',
-                                        padding: '0.5rem',
-                                        borderRadius: '0.5rem',
-                                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                                        minWidth: '160px',
-                                        zIndex: 1000,
-                                        marginRight: '1rem'
-                                    }}
-                                    sideOffset={5}
-                                >
-                                    <DropdownMenu.Item
-                                        className="DropdownMenuItem"
-                                        onSelect={() => router.push('/orders')}
-                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
-                                    >
-                                        <span>📜</span> Order History
-                                    </DropdownMenu.Item>
-
-                                    <DropdownMenu.Item
-                                        className="DropdownMenuItem"
-                                        onSelect={() => router.push('/subscription')}
-                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
-                                    >
-                                        <span>✨</span> Subscription Plans
-                                    </DropdownMenu.Item>
-
-                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
-
-                                    <DropdownMenu.Item
-                                        className="DropdownMenuItem"
-                                        onSelect={async () => {
-                                            if (!user.id) return;
-                                            const { enableNotifications } = await import('@/lib/notifications');
-                                            enableNotifications({ ...user, id: user.id });
-                                        }}
-                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
-                                    >
-                                        <span>🔔</span> Enable Notifications
-                                    </DropdownMenu.Item>
-
-                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
-
-                                    <DropdownMenu.Item
-                                        className="DropdownMenuItem"
-                                        onSelect={() => setShowFeedbackModal(true)}
-                                        style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '4px', outline: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}
-                                    >
-                                        <span>⭐</span> Feedback
-                                    </DropdownMenu.Item>
-
-                                    <div style={{ height: 1, backgroundColor: '#eee', margin: '0.5rem 0' }} />
-
-                                    <DropdownMenu.Item
-                                        className="DropdownMenuItem"
-                                        onSelect={handleLogout}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '0.5rem',
-                                            color: '#dc2626',
-                                            cursor: 'pointer',
-                                            borderRadius: '0.25rem',
-                                            outline: 'none',
-                                            gap: '0.5rem',
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        <span>🚪</span> Log out
-                                    </DropdownMenu.Item>
-                                </DropdownMenu.Content>
-                            </DropdownMenu.Portal>
-                        </DropdownMenu.Root>
+                        <StaggeredMenu
+                            position="right"
+                            items={[
+                                { label: 'My Account', action: () => router.push('/account') },
+                                { label: 'Subscriptions', action: () => router.push('/subscription') },
+                                {
+                                    label: 'Enable Notifications', action: async () => {
+                                        if (!user.id) return;
+                                        const { enableNotifications } = await import('@/lib/notifications');
+                                        enableNotifications({ ...user, id: user.id });
+                                    }
+                                },
+                                { label: 'Feedback', action: () => setShowFeedbackModal(true) },
+                                { label: 'Log Out', action: handleLogout }
+                            ]}
+                            socialItems={[]}
+                            displaySocials={false}
+                            displayItemNumbering={false}
+                            menuButtonColor={isDarkMode ? '#ffffff' : '#5C3A1A'}
+                            openMenuButtonColor={isDarkMode ? '#000000' : '#1F1F1F'}
+                            changeMenuColorOnOpen={true}
+                            colors={['#5C3A1A', '#2F4F2F']}
+                            accentColor="#F5B700"
+                            logoUrl={isDarkMode ? "/logo-white.png" : "/logo.png"}
+                            isCompact={true}
+                            inlineTrigger={true}
+                        />
                     )}
+
                 </div>
             </header>
 
