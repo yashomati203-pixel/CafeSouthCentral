@@ -1,172 +1,144 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
-interface ScrollParallaxItem {
-  id: number;
-  src: string;
-  alt: string;
-  delay?: number;
-  offsetX?: number;
-  offsetY?: number;
-  scale?: number;
+interface Category {
+  name: string;
+  dataCategory: string;
+  icon: string;
+  color: string;
 }
 
 interface ScrollParallaxProps {
-  items?: ScrollParallaxItem[];
+  categories?: Category[];
+  onCategorySelect?: (category: string) => void;
   children?: React.ReactNode;
 }
 
-const defaultItems: ScrollParallaxItem[] = [
-  {
-    id: 1,
-    src: '/images/hero/filter-coffee.png',
-    alt: 'Filter Coffee',
-    delay: 0.2,
-    offsetX: -100,
-    offsetY: -50,
-    scale: 1
-  },
-  {
-    id: 2,
-    src: '/images/hero/latte.png',
-    alt: 'Latte',
-    delay: 0.3,
-    offsetX: 100,
-    offsetY: 50,
-    scale: 1.1
-  },
-  {
-    id: 3,
-    src: '/images/hero/dosa.png',
-    alt: 'Dosa',
-    delay: 0.4,
-    offsetX: -80,
-    offsetY: 60,
-    scale: 0.95
-  },
-  {
-    id: 4,
-    src: '/images/hero/idli.png',
-    alt: 'Idli',
-    delay: 0.5,
-    offsetX: 120,
-    offsetY: -60,
-    scale: 1.05
-  }
+const defaultCategories: Category[] = [
+  { name: 'South Indian', dataCategory: 'South Indian', icon: '🥘', color: '#ffedd5' },
+  { name: 'Dosa Special', dataCategory: 'Dosa', icon: '🥞', color: '#fee2e2' },
+  { name: 'Rice Bowls', dataCategory: 'Rice', icon: '🍚', color: '#dcfce7' },
+  { name: 'North Indian', dataCategory: 'North Indian', icon: '🍛', color: '#e0e7ff' },
+  { name: 'Snacks', dataCategory: 'Snacks', icon: '🍟', color: '#fef9c3' },
+  { name: 'Beverages', dataCategory: 'Beverages', icon: '☕', color: '#fae8ff' },
+  { name: 'Chaat', dataCategory: 'Chaat', icon: '🥟', color: '#f3f4f6' },
+  { name: 'Desserts', dataCategory: 'Dessert', icon: '🍦', color: '#ffe4e6' },
 ];
 
-export default function ScrollParallax({ items = defaultItems, children }: ScrollParallaxProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const [containerTop, setContainerTop] = useState(0);
+export default function ScrollParallax({ categories = defaultCategories, onCategorySelect, children }: ScrollParallaxProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const updatePosition = () => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (rect) {
-        setContainerTop(rect.top + window.scrollY);
-      }
-    };
-
-    updatePosition();
-    window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
-  }, []);
+  const handleCategoryClick = (category: Category) => {
+    setSelectedCategory(category.dataCategory);
+    if (onCategorySelect) {
+      onCategorySelect(category.dataCategory);
+    }
+  };
 
   return (
     <div
-      ref={containerRef}
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: '100vh',
-        overflow: 'hidden',
+        minHeight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem 2rem',
         background: 'linear-gradient(135deg, #fefaef 0%, #faf5ed 100%)'
       }}
     >
-      {/* Parallax Items */}
-      {items.map((item, index) => {
-        const itemOffset = containerTop + (index * 150);
-        const yTransform = useTransform(
-          scrollY,
-          [Math.max(0, itemOffset - 500), itemOffset + 500],
-          [item.offsetY || 100, -(item.offsetY || 100)]
-        );
-        const xTransform = useTransform(
-          scrollY,
-          [Math.max(0, itemOffset - 500), itemOffset + 500],
-          [item.offsetX || 100, -(item.offsetX || 100)]
-        );
-        const rotateTransform = useTransform(
-          scrollY,
-          [Math.max(0, itemOffset - 600), itemOffset + 400],
-          [index % 2 === 0 ? -15 : 15, index % 2 === 0 ? 15 : -15]
-        );
-        const opacityTransform = useTransform(
-          scrollY,
-          [Math.max(0, itemOffset - 700), itemOffset + 300],
-          [0, 1]
-        );
-
-        return (
-          <motion.div
-            key={item.id}
+      {/* Category Tabs Grid */}
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '0.75rem',
+        marginBottom: '2rem',
+        flexWrap: 'nowrap',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        padding: '0 1rem'
+      }}>
+        {categories.map((category, index) => (
+          <motion.button
+            key={category.dataCategory}
+            onClick={() => handleCategoryClick(category)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
             style={{
-              position: 'absolute',
-              y: yTransform,
-              x: xTransform,
-              rotate: rotateTransform,
-              opacity: opacityTransform,
-              willChange: 'transform',
-              pointerEvents: 'none'
+              padding: '0.9rem 0.6rem',
+              borderRadius: '12px',
+              border: selectedCategory === category.dataCategory ? '2px solid #3C2A21' : '2px solid #e0d4c9',
+              backgroundColor: selectedCategory === category.dataCategory ? category.color : '#ffffff',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.3rem',
+              boxShadow: selectedCategory === category.dataCategory 
+                ? '0 8px 16px rgba(60, 42, 33, 0.2)' 
+                : '0 2px 8px rgba(0, 0, 0, 0.05)',
+              transform: selectedCategory === category.dataCategory ? 'scale(1.05)' : 'scale(1)',
+              minWidth: '90px',
+              maxWidth: '90px',
+              flex: '0 0 90px',
+              whiteSpace: 'nowrap' as const
             }}
-            initial={{ scale: 0.8 }}
-            animate={{ scale: item.scale || 1 }}
-            transition={{ duration: 0.6, delay: item.delay }}
+            onMouseOver={(e) => {
+              if (selectedCategory !== category.dataCategory) {
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(60, 42, 33, 0.15)';
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }
+            }}
+            onMouseOut={(e) => {
+              if (selectedCategory !== category.dataCategory) {
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                e.currentTarget.style.transform = 'scale(1)';
+              }
+            }}
           >
-            <div
-              style={{
-                width: '200px',
-                height: '200px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15)',
-                background: '#fff'
-              }}
-            >
-              <img
-                src={item.src}
-                alt={item.alt}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block'
-                }}
-              />
-            </div>
-          </motion.div>
-        );
-      })}
+            <span style={{ fontSize: '1.8rem' }}>{category.icon}</span>
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: '#3C2A21',
+              textAlign: 'center',
+              lineHeight: '1.1',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box' as const,
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const
+            }}>
+              {category.name}
+            </span>
+          </motion.button>
+        ))}
+      </div>
 
       {/* Content */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        {children}
-      </div>
+      {children && (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 }

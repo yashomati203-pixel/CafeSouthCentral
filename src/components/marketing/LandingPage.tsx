@@ -83,7 +83,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                 position: 'sticky',
                 top: 0,
                 zIndex: 1000,
-                backgroundColor: scrolled ? '#fefaef' : 'transparent',
+                backgroundColor: '#fefaef',
                 backdropFilter: scrolled ? 'blur(10px)' : 'none',
                 transition: 'all 0.3s ease',
                 padding: '1rem 2rem',
@@ -120,13 +120,6 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                         marginLeft: 'auto',
                         marginRight: '3rem'
                     }}>
-                        <a href="#home" style={{
-                            color: '#3C2A21',
-                            textDecoration: 'none',
-                            fontWeight: 600,
-                            fontSize: '1rem',
-                            transition: 'color 0.2s'
-                        }}>Home</a>
                         <a href="#menu" onClick={(e) => {
                             e.preventDefault();
                             onExplore();
@@ -502,23 +495,19 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                 </div>
             </header>
 
-            {/* Visual Category Grid */}
-            {/* Spacer for Carousel overflow */}
-            <div style={{ height: '300px' }}></div>
-
-            {/* Parallax Scroll Section */}
+            {/* Category Tabs Section */}
             <section style={{
                 position: 'relative',
                 width: '100%',
-                minHeight: '60vh',
                 background: 'linear-gradient(180deg, #fefaef 0%, #f5ede2 100%)',
-                padding: '2rem 2rem',
+                padding: '12rem 2rem 4rem 2rem',
+                marginTop: '4rem',
                 overflow: 'hidden'
             }}>
-                {/* Title for Parallax Section */}
+                {/* Title for Category Section */}
                 <div style={{
                     textAlign: 'center',
-                    marginBottom: '1.5rem',
+                    marginBottom: '4rem',
                     position: 'relative',
                     zIndex: 20
                 }}>
@@ -531,18 +520,16 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                     }}>
                         We Serve You With
                     </h2>
-                    <p style={{
-                        fontSize: '1rem',
-                        color: '#6B5B52',
-                        maxWidth: '500px',
-                        margin: '0 auto'
-                    }}>
-                        South Indian, Dosa, Rice Bowls, North Indian, Snacks, Beverages, Chaat & Desserts
-                    </p>
                 </div>
 
-                {/* Parallax Items Container */}
-                <ScrollParallax />
+                {/* Category Tabs Container */}
+                <ScrollParallax 
+                    categories={CATEGORIES}
+                    onCategorySelect={(category) => {
+                        onCategorySelect?.(category);
+                        onExplore();
+                    }}
+                />
             </section>
 
             {/* New Features and Footer Sections */}
