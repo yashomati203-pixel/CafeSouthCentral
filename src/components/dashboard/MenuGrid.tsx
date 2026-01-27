@@ -312,7 +312,7 @@ function MenuItemCard({
     return (
         <div className={`flex flex-col h-full ${item.inventoryCount === 0 ? 'opacity-60' : ''}`}>
             {/* Image */}
-            <div className="relative aspect-square w-full overflow-hidden bg-slate-100 dark:bg-slate-700">
+            <div className="relative w-full overflow-hidden bg-slate-100 dark:bg-slate-700" style={{ aspectRatio: '4/3' }}>
                 {!isBestseller && isPopular && (
                     <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full px-3 py-1 text-xs font-bold text-[#5C3A1A] shadow-sm">
                         Bestseller
@@ -326,7 +326,7 @@ function MenuItemCard({
             </div>
 
             {/* Content */}
-            <div className="p-6 flex-1 flex flex-col">
+            <div className="p-4 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white flex-1">
                         {item.name}
@@ -350,12 +350,12 @@ function MenuItemCard({
                     </div>
                 </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 line-clamp-2">
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-3 line-clamp-2">
                     {item.description}
                 </p>
 
                 <div className="mt-auto">
-                    <p className="text-lg font-extrabold mb-3 text-[#5C3A1A] dark:text-amber-500">
+                    <p className="text-lg font-extrabold mb-2 text-[#5C3A1A] dark:text-amber-500">
                         {mode === 'NORMAL' ? `₹${item.price}` : 'Included in Plan'}
                     </p>
 

@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     title: 'Cafe South Central',
     description: 'Premium Food Ordering Experience',
     manifest: '/manifest.json',
+    icons: {
+        icon: '/logo-final.png',
+        shortcut: '/logo-final.png',
+        apple: '/logo-final.png',
+    },
 };
 
 export default function RootLayout({

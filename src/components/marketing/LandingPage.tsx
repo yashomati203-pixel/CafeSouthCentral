@@ -12,26 +12,27 @@ interface LandingPageProps {
     onViewPlans?: () => void;
     onCategorySelect?: (category: string) => void;
     onLogin?: () => void;
+    user?: { id?: string; name: string; phone: string; role?: string } | null;
 }
 
 const CATEGORIES = [
-    { name: 'South Indian', dataCategory: 'South Indian', icon: '🥘', color: '#ffedd5', image: '/images/cat-south.jpg' },
-    { name: 'Dosa Special', dataCategory: 'Dosa', icon: '🥞', color: '#fee2e2', image: '/images/cat-dosa.jpg' },
-    { name: 'Rice Bowls', dataCategory: 'Rice', icon: '🍚', color: '#dcfce7', image: '/images/cat-rice.jpg' },
-    { name: 'North Indian', dataCategory: 'North Indian', icon: '🍛', color: '#e0e7ff', image: '/images/cat-north.jpg' },
-    { name: 'Snacks', dataCategory: 'Snacks', icon: '🍟', color: '#fef9c3', image: '/images/cat-snacks.jpg' },
-    { name: 'Beverages', dataCategory: 'Beverages', icon: '☕', color: '#fae8ff', image: '/images/cat-bev.jpg' },
-    { name: 'Chaat', dataCategory: 'Chaat', icon: '🥟', color: '#f3f4f6', image: '/images/cat-chaat.jpg' },
-    { name: 'Desserts', dataCategory: 'Dessert', icon: '🍦', color: '#ffe4e6', image: '/images/cat-sweet.jpg' },
+    { name: 'South Indian', dataCategory: 'South Indian', iconImage: '/images/categories/south-indian.png', color: '#ffedd5', image: '/images/cat-south.jpg' },
+    { name: 'Dosa Special', dataCategory: 'Dosa', iconImage: '/images/categories/dosa.png', color: '#fee2e2', image: '/images/cat-dosa.jpg' },
+    { name: 'Rice Bowls', dataCategory: 'Rice', iconImage: '/images/categories/rice.png', color: '#dcfce7', image: '/images/cat-rice.jpg' },
+    { name: 'North Indian', dataCategory: 'North Indian', iconImage: '/images/categories/north-indian.png', color: '#e0e7ff', image: '/images/cat-north.jpg' },
+    { name: 'Snacks', dataCategory: 'Snacks', iconImage: '/images/categories/snacks.png', color: '#fef9c3', image: '/images/cat-snacks.jpg' },
+    { name: 'Beverages', dataCategory: 'Beverages', iconImage: '/images/categories/beverages.png', color: '#fae8ff', image: '/images/cat-bev.jpg' },
+    { name: 'Chaat', dataCategory: 'Chaat', iconImage: '/images/categories/chaat.png', color: '#f3f4f6', image: '/images/cat-chaat.jpg' },
+    { name: 'Desserts', dataCategory: 'Dessert', iconImage: '/images/categories/desserts.png', color: '#ffe4e6', image: '/images/cat-sweet.jpg' },
 ];
 
-export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, onLogin }: LandingPageProps) {
+export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, onLogin, user }: LandingPageProps) {
     const [scrolled, setScrolled] = useState(false);
     const { scrollY } = useScroll();
 
     // Scroll-based carousel movement
     const carouselX = useTransform(scrollY, [0, 500], [0, -600]);
-    
+
     // Parallax transforms for floating coffee cup elements
     const floatingY1 = useTransform(scrollY, [0, 800], [0, -150]);
     const floatingY2 = useTransform(scrollY, [0, 800], [0, 150]);
@@ -142,12 +143,17 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                         }}>Subscriptions</a>
                     </div>
 
-                    {/* Right: Login Button */}
+                    {/* Right: Login Button or User Profile */}
                     <button
                         onClick={(e) => {
-                            console.log('Login button clicked');
-                            if (onLogin) onLogin();
-                            else console.error('onLogin prop is missing');
+                            if (user) {
+                                // If logged in, navigate to account page or show profile
+                                window.location.href = '/account';
+                            } else {
+                                console.log('Login button clicked');
+                                if (onLogin) onLogin();
+                                else console.error('onLogin prop is missing');
+                            }
                         }}
                         style={{
 
@@ -171,7 +177,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                             e.currentTarget.style.boxShadow = '0 2px 8px rgba(60, 42, 33, 0.2)';
                         }}
                     >
-                        Login / Sign Up
+                        {user ? user.name : 'Login / Sign Up'}
                     </button>
                 </div>
             </nav>
@@ -523,7 +529,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                 </div>
 
                 {/* Category Tabs Container */}
-                <ScrollParallax 
+                <ScrollParallax
                     categories={CATEGORIES}
                     onCategorySelect={(category) => {
                         onCategorySelect?.(category);

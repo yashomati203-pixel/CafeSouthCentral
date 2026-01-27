@@ -3,12 +3,8 @@
 import {
     Cross2Icon,
     ExitIcon,
-    ReaderIcon,
-    StarIcon,
-    ChatBubbleIcon,
-    PersonIcon
+    ChatBubbleIcon
 } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
 
 interface MobileProfileMenuProps {
     isOpen: boolean;
@@ -25,7 +21,6 @@ export default function MobileProfileMenu({
     onLogout,
     onFeedback
 }: MobileProfileMenuProps) {
-    const router = useRouter();
 
     if (!isOpen) return null;
 
@@ -60,27 +55,11 @@ export default function MobileProfileMenu({
 
                 <nav className="flex flex-col gap-4">
                     <button
-                        onClick={() => { router.push('/subscription'); onClose(); }}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                        <StarIcon className="w-5 h-5" />
-                        <span className="font-medium">Subscriptions</span>
-                    </button>
-
-                    <button
-                        onClick={() => { router.push('/account'); onClose(); }}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                        <PersonIcon className="w-5 h-5" />
-                        <span className="font-medium">My Account</span>
-                    </button>
-
-                    <button
                         onClick={() => { onFeedback(); onClose(); }}
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                         <ChatBubbleIcon className="w-5 h-5" />
-                        <span className="font-medium">Send Feedback</span>
+                        <span className="font-medium">Feedback</span>
                     </button>
 
                     <button
@@ -92,7 +71,7 @@ export default function MobileProfileMenu({
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                         <span className="w-5 h-5 text-center">🔔</span>
-                        <span className="font-medium">Enable Notifications</span>
+                        <span className="font-medium">Notifications</span>
                     </button>
 
                     <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />

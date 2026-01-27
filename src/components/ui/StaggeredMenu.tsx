@@ -372,11 +372,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 <aside
                     id="staggered-menu-panel"
                     ref={panelRef}
-                    className="staggered-menu-panel fixed top-0 right-0 h-full bg-white flex flex-col overflow-y-auto z-[50] backdrop-blur-[12px] pointer-events-auto shadow-2xl"
+                    className="staggered-menu-panel fixed top-0 right-0 h-full flex flex-col overflow-y-auto z-[50] backdrop-blur-[12px] pointer-events-auto shadow-2xl"
                     style={{
                         WebkitBackdropFilter: 'blur(12px)',
                         width: isCompact ? 'clamp(250px, 30vw, 380px)' : 'clamp(300px, 40vw, 450px)',
-                        padding: isCompact ? '5em 1.5em 2em 1.5em' : '6em 2em 2em 2em'
+                        padding: isCompact ? '5em 1.5em 2em 1.5em' : '6em 2em 2em 2em',
+                        backgroundColor: '#fef9ee'
                     }}
                     aria-hidden={!open}
                 >
@@ -411,8 +412,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                                         return (
                                             <li className="sm-panel-itemWrap relative overflow-hidden leading-none" key={it.label + idx}>
                                                 <button
-                                                    className="sm-panel-item relative text-black font-semibold text-left cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em] bg-transparent border-none p-0"
-                                                    style={isCompact ? { fontSize: '1.5rem', textTransform: 'capitalize', letterSpacing: '0' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px' }}
+                                                    className="sm-panel-item relative font-bold text-left cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em] bg-transparent border-none p-0"
+                                                    style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#5C3A1A' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#5C3A1A' }}
                                                     onClick={() => {
                                                         it.action?.();
                                                         closeMenu();
@@ -429,8 +430,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                                     return (
                                         <li className="sm-panel-itemWrap relative overflow-hidden leading-none" key={it.label + idx}>
                                             <a
-                                                className="sm-panel-item relative text-black font-semibold cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
-                                                style={isCompact ? { fontSize: '1.5rem', textTransform: 'capitalize', letterSpacing: '0' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px' }}
+                                                className="sm-panel-item relative font-bold cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
+                                                style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#5C3A1A' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#5C3A1A' }}
                                                 href={it.link}
                                                 aria-label={it.ariaLabel}
                                                 data-index={idx + 1}

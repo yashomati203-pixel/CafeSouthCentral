@@ -6,7 +6,8 @@ import { motion } from 'framer-motion';
 interface Category {
   name: string;
   dataCategory: string;
-  icon: string;
+  icon?: string;
+  iconImage?: string;
   color: string;
 }
 
@@ -17,14 +18,14 @@ interface ScrollParallaxProps {
 }
 
 const defaultCategories: Category[] = [
-  { name: 'South Indian', dataCategory: 'South Indian', icon: '🥘', color: '#ffedd5' },
-  { name: 'Dosa Special', dataCategory: 'Dosa', icon: '🥞', color: '#fee2e2' },
-  { name: 'Rice Bowls', dataCategory: 'Rice', icon: '🍚', color: '#dcfce7' },
-  { name: 'North Indian', dataCategory: 'North Indian', icon: '🍛', color: '#e0e7ff' },
-  { name: 'Snacks', dataCategory: 'Snacks', icon: '🍟', color: '#fef9c3' },
-  { name: 'Beverages', dataCategory: 'Beverages', icon: '☕', color: '#fae8ff' },
-  { name: 'Chaat', dataCategory: 'Chaat', icon: '🥟', color: '#f3f4f6' },
-  { name: 'Desserts', dataCategory: 'Dessert', icon: '🍦', color: '#ffe4e6' },
+  { name: 'South Indian', dataCategory: 'South Indian', iconImage: '/images/categories/south-indian.png', color: '#ffedd5' },
+  { name: 'Dosa Special', dataCategory: 'Dosa', iconImage: '/images/categories/dosa.png', color: '#fee2e2' },
+  { name: 'Rice Bowls', dataCategory: 'Rice', iconImage: '/images/categories/rice.png', color: '#dcfce7' },
+  { name: 'North Indian', dataCategory: 'North Indian', iconImage: '/images/categories/north-indian.png', color: '#e0e7ff' },
+  { name: 'Snacks', dataCategory: 'Snacks', iconImage: '/images/categories/snacks.png', color: '#fef9c3' },
+  { name: 'Beverages', dataCategory: 'Beverages', iconImage: '/images/categories/beverages.png', color: '#fae8ff' },
+  { name: 'Chaat', dataCategory: 'Chaat', iconImage: '/images/categories/chaat.png', color: '#f3f4f6' },
+  { name: 'Desserts', dataCategory: 'Dessert', iconImage: '/images/categories/desserts.png', color: '#ffe4e6' },
 ];
 
 export default function ScrollParallax({ categories = defaultCategories, onCategorySelect, children }: ScrollParallaxProps) {
@@ -83,13 +84,13 @@ export default function ScrollParallax({ categories = defaultCategories, onCateg
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.3rem',
-              boxShadow: selectedCategory === category.dataCategory 
-                ? '0 8px 16px rgba(60, 42, 33, 0.2)' 
+              boxShadow: selectedCategory === category.dataCategory
+                ? '0 8px 16px rgba(60, 42, 33, 0.2)'
                 : '0 2px 8px rgba(0, 0, 0, 0.05)',
               transform: selectedCategory === category.dataCategory ? 'scale(1.05)' : 'scale(1)',
-              minWidth: '90px',
-              maxWidth: '90px',
-              flex: '0 0 90px',
+              minWidth: '140px',
+              maxWidth: '140px',
+              flex: '0 0 140px',
               whiteSpace: 'nowrap' as const
             }}
             onMouseOver={(e) => {
@@ -105,7 +106,20 @@ export default function ScrollParallax({ categories = defaultCategories, onCateg
               }
             }}
           >
-            <span style={{ fontSize: '1.8rem' }}>{category.icon}</span>
+            {category.iconImage ? (
+              <img
+                src={category.iconImage}
+                alt={category.name}
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'cover',
+                  borderRadius: '8px'
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: '1.8rem' }}>{category.icon}</span>
+            )}
             <span style={{
               fontSize: '0.75rem',
               fontWeight: 600,

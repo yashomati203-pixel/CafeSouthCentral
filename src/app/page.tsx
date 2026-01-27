@@ -158,6 +158,13 @@ function DashboardContent() {
                         setHasExplored(true); // Show the main page
                         setTimeout(() => setShowLoginModal(true), 500);
                     }
+
+                    // If feedback parameter is present, show feedback modal
+                    const shouldShowFeedback = searchParams.get('feedback');
+                    if (shouldShowFeedback === 'true') {
+                        setHasExplored(true); // Show the main page
+                        setTimeout(() => setShowFeedbackModal(true), 500);
+                    }
                 }
             } catch (e) {
                 console.error("Failed to parse user", e);
@@ -410,13 +417,14 @@ function DashboardContent() {
         );
     }
 
-    // LANDING PAGE VIEW
-    if (!user && !hasExplored) {
+    // LANDING PAGE VIEW - Show for all users until they explore
+    if (!hasExplored) {
         return (
             <>
 
                 {layoutStyles}
                 <LandingPage
+                    user={user}
                     onExplore={() => {
                         // Push query param for back button support
                         router.push('?mode=guest');
@@ -473,172 +481,174 @@ function DashboardContent() {
 
             {/* Desktop Header Section (Hidden on Mobile) */}
             <header className="hidden md:flex" style={{
-                justifyContent: 'space-between',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
                 alignItems: 'center',
-                marginBottom: '2rem'
+                padding: '1rem 2rem',
+                borderBottom: '1px solid #e5e7eb',
+                position: 'sticky',
+                top: 0,
+                backgroundColor: '#FFF8F0',
+                zIndex: 50
             }}>
+                {/* Left: Logo */}
                 <div>
                     <div
                         onClick={() => {
                             router.push('/');
-                            // Also manually reset state if needed, though useEffect should handle it
-                            // but for faster feedback:
-                            if (!user) setHasExplored(false);
+                            setHasExplored(false);
                         }}
                         style={{ cursor: 'pointer' }}
                     >
                         <Image
                             src="/logo.png"
                             alt="Cafe South Central"
-                            width={250}
-                            height={80}
-                            style={{ marginBottom: '0.5rem', objectFit: 'contain', objectPosition: 'left' }}
+                            width={200}
+                            height={60}
+                            style={{ objectFit: 'contain', objectPosition: 'left' }}
                             priority
                         />
                     </div>
-                    <p style={{ color: '#2F4F2F', fontWeight: 600 }}>
-                        {user ? `Welcome, ${user.name}` : 'Welcome, Guest'}
-                    </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                    <div
-                        onClick={toggleTheme}
-                        style={{
-                            width: '50px',
-                            height: '24px',
-                            backgroundColor: isDarkMode ? '#333' : '#e5e7eb',
-                            borderRadius: '99px',
-                            position: 'relative',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            border: '1px solid #ccc',
-                            display: 'flex', alignItems: 'center'
-                        }}
-                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                    >
-                        <div style={{
-                            width: '20px',
-                            height: '20px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            left: isDarkMode ? '26px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.8rem'
-                        }}>
-                            {isDarkMode ? '🌙' : '☀️'}
-                        </div>
-                    </div>
-
-                    {!user && (
-                        <>
-                            <button
-                                onClick={() => router.push('/subscription')}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    color: '#5C3A1A',
-                                    fontWeight: 'bold',
-                                    background: 'none',
-                                    border: '1px solid #5C3A1A',
-                                    borderRadius: '0.5rem',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Membership Plans
-                            </button>
-
-                            <button
-                                onClick={() => setShowLoginModal(true)}
-                                style={{
-                                    padding: '0.5rem 1.5rem',
-                                    backgroundColor: '#5C3A1A',
-                                    color: 'white',
-                                    borderRadius: '0.5rem',
-                                    border: 'none',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                Login
-                            </button>
-                        </>
-                    )}
-
-                    {user && isMember && <ModeToggle mode={mode} setMode={setMode} />}
-
-                    {/* Cart Button (Only show if user is logged in OR allow showing 0 items) */}
-                    {/* Strategy: Show it, but it will be empty for guest. Handled by cartItemCount=0 */}
+                {/* Right: Navigation Links + Cart + Profile */}
+                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    {/* Navigation Links */}
                     <button
-                        onClick={() => setIsCartOpen(true)}
+                        onClick={() => {
+                            // Scroll to menu or stay on current page
+                            const menuSection = document.getElementById('menu-section');
+                            if (menuSection) {
+                                menuSection.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#5C3A1A',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            padding: '0.5rem 0',
+                            transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                    >
+                        Menu
+                    </button>
+                    <button
+                        onClick={() => router.push('/subscription')}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#5C3A1A',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            padding: '0.5rem 0',
+                            transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                    >
+                        Subscriptions
+                    </button>
+                    <button
+                        onClick={() => router.push('/orders')}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#5C3A1A',
+                            fontSize: '1rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            padding: '0.5rem 0',
+                            transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                    >
+                        Orders
+                    </button>
+
+                    {/* Cart Icon */}
+                    <button
+                        onClick={() => user ? setIsCartOpen(true) : setShowLoginModal(true)}
                         style={{
                             position: 'relative',
-                            padding: '0.5rem 1rem',
-                            backgroundColor: '#5C3A1A',
-                            color: 'white',
-                            borderRadius: '0.5rem',
+                            background: 'none',
                             border: 'none',
                             cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontWeight: 'bold',
-                            opacity: user ? 1 : 0.5 // Dim if not user
+                            fontSize: '1.5rem',
+                            padding: '0.5rem',
+                            color: '#5C3A1A'
                         }}
+                        title="Cart"
                     >
-                        🛒 Cart
+                        🛒
                         {cartItemCount > 0 && (
                             <span style={{
                                 position: 'absolute',
-                                top: '-8px',
-                                right: '-8px',
-                                backgroundColor: 'red',
+                                top: '0',
+                                right: '0',
+                                backgroundColor: '#ef4444',
                                 color: 'white',
                                 borderRadius: '50%',
-                                width: '20px',
-                                height: '20px',
+                                width: '18px',
+                                height: '18px',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                fontSize: '0.75rem'
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold'
                             }}>
                                 {cartItemCount}
                             </span>
                         )}
                     </button>
 
-                    {user && (
-                        <StaggeredMenu
-                            position="right"
-                            items={[
-                                { label: 'My Account', action: () => router.push('/account') },
-                                { label: 'Subscriptions', action: () => router.push('/subscription') },
-                                {
-                                    label: 'Enable Notifications', action: async () => {
-                                        if (!user.id) return;
-                                        const { enableNotifications } = await import('@/lib/notifications');
-                                        enableNotifications({ ...user, id: user.id });
-                                    }
-                                },
-                                { label: 'Feedback', action: () => setShowFeedbackModal(true) },
-                                { label: 'Log Out', action: handleLogout }
-                            ]}
-                            socialItems={[]}
-                            displaySocials={false}
-                            displayItemNumbering={false}
-                            menuButtonColor={isDarkMode ? '#ffffff' : '#5C3A1A'}
-                            openMenuButtonColor={isDarkMode ? '#000000' : '#1F1F1F'}
-                            changeMenuColorOnOpen={true}
-                            colors={['#5C3A1A', '#2F4F2F']}
-                            accentColor="#F5B700"
-                            logoUrl={isDarkMode ? "/logo-white.png" : "/logo.png"}
-                            isCompact={true}
-                            inlineTrigger={true}
-                        />
+                    {/* Profile Icon or Login */}
+                    {user ? (
+                        <button
+                            onClick={() => router.push('/account')}
+                            style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#5C3A1A',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1rem',
+                                fontWeight: 'bold'
+                            }}
+                            title={user.name || 'Profile'}
+                        >
+                            {user.name?.[0]?.toUpperCase() || '👤'}
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setShowLoginModal(true)}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#5C3A1A',
+                                fontSize: '1rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                padding: '0.5rem 0',
+                                transition: 'color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                        >
+                            Login
+                        </button>
                     )}
-
                 </div>
             </header>
 
