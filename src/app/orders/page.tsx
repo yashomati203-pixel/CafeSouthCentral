@@ -6,6 +6,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import { requestNotificationPermission, sendLocalNotification } from '@/lib/notifications';
 import DesktopHeader from '@/components/layout/DesktopHeader';
 
+type StatusFilter = 'ALL' | 'COMPLETED' | 'CANCELLED' | 'SCHEDULED';
+
 export default function OrderHistoryPage() {
     const router = useRouter();
     const [orders, setOrders] = useState<any[]>([]);
@@ -13,7 +15,9 @@ export default function OrderHistoryPage() {
     const [user, setUser] = useState<any>(null);
     const [activeQrOrder, setActiveQrOrder] = useState<any>(null);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
-    const [selectedDate, setSelectedDate] = useState<string>(''); // For date filtering
+    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('cafe_user') || sessionStorage.getItem('cafe_user');
@@ -125,13 +129,27 @@ export default function OrderHistoryPage() {
         return null;
     };
 
-    // Filter orders by selected date
-    const filteredOrders = selectedDate
-        ? orders.filter(order => {
+    // Filter orders by status and date
+    const filteredOrders = orders.filter(order => {
+        // Status filter
+        let matchesStatus = true;
+        if (statusFilter === 'COMPLETED') {
+            matchesStatus = order.status === 'SOLD';
+        } else if (statusFilter === 'CANCELLED') {
+            matchesStatus = order.status === 'CANCELLED';
+        } else if (statusFilter === 'SCHEDULED') {
+            matchesStatus = !!order.timeSlot;
+        }
+
+        // Date filter
+        let matchesDate = true;
+        if (selectedDate) {
             const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
-            return orderDate === selectedDate;
-        })
-        : orders;
+            matchesDate = orderDate === selectedDate;
+        }
+
+        return matchesStatus && matchesDate;
+    });
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading history...</div>;
 
@@ -142,52 +160,123 @@ export default function OrderHistoryPage() {
                 onLoginClick={() => router.push('/?login=true')}
             />
             <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#5C3A1A', margin: 0 }}>Order History</h1>
+                {/* Header */}
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1.5rem' }}>
+                    Order History
+                </h1>
 
-                    {/* Date Filter */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <label htmlFor="orderDate" style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '600' }}>
-                            Filter by Date:
-                        </label>
-                        <input
-                            type="date"
-                            id="orderDate"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            style={{
-                                padding: '0.5rem 0.75rem',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '0.5rem',
-                                fontSize: '0.875rem',
-                                color: '#374151',
-                                backgroundColor: 'white',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        {selectedDate && (
+                {/* Filters Row */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '1.5rem',
+                    flexWrap: 'wrap',
+                    gap: '1rem'
+                }}>
+                    {/* Status Filter Buttons */}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {(['ALL', 'COMPLETED', 'CANCELLED', 'SCHEDULED'] as StatusFilter[]).map((filter) => (
                             <button
-                                onClick={() => setSelectedDate('')}
+                                key={filter}
+                                onClick={() => setStatusFilter(filter)}
                                 style={{
-                                    padding: '0.5rem 0.75rem',
-                                    backgroundColor: '#f3f4f6',
-                                    color: '#6b7280',
-                                    border: '1px solid #d1d5db',
-                                    borderRadius: '0.5rem',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '1.5rem',
+                                    border: 'none',
                                     fontSize: '0.875rem',
                                     fontWeight: '600',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    backgroundColor: statusFilter === filter ? '#5C3A1A' : '#f3f4f6',
+                                    color: statusFilter === filter ? 'white' : '#6b7280',
+                                    transition: 'all 0.2s'
                                 }}
                             >
-                                Clear
+                                {filter === 'ALL' ? 'All' : filter.charAt(0) + filter.slice(1).toLowerCase()}
                             </button>
+                        ))}
+                    </div>
+
+                    {/* Date Picker with Icon */}
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.5rem 1rem',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '0.5rem',
+                                backgroundColor: 'white',
+                                color: '#6b7280',
+                                fontSize: '0.875rem',
+                                cursor: 'pointer',
+                                fontWeight: '500'
+                            }}
+                        >
+                            <span>📅</span>
+                            <span>{selectedDate ? `by Date: ${new Date(selectedDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}` : 'by Date: mm/dd/yyyy'}</span>
+                        </button>
+
+                        {showDatePicker && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                right: 0,
+                                marginTop: '0.5rem',
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '0.5rem',
+                                padding: '1rem',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                zIndex: 10
+                            }}>
+                                <input
+                                    type="date"
+                                    value={selectedDate}
+                                    onChange={(e) => {
+                                        setSelectedDate(e.target.value);
+                                        setShowDatePicker(false);
+                                    }}
+                                    style={{
+                                        padding: '0.5rem',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '0.375rem',
+                                        fontSize: '0.875rem',
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                                {selectedDate && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedDate('');
+                                            setShowDatePicker(false);
+                                        }}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            width: '100%',
+                                            padding: '0.5rem',
+                                            backgroundColor: '#f3f4f6',
+                                            color: '#6b7280',
+                                            border: 'none',
+                                            borderRadius: '0.375rem',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {filteredOrders.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '3rem', color: '#666', border: '1px dashed #ccc', borderRadius: '0.5rem' }}>
-                        <p>No past orders found.</p>
+                        <p>No orders found.</p>
                         <button
                             onClick={() => router.push('/')}
                             style={{ marginTop: '1rem', color: '#5C3A1A', fontWeight: 'bold', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
@@ -196,7 +285,7 @@ export default function OrderHistoryPage() {
                         </button>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '700px', margin: '0 auto' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {filteredOrders.map(order => {
                             const isExpanded = expandedOrders.has(order.id);
                             const statusStyle = getStatusStyle(order.status);
@@ -206,56 +295,64 @@ export default function OrderHistoryPage() {
                                 <div
                                     key={order.id}
                                     style={{
-                                        backgroundColor: '#fdf9ee',
-                                        borderRadius: '1rem',
-                                        padding: '1.5rem',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                        border: '1px solid #e5e7eb'
+                                        backgroundColor: 'white',
+                                        borderRadius: '0.75rem',
+                                        padding: '1.25rem',
+                                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                        border: '1px solid #e5e7eb',
+                                        cursor: 'pointer'
                                     }}
+                                    onClick={() => toggleOrderExpansion(order.id)}
                                 >
-                                    {/* Card Header */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-                                            #{order.displayId || order.id.slice(0, 10).toUpperCase()}
-                                        </h3>
-                                        <span style={{
-                                            padding: '0.375rem 0.75rem',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.75rem',
-                                            fontWeight: 'bold',
-                                            backgroundColor: statusStyle.bg,
-                                            color: statusStyle.color
-                                        }}>
-                                            {statusStyle.label}
-                                        </span>
-                                    </div>
+                                    {/* Collapsed Header */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', margin: '0 0 0.25rem 0' }}>
+                                                #{order.displayId || 'JAN26-' + order.id.slice(0, 4).toUpperCase()}
+                                            </h3>
+                                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                                                {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                })} | {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
 
-                                    {/* Date & Time */}
-                                    <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
-                                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })} | {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-
-                                    {/* Scheduled Time Tag */}
-                                    {order.timeSlot && (
-                                        <div style={{
-                                            display: 'inline-block',
-                                            backgroundColor: '#fef3c7',
-                                            color: '#92400e',
-                                            padding: '0.25rem 0.75rem',
-                                            borderRadius: '0.375rem',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600',
-                                            marginBottom: '1rem'
-                                        }}>
-                                            ⏰ Scheduled: {order.timeSlot}
+                                            {/* Scheduled Time Tag - Show for all orders */}
+                                            {order.timeSlot && (
+                                                <div style={{
+                                                    display: 'inline-block',
+                                                    marginTop: '0.5rem',
+                                                    backgroundColor: '#fef3c7',
+                                                    color: '#92400e',
+                                                    padding: '0.25rem 0.625rem',
+                                                    borderRadius: '0.375rem',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600'
+                                                }}>
+                                                    ⏰ Scheduled: {order.timeSlot}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
 
-                                    {/* Expandable Details */}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <span style={{
+                                                padding: '0.375rem 0.75rem',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 'bold',
+                                                backgroundColor: statusStyle.bg,
+                                                color: statusStyle.color
+                                            }}>
+                                                {statusStyle.label}
+                                            </span>
+                                            <span style={{ fontSize: '1rem', color: '#9ca3af' }}>
+                                                {isExpanded ? '▲' : '▼'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Expanded Details */}
                                     {isExpanded && (
                                         <div style={{
                                             marginTop: '1rem',
@@ -264,7 +361,7 @@ export default function OrderHistoryPage() {
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: '1rem'
-                                        }}>
+                                        }} onClick={(e) => e.stopPropagation()}>
                                             {/* Items */}
                                             <div>
                                                 <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
@@ -314,7 +411,10 @@ export default function OrderHistoryPage() {
                                                     {/* Show QR Code button for active orders */}
                                                     {qrStatus.text === 'Not Scanned' && (
                                                         <button
-                                                            onClick={() => setActiveQrOrder(order)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActiveQrOrder(order);
+                                                            }}
                                                             style={{
                                                                 marginTop: '0.5rem',
                                                                 padding: '0.5rem 1rem',
@@ -337,7 +437,10 @@ export default function OrderHistoryPage() {
                                             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                                                 {isCancellable(order) && (
                                                     <button
-                                                        onClick={() => handleCancel(order.id)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCancel(order.id);
+                                                        }}
                                                         style={{
                                                             padding: '0.5rem 1rem',
                                                             fontSize: '0.875rem',
@@ -355,6 +458,7 @@ export default function OrderHistoryPage() {
                                                 <a
                                                     href={`/receipt/${order.id}`}
                                                     target="_blank"
+                                                    onClick={(e) => e.stopPropagation()}
                                                     style={{
                                                         display: 'inline-flex',
                                                         alignItems: 'center',
@@ -374,48 +478,13 @@ export default function OrderHistoryPage() {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* Collapse/Expand Button */}
-                                    <button
-                                        onClick={() => toggleOrderExpansion(order.id)}
-                                        style={{
-                                            width: '100%',
-                                            marginTop: '1rem',
-                                            padding: '0.75rem',
-                                            backgroundColor: 'transparent',
-                                            border: 'none',
-                                            color: '#5C3A1A',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between'
-                                        }}
-                                    >
-                                        <span>View Order Details</span>
-                                        <span style={{ fontSize: '1.25rem' }}>
-                                            {isExpanded ? '▲' : '▼'}
-                                        </span>
-                                    </button>
-
-                                    {/* Total Amount (visible when collapsed) */}
-                                    {!isExpanded && (
-                                        <div style={{
-                                            fontSize: '1.125rem',
-                                            fontWeight: 'bold',
-                                            color: '#1f2937',
-                                            textAlign: 'right',
-                                            marginTop: '0.5rem'
-                                        }}>
-                                            ₹{order.totalAmount}
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}
                     </div>
                 )}
+
+                {/* QR Code Modal */}
                 {activeQrOrder && (
                     <div style={{
                         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,

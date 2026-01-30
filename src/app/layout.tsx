@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import ClickSpark from '@/components/ui/ClickSpark';
+import SmoothScroll from '@/components/ui/SmoothScroll';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className} style={{ background: '#fefaef', minHeight: '100vh' }}>
+                <SmoothScroll />
                 <CartProvider>
                     {children}
                 </CartProvider>

@@ -28,9 +28,9 @@
 .sidebarWrapper {
     /* Takes up full height of its container/column */
     height: fit-content;
-    max-height: calc(100vh - 4rem);
+    max-height: calc(100vh - 2rem);
     position: sticky;
-    top: 2rem;
+    top: 1rem;
     display: flex;
     flex-direction: column;
     background-color: white;
@@ -45,7 +45,7 @@
 .sidebar {
     width: 100%;
     height: auto;
-    max-height: 80vh;
+    max-height: 90vh;
     /* Scrollable inside */
     box-shadow: none;
     animation: none;

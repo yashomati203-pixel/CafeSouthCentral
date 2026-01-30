@@ -254,7 +254,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
 
             {variant === 'drawer' ? (
                 <div className={`${styles.overlay} ${!isOpen ? styles.hidden : ''}`}>
-                    <div className={styles.drawer}>
+                    <div className={styles.drawer} data-lenis-prevent>
                         <header className={styles.header}>
                             <h2>Your Order</h2>
                             <button onClick={showSuccessAnimation ? handleAnimationComplete : onClose} className={styles.closeBtn}>×</button>
@@ -297,7 +297,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                 </div>
             ) : (
                 <div className={styles.sidebarWrapper}>
-                    <div className={styles.sidebar}>
+                    <div className={styles.sidebar} data-lenis-prevent>
                         <header className={styles.header}>
                             <h2>Your Order</h2>
                             {/* No close button for sidebar */}
@@ -429,12 +429,6 @@ function CartContent({
                                 </div>
                             </div>
                         ))}
-
-                        {subTotalCount > 4 && (
-                            <div className={styles.errorBanner}>
-                                ⚠️ You have exceeded the daily limit of 4 items.
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -698,7 +692,7 @@ function CartContent({
 
                 <button
                     className={styles.checkoutBtn}
-                    disabled={subTotalCount > 4 || (!hasSubscription && !hasNormal) || isProcessing}
+                    disabled={(!hasSubscription && !hasNormal) || isProcessing}
                     onClick={handleCheckout}
                     style={{ opacity: isProcessing ? 0.7 : 1 }}
                 >

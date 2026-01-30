@@ -87,7 +87,10 @@ export default function MenuGrid({
         const isAvailableInSub = item.type === 'SUBSCRIPTION' || item.type === 'BOTH';
         const matchesMode = mode === 'NORMAL' || isAvailableInSub;
 
-        return matchesSearch && matchesCategory && matchesMode;
+        // Only show items that are marked as available in admin
+        const isActiveItem = item.isAvailable !== false;
+
+        return matchesSearch && matchesCategory && matchesMode && isActiveItem;
     });
 
     return (

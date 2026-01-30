@@ -482,14 +482,15 @@ function DashboardContent() {
             {/* Desktop Header Section (Hidden on Mobile) */}
             <header className="hidden md:flex" style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr auto',
+                gridTemplateColumns: isMember ? '1fr auto auto' : '1fr auto',
                 alignItems: 'center',
                 padding: '1rem 2rem',
                 borderBottom: '1px solid #e5e7eb',
                 position: 'sticky',
                 top: 0,
                 backgroundColor: '#FFF8F0',
-                zIndex: 50
+                zIndex: 50,
+                gap: '2rem'
             }}>
                 {/* Left: Logo */}
                 <div>
@@ -510,6 +511,13 @@ function DashboardContent() {
                         />
                     </div>
                 </div>
+
+                {/* Center: Mode Toggle (Only for Members) */}
+                {isMember && (
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ModeToggle mode={mode} setMode={setMode} />
+                    </div>
+                )}
 
                 {/* Right: Navigation Links + Cart + Profile */}
                 <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'flex-end' }}>
