@@ -14,6 +14,14 @@ import {
     Search
 } from 'lucide-react';
 
+interface NewCustomer {
+    id: string;
+    name: string;
+    phone: string;
+    email: string | null;
+    createdAt: string;
+}
+
 interface AnalyticsData {
     kpi: {
         totalRevenue: number;
@@ -41,10 +49,12 @@ interface AnalyticsData {
         neutralPct: number;
         negativePct: number;
     };
+    newCustomersList?: NewCustomer[];
 }
 
 const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
     const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('week');
+    const [showCustomersModal, setShowCustomersModal] = useState(false);
 
     // Safe access to data or defaults
     const revenue = data?.kpi?.totalRevenue || 0;
@@ -116,8 +126,11 @@ const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
                     <h3 className="text-3xl font-black mt-1">₹{avgValue.toLocaleString()}</h3>
                 </div>
 
-                {/* KPI Card 3 */}
-                <div className="bg-surface-light dark:bg-surface-dark p-8 rounded-xl border border-border-light dark:border-border-dark shadow-sm hover:shadow-md transition-shadow group">
+                {/* KPI Card 3 - Clickable New Customers */}
+                <button
+                    onClick={() => setShowCustomersModal(true)}
+                    className="bg-surface-light dark:bg-surface-dark p-8 rounded-xl border border-border-light dark:border-border-dark shadow-sm hover:shadow-md transition-all group cursor-pointer text-left w-full hover:scale-[1.02]"
+                >
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-primary-brown/5 rounded-xl group-hover:bg-primary-brown/10 transition-colors">
                             <UserPlus className="text-primary-brown w-6 h-6" />
@@ -128,7 +141,8 @@ const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
                     </div>
                     <p className="text-text-subtle font-medium text-sm">New Customers</p>
                     <h3 className="text-3xl font-black mt-1">{newCust}</h3>
-                </div>
+                    <p className="text-xs text-primary-brown font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">👆 Click to view details</p>
+                </button>
             </div>
 
             {/* Main Bento Grid */}
@@ -273,6 +287,91 @@ const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
                     </div>
                 </div>
             </div>
+
+            {/* New Customers Modal */}
+            {showCustomersModal && (
+                <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    onClick={() => setShowCustomersModal(false)}
+                >
+                    <div
+                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="bg-primary-brown text-white p-6 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-2xl font-black">New Customers (Last 30 Days)</h3>
+                                <p className="text-sm text-white/80 mt-1">{data?.newCustomersList?.length || 0} customers joined recently</p>
+                            </div>
+                            <button
+                                onClick={() => setShowCustomersModal(false)}
+                                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="overflow-y-auto max-h-[60vh] p-6">
+                            {!data?.newCustomersList || data.newCustomersList.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500">
+                                    <UserPlus className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                                    <p className="text-lg font-bold">No new customers yet</p>
+                                    <p className="text-sm">Check back later!</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {data.newCustomersList.map((customer, idx) => (
+                                        <div
+                                            key={customer.id}
+                                            className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-md transition-all border-l-4 border-primary-brown"
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <div className="w-10 h-10 bg-primary-brown text-white rounded-full flex items-center justify-center font-black text-lg">
+                                                            {customer.name?.[0]?.toUpperCase() || '?'}
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-bold text-lg text-gray-900 dark:text-white">{customer.name || 'Unknown'}</h4>
+                                                            <p className="text-sm text-gray-500">#{idx + 1} newest customer</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="ml-13 space-y-1">
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="font-bold text-gray-600 dark:text-gray-400">📞 Phone:</span>
+                                                            <span className="text-gray-900 dark:text-white font-medium">{customer.phone}</span>
+                                                        </div>
+                                                        {customer.email && (
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                <span className="font-bold text-gray-600 dark:text-gray-400">📧 Email:</span>
+                                                                <span className="text-gray-900 dark:text-white font-medium">{customer.email}</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="font-bold text-gray-600 dark:text-gray-400">📅 Joined:</span>
+                                                            <span className="text-gray-900 dark:text-white font-medium">
+                                                                {new Date(customer.createdAt).toLocaleDateString('en-IN', {
+                                                                    day: 'numeric',
+                                                                    month: 'short',
+                                                                    year: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit'
+                                                                })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

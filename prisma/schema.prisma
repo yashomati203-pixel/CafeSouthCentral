@@ -65,6 +65,9 @@ model UserSubscription {
   startDate              DateTime
   endDate                DateTime
   isActive               Boolean  @default(true)
+  isCancelled            Boolean  @default(false)
+  cancelledAt            DateTime?
+  cancellationReason     String?
   user                   User     @relation(fields: [userId], references: [id])
 }
 

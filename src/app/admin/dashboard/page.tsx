@@ -132,10 +132,12 @@ export default function AdminDashboard() {
         fetchInventory(); // Inventory fetch
         fetchUsers(); // Fetch users
         fetchFeedback(); // Fetch feedback
+        fetchAnalytics(); // Fetch analytics on load
 
         const interval = setInterval(() => {
             fetchOrders();
             fetchInventory();
+            fetchAnalytics(); // Refresh analytics every 5s to sync with new orders
         }, 5000); // Poll every 5s for "Live" feel (user requested live)
 
         return () => clearInterval(interval);
@@ -379,9 +381,9 @@ export default function AdminDashboard() {
             <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm transition-all duration-300">
                 <div className="p-6 pb-4">
                     <div className="flex items-center gap-3 mb-1">
-                        <img 
-                            src="/coconut-logo.png.png" 
-                            alt="Cafe South Central Logo" 
+                        <img
+                            src="/coconut-logo.png.png"
+                            alt="Cafe South Central Logo"
                             className="w-10 h-10 rounded-xl shadow-md object-contain"
                         />
                         <h1 className="text-2xl font-bold font-serif-display text-[#2F4F2F] leading-tight">
@@ -402,6 +404,7 @@ export default function AdminDashboard() {
                                     if (item.id === 'stock') fetchInventory();
                                     if (item.id === 'members') fetchUsers();
                                     if (item.id === 'feedback') fetchFeedback();
+                                    if (item.id === 'analytics') fetchAnalytics();
                                 }}
                                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isActive
                                     ? 'bg-primary-brown text-white shadow-md shadow-primary-brown/20'
@@ -927,150 +930,6 @@ export default function AdminDashboard() {
                         )
                     }
 
-                    {/* ANALYTICS TAB */}
-                    {
-                        activeTab === 'analytics' && (
-                            <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-                                {!analytics ? (
-                                    <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Loading analytics...</div>
-                                ) : analytics.stats.length === 0 ? (
-                                    <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>No sales data yet</div>
-                                ) : (
-                                    <>
-                                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
-                                            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.5rem' }}>📊 Item Analytics</h2>
-                                            <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>Total Orders Analyzed: {analytics.totalOrders}</p>
-
-                                            {/* Reports Section */}
-                                            <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e5e7eb' }}>
-                                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.75rem' }}>📄 Generate Reports</h3>
-                                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                                    {['day', 'week', 'month', 'year'].map(period => (
-                                                        <button
-                                                            key={period}
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const res = await fetch(`/api/admin/reports?period=${period}`);
-                                                                    const data = await res.json();
-
-                                                                    // Create CSV report
-                                                                    const csvRows = [
-                                                                        [`Sales Report - ${period.toUpperCase()}`],
-                                                                        [`Generated`, new Date().toLocaleDateString()],
-                                                                        [],
-                                                                        [`Period`, `Start Date`, `End Date`],
-                                                                        [`Summary`, new Date(data.startDate).toLocaleDateString(), new Date(data.endDate).toLocaleDateString()],
-                                                                        [],
-                                                                        [`Metric`, `Value`],
-                                                                        [`Total Revenue`, `₹${data.totalRevenue.toFixed(2)}`],
-                                                                        [`Total Orders`, data.totalOrders],
-                                                                        [`Average Order Value`, `₹${data.averageOrderValue.toFixed(2)}`],
-                                                                        [],
-                                                                        [`TOP 10 ITEMS`],
-                                                                        [`Rank`, `Item Name`, `Quantity Sold`, `Revenue`],
-                                                                        ...data.topItems.map((item: any, i: number) =>
-                                                                            [`${i + 1}`, item.name, item.quantity, `₹${item.revenue.toFixed(2)}`]
-                                                                        ),
-                                                                        [],
-                                                                        [`PAYMENT BREAKDOWN`],
-                                                                        [`Payment Method`, `Order Count`],
-                                                                        ...Object.entries(data.paymentBreakdown).map(([method, count]) =>
-                                                                            [method, count]
-                                                                        )
-                                                                    ];
-
-                                                                    // Convert to CSV string
-                                                                    const csvContent = csvRows.map(row => row.join(',')).join('\n');
-
-                                                                    // Download as CSV file
-                                                                    const blob = new Blob([csvContent], { type: 'text/csv' });
-                                                                    const url = URL.createObjectURL(blob);
-                                                                    const a = document.createElement('a');
-                                                                    a.href = url;
-                                                                    a.download = `sales-report-${period}-${Date.now()}.csv`;
-                                                                    a.click();
-                                                                    URL.revokeObjectURL(url);
-                                                                } catch (e) {
-                                                                    alert('Failed to generate report');
-                                                                }
-                                                            }}
-                                                            style={{
-                                                                padding: '0.5rem 1rem',
-                                                                backgroundColor: '#5C3A1A',
-                                                                color: 'white',
-                                                                border: 'none',
-                                                                borderRadius: '0.5rem',
-                                                                fontWeight: 'bold',
-                                                                cursor: 'pointer',
-                                                                fontSize: '0.9rem',
-                                                                transition: 'background 0.2s'
-                                                            }}
-                                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3d2612'}
-                                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#5C3A1A'}
-                                                        >
-                                                            {period === 'day' && '📅'}
-                                                            {period === 'week' && '📆'}
-                                                            {period === 'month' && '🗓️'}
-                                                            {period === 'year' && '📊'}
-                                                            {' '}
-                                                            {period === 'day' ? 'Daily' : period === 'week' ? 'Weekly' : period === 'month' ? 'Monthly' : 'Yearly'} Report
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            <thead style={{ backgroundColor: '#f3f4f6' }}>
-                                                <tr>
-                                                    <th style={{ padding: '1rem', textAlign: 'left' }}>Rank</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'left' }}>Item Name</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'left' }}>Category</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'right' }}>Qty Sold</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'right' }}>Orders</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'right' }}>Revenue</th>
-                                                    <th style={{ padding: '1rem', textAlign: 'center' }}>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {analytics.stats.map((item: any, idx: number) => (
-                                                    <tr key={item.id} style={{ borderTop: '1px solid #eee', backgroundColor: idx < 5 ? '#fffbeb' : 'white' }}>
-                                                        <td style={{ padding: '1rem', fontWeight: 'bold', fontSize: '1.2rem', color: idx < 3 ? '#d97706' : '#666' }}>
-                                                            {idx === 0 && '🥇'}
-                                                            {idx === 1 && '🥈'}
-                                                            {idx === 2 && '🥉'}
-                                                            {idx > 2 && `#${idx + 1}`}
-                                                        </td>
-                                                        <td style={{ padding: '1rem', fontWeight: '600' }}>{item.name}</td>
-                                                        <td style={{ padding: '1rem', color: '#666', fontSize: '0.9rem' }}>{item.category}</td>
-                                                        <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem' }}>{item.totalQuantity}</td>
-                                                        <td style={{ padding: '1rem', textAlign: 'right', color: '#666' }}>{item.orderCount}</td>
-                                                        <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 'bold', color: '#059669' }}>₹{item.totalRevenue.toFixed(2)}</td>
-                                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                            {idx < 5 && (
-                                                                <span style={{
-                                                                    backgroundColor: '#fef3c7',
-                                                                    color: '#d97706',
-                                                                    padding: '0.25rem 0.75rem',
-                                                                    borderRadius: '999px',
-                                                                    fontSize: '0.75rem',
-                                                                    fontWeight: 'bold',
-                                                                    display: 'inline-flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.25rem'
-                                                                }}>
-                                                                    🔥 POPULAR
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </>
-                                )}
-                            </div>
-                        )
-                    }
                     {/* POS TAB */}
                     {
                         activeTab === 'pos' && (

@@ -27,11 +27,28 @@ export async function GET(req: NextRequest) {
 
         // Users
         const totalUsers = await prisma.user.count();
-        const newUsers = await prisma.user.count({
+        const newUsers = await prisma.user.findMany({
             where: {
-                createdAt: {
-                    gte: new Date(new Date().setDate(new Date().getDate() - 30)) // Last 30 days
-                }
+                AND: [
+                    {
+                        createdAt: {
+                            gte: new Date(new Date().setDate(new Date().getDate() - 30)) // Last 30 days
+                        }
+                    },
+                    {
+                        role: 'CUSTOMER' // Exclude ADMIN and KITCHEN staff
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+                createdAt: true
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
 
@@ -140,13 +157,14 @@ export async function GET(req: NextRequest) {
             kpi: {
                 totalRevenue,
                 avgOrderValue: Math.round(avgOrderValue),
-                newCustomers: newUsers,
+                newCustomers: newUsers.length,
                 totalOrders: orders.length
             },
             salesChart, // { labels: [], data: [] }
             topSellingItems, // [{name, count, width}]
             peakHours, // [{time, height, opacity}]
-            sentiment
+            sentiment,
+            newCustomersList: newUsers // Full customer details
         });
 
     } catch (error: any) {

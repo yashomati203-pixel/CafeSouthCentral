@@ -6,6 +6,7 @@ import styles from './CartDrawer.module.css';
 import { useState, useEffect } from 'react';
 import OrderConfirmed from '@/components/ui/OrderConfirmed';
 import { QRCodeSVG } from 'qrcode.react';
+import PaymentSelector, { PaymentDetails } from '@/components/payment/PaymentSelector';
 
 
 interface CartProps {
@@ -28,8 +29,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
         clearCart
     } = useCart();
 
-    const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'UPI' | 'SCAN'>('CASH');
-    const [upiId, setUpiId] = useState('');
+    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({ method: 'CASH' });
     const [isProcessing, setIsProcessing] = useState(false);
 
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
@@ -206,12 +206,23 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
 
             // 2. Process Normal Part (Payment + Order Creation)
             if (hasNormal) {
-                if (paymentMethod === 'UPI' && !upiId.trim()) {
+                // Validate payment details
+                if (paymentDetails.method === 'UPI' && !paymentDetails.upiId) {
                     alert('Please enter your UPI ID');
                     return;
                 }
+                if (paymentDetails.method === 'CARD') {
+                    if (!paymentDetails.cardNumber || !paymentDetails.cardExpiry || !paymentDetails.cardCVV) {
+                        alert('Please fill in all card details');
+                        return;
+                    }
+                }
+                if (paymentDetails.method === 'NET_BANKING' && !paymentDetails.bankName) {
+                    alert('Please select your bank');
+                    return;
+                }
 
-                if (!isOffline && (paymentMethod === 'UPI' || paymentMethod === 'SCAN')) {
+                if (!isOffline && (paymentDetails.method === 'UPI' || paymentDetails.method === 'CARD' || paymentDetails.method === 'NET_BANKING')) {
                     setIsProcessing(true);
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
@@ -220,8 +231,9 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                     userId: user.id,
                     items: normalItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
                     mode: 'NORMAL',
-                    paymentMethod: paymentMethod,
-                    upiId: paymentMethod === 'UPI' ? upiId : undefined,
+                    paymentMethod: paymentDetails.method,
+                    upiId: paymentDetails.upiId,
+                    paymentDetails: paymentDetails,
                     note: note,
                     timeSlot: orderType === 'LATER' ? scheduledTime : undefined
                 };
@@ -245,7 +257,7 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
     const getButtonText = () => {
         if (isProcessing) return 'Processing Payment...';
         if (!hasNormal) return 'Redeem Now';
-        if (paymentMethod === 'CASH') return `Confirm Order (₹${normalTotalAmount})`;
+        if (paymentDetails.method === 'CASH') return `Confirm Order (₹${normalTotalAmount})`;
         return `Proceed to Pay (₹${normalTotalAmount})`;
     };
 
@@ -269,10 +281,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             normalTotalAmount={normalTotalAmount}
                             subscriptionItems={subscriptionItems}
                             normalItems={normalItems}
-                            paymentMethod={paymentMethod}
-                            setPaymentMethod={setPaymentMethod}
-                            upiId={upiId}
-                            setUpiId={setUpiId}
+                            paymentDetails={paymentDetails}
+                            setPaymentDetails={setPaymentDetails}
                             decreaseQty={decreaseQty}
                             addToCart={addToCart}
                             removeFromCart={removeFromCart}
@@ -312,10 +322,8 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
                             normalTotalAmount={normalTotalAmount}
                             subscriptionItems={subscriptionItems}
                             normalItems={normalItems}
-                            paymentMethod={paymentMethod}
-                            setPaymentMethod={setPaymentMethod}
-                            upiId={upiId}
-                            setUpiId={setUpiId}
+                            paymentDetails={paymentDetails}
+                            setPaymentDetails={setPaymentDetails}
                             decreaseQty={decreaseQty}
                             addToCart={addToCart}
                             removeFromCart={removeFromCart}
@@ -353,10 +361,8 @@ function CartContent({
     normalTotalAmount,
     subscriptionItems,
     normalItems,
-    paymentMethod,
-    setPaymentMethod,
-    upiId,
-    setUpiId,
+    paymentDetails,
+    setPaymentDetails,
     decreaseQty,
     addToCart,
     removeFromCart,
@@ -567,71 +573,11 @@ function CartContent({
                 {/* Payment Options (Only for Normal Orders) */}
                 {hasNormal && (
                     <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                            💳 Payment Method
-                        </h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: paymentMethod === 'CASH' ? '1px solid #5C3A1A' : '1px solid #ddd', borderRadius: '0.5rem', backgroundColor: paymentMethod === 'CASH' ? '#fdf8f6' : 'white' }}>
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="CASH"
-                                    checked={paymentMethod === 'CASH'}
-                                    onChange={() => setPaymentMethod('CASH')}
-                                    style={{ accentColor: '#5C3A1A' }}
-                                />
-                                <span style={{ fontWeight: 500 }}>💵 Cash / Counter</span>
-                            </label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: paymentMethod === 'UPI' ? '1px solid #5C3A1A' : '1px solid #ddd', borderRadius: '0.5rem', backgroundColor: paymentMethod === 'UPI' ? '#fdf8f6' : 'white' }}>
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="UPI"
-                                    checked={paymentMethod === 'UPI'}
-                                    onChange={() => setPaymentMethod('UPI')}
-                                    style={{ accentColor: '#5C3A1A' }}
-                                />
-                                <span style={{ fontWeight: 500 }}>📱 UPI ID</span>
-                            </label>
-
-                            {paymentMethod === 'UPI' && (
-                                <div style={{ paddingLeft: '2rem', marginTop: '-0.25rem' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter UPI ID (e.g. 9876543210@upi)"
-                                        value={upiId}
-                                        onChange={(e: any) => setUpiId(e.target.value)}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.5rem',
-                                            borderRadius: '0.3rem',
-                                            border: '1px solid #ccc',
-                                            fontSize: '0.9rem'
-                                        }}
-                                    />
-                                </div>
-                            )}
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: paymentMethod === 'SCAN' ? '1px solid #5C3A1A' : '1px solid #ddd', borderRadius: '0.5rem', backgroundColor: paymentMethod === 'SCAN' ? '#fdf8f6' : 'white' }}>
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="SCAN"
-                                    checked={paymentMethod === 'SCAN'}
-                                    onChange={() => setPaymentMethod('SCAN')}
-                                    style={{ accentColor: '#5C3A1A' }}
-                                />
-                                <span style={{ fontWeight: 500 }}>📷 Scan & Pay</span>
-                            </label>
-                        </div>
-
-                        {paymentMethod === 'SCAN' && (
-                            <div style={{ marginTop: '1rem', textAlign: 'center', border: '1px dashed #ccc', padding: '1rem', borderRadius: '0.5rem' }}>
-                                <div style={{ width: '150px', height: '150px', backgroundColor: '#eee', margin: '0 auto 0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.8rem' }}>
-                                    [QR Code Placeholder]
-                                </div>
-                                <p style={{ fontSize: '0.9rem', color: '#666' }}>Scan this QR to pay ₹{normalTotalAmount}</p>
-                            </div>
-                        )}
+                        <PaymentSelector
+                            amount={normalTotalAmount}
+                            onPaymentChange={setPaymentDetails}
+                            variant="compact"
+                        />
                     </div>
                 )}
 

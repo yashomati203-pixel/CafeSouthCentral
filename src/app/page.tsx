@@ -3,24 +3,36 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
-import ModeToggle from '@/components/ui/ModeToggle';
-import SubscriptionSummary from '@/components/dashboard/SubscriptionSummary';
+// import ModeToggle from '@/components/ui/ModeToggle';
+// import SubscriptionSummary from '@/components/dashboard/SubscriptionSummary';
 import { useCart } from '@/context/CartContext';
-import CartDrawer from '@/components/ordering/CartDrawer';
+// import CartDrawer from '@/components/ordering/CartDrawer';
 import { MenuItem, MenuItemType } from '@/types/db';
-import LoginPage from '@/components/auth/LoginPage';
+// import LoginPage from '@/components/auth/LoginPage';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
-import LandingPage from '@/components/marketing/LandingPage';
-import FeedbackModal from '@/components/feedback/FeedbackModal';
+// import SubscriptionInvitation from '@/components/marketing/SubscriptionInvitation';
+// import LandingPage from '@/components/marketing/LandingPage';
+// import FeedbackModal from '@/components/feedback/FeedbackModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMenu } from '@/hooks/useMenu';
-import MenuGrid from '@/components/dashboard/MenuGrid';
-import MobileHeader from '@/components/layout/MobileHeader';
-import MobileBottomNav from '@/components/layout/MobileBottomNav';
+// import MenuGrid from '@/components/dashboard/MenuGrid';
+// import MobileHeader from '@/components/layout/MobileHeader';
+// import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import StickyCartSummary from '@/components/ordering/StickyCartSummary';
-import MobileProfileMenu from '@/components/layout/MobileProfileMenu';
+// import MobileProfileMenu from '@/components/layout/MobileProfileMenu';
 import StaggeredMenu from '@/components/ui/StaggeredMenu';
+import dynamic from 'next/dynamic';
+
+const LandingPage = dynamic(() => import('@/components/marketing/LandingPage'), { ssr: false });
+const MenuGrid = dynamic(() => import('@/components/dashboard/MenuGrid'), { ssr: false });
+const CartDrawer = dynamic(() => import('@/components/ordering/CartDrawer'), { ssr: false });
+const MobileHeader = dynamic(() => import('@/components/layout/MobileHeader'), { ssr: false });
+const MobileBottomNav = dynamic(() => import('@/components/layout/MobileBottomNav'), { ssr: false });
+const MobileProfileMenu = dynamic(() => import('@/components/layout/MobileProfileMenu'), { ssr: false });
+const FeedbackModal = dynamic(() => import('@/components/feedback/FeedbackModal'), { ssr: false });
+const SubscriptionInvitation = dynamic(() => import('@/components/marketing/SubscriptionInvitation'), { ssr: false });
+const LoginPage = dynamic(() => import('@/components/auth/LoginPage'), { ssr: false });
+const ModeToggle = dynamic(() => import('@/components/ui/ModeToggle'), { ssr: false });
 
 function DashboardContent() {
     const router = useRouter();
@@ -141,7 +153,11 @@ function DashboardContent() {
                         return;
                     }
                     setUser(parsedUser);
-                    setHasExplored(true); // If logged in, skip landing page
+                    // Check if user has previously explored (don't auto-skip landing page)
+                    const hasVisited = sessionStorage.getItem('cafe_has_explored');
+                    if (hasVisited === 'true') {
+                        setHasExplored(true);
+                    }
                 } else {
                     // No user, check URL params for guest mode
                     const mode = searchParams.get('mode');
@@ -158,13 +174,13 @@ function DashboardContent() {
                         setHasExplored(true); // Show the main page
                         setTimeout(() => setShowLoginModal(true), 500);
                     }
+                }
 
-                    // If feedback parameter is present, show feedback modal
-                    const shouldShowFeedback = searchParams.get('feedback');
-                    if (shouldShowFeedback === 'true') {
-                        setHasExplored(true); // Show the main page
-                        setTimeout(() => setShowFeedbackModal(true), 500);
-                    }
+                // If feedback parameter is present, show feedback modal (works for both logged-in and guest users)
+                const shouldShowFeedback = searchParams.get('feedback');
+                if (shouldShowFeedback === 'true') {
+                    setHasExplored(true); // Show the main page
+                    setTimeout(() => setShowFeedbackModal(true), 500);
                 }
             } catch (e) {
                 console.error("Failed to parse user", e);
@@ -303,6 +319,7 @@ function DashboardContent() {
             } else {
                 setUser(fullUser);
                 setShowLoginModal(false);
+                sessionStorage.setItem('cafe_has_explored', 'true');
                 setHasExplored(true);
 
                 // Check subscription status immediately to decide on invitation
@@ -426,6 +443,8 @@ function DashboardContent() {
                 <LandingPage
                     user={user}
                     onExplore={() => {
+                        // Mark as explored in session
+                        sessionStorage.setItem('cafe_has_explored', 'true');
                         // Push query param for back button support
                         router.push('?mode=guest');
                         setHasExplored(true);
@@ -433,6 +452,7 @@ function DashboardContent() {
                     onViewPlans={() => router.push('/subscription')}
                     onCategorySelect={(category) => {
                         setSelectedCategory(category);
+                        sessionStorage.setItem('cafe_has_explored', 'true');
                         router.push('?mode=guest'); // Also sync URL here
                         setHasExplored(true);
                     }}
@@ -496,6 +516,7 @@ function DashboardContent() {
                 <div>
                     <div
                         onClick={() => {
+                            sessionStorage.removeItem('cafe_has_explored');
                             router.push('/');
                             setHasExplored(false);
                         }}
