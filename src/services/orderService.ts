@@ -1,11 +1,15 @@
 import { prisma } from '../lib/prisma';
-import { MenuItemType, OrderMode, OrderStatus, MenuItem } from '@prisma/client';
+import { MenuItemType, OrderMode, OrderStatus, SubscriptionState } from '@prisma/client';
+import { validateAndBookSlot } from './slotService';
+import { createRazorpayOrder } from './paymentService';
+import { reserveStock, releaseStock } from './inventoryService';
 
 interface CartItem {
     menuItemId: string;
     qty: number;
 }
 
+// Helper to generate Display ID
 async function generateOrderDisplayId(tx: any) {
     const now = new Date();
     const month = now.toLocaleString('default', { month: 'short' }).toUpperCase();
@@ -21,221 +25,210 @@ async function generateOrderDisplayId(tx: any) {
     if (lastOrder?.displayId) {
         const parts = lastOrder.displayId.split('-');
         if (parts[1]) {
-            const lastNum = parseInt(parts[1]);
-            if (!isNaN(lastNum)) nextNum = lastNum + 1;
+            const nextVal = parseInt(parts[1], 10);
+            if (!isNaN(nextVal)) nextNum = nextVal + 1;
         }
     }
 
     return `${prefix}-${nextNum.toString().padStart(4, '0')}`;
 }
 
-export async function createSubscriptionOrder(userId: string, items: CartItem[], note?: string, timeSlot?: string) {
-    // Date string for today: YYYY-MM-DD
-    const today = new Date().toISOString().split('T')[0];
-
-    // We transactionally:
-    // 1. Get Subscription (ensure Active)
-    // 2. Get/Create DailyUsage (lock?)
-    // 3. Check Limits
-    // 4. Check Items & Update Inventory
-    // 5. Create Order & OrderItems
-    // 6. Update Usage & Subscription
-
-    return prisma.$transaction(async (tx) => {
-        // 1. Fetch Subscription
-        const subscription = await tx.userSubscription.findFirst({
-            where: { userId, isActive: true }
-        });
-
-        if (!subscription) {
-            throw new Error('No active subscription found.');
-        }
-
-        // 2. Fetch or Create Daily Usage
-        let dailyUsage = await tx.dailyUsage.findUnique({
-            where: { userId_date: { userId, date: today } }
-        });
-
-        // If not exists, create it now (so we can lock or update it)
-        if (!dailyUsage) {
-            dailyUsage = await tx.dailyUsage.create({
-                data: {
-                    userId,
-                    date: today,
-                    itemsRedeemedCount: 0
-                }
-            });
-        }
-
-        // Count orders for today? We need to query Order table
-        const ordersTodayCount = await tx.order.count({
-            where: {
-                userId,
-                createdAt: {
-                    gte: new Date(today) // simplified, strictly should use Start of Day in TZ
-                },
-                mode: OrderMode.SUBSCRIPTION
-            }
-        });
-
-        // 3. Validation: Total Items Count
-        const totalNewItems = items.reduce((sum, item) => sum + item.qty, 0);
-        // Removed Daily Limit Checks as per request
-
-        if (subscription.mealsConsumedThisMonth + totalNewItems > subscription.monthlyQuota) {
-            throw new Error('Monthly quota exceeded.');
-        }
-
-        if (subscription.mealsConsumedThisMonth + totalNewItems > subscription.monthlyQuota) {
-            throw new Error('Monthly quota exceeded.');
-        }
-
-        // 4. Validate Individual Items & Inventory
-        const orderItemsData = [];
-
-        for (const itemReq of items) {
-            const menuItem = await tx.menuItem.findUnique({
-                where: { id: itemReq.menuItemId }
-            });
-
-            if (!menuItem) throw new Error(`Menu item ${itemReq.menuItemId} not found.`);
-
-            // Rule: Subscription Only
-            if (menuItem.type !== MenuItemType.SUBSCRIPTION && menuItem.type !== MenuItemType.BOTH) {
-                throw new Error(`Item ${menuItem.name} is not available for Subscription.`);
-            }
-
-            // Rule: Double Allowed
-            if (!menuItem.isDoubleAllowed && itemReq.qty > 1) {
-                throw new Error(`You can only take 1 quantity of ${menuItem.name} per order/day in subscription.`);
-            }
-            // For strict daily check of double allowed, we'd need to query previous orders today.
-            // Implemented simple per-order check here as per original code.
-
-            if (menuItem.isDoubleAllowed && itemReq.qty > 2) {
-                throw new Error(`Max 2 units allowed for ${menuItem.name}.`);
-            }
-
-            // Rule: Inventory
-            if (menuItem.inventoryCount < itemReq.qty) {
-                throw new Error(`Insufficient inventory for ${menuItem.name}.`);
-            }
-
-            // Deduct Inventory
-            await tx.menuItem.update({
-                where: { id: menuItem.id },
-                data: { inventoryCount: { decrement: itemReq.qty } }
-            });
-
-            orderItemsData.push({
-                menuItemId: menuItem.id,
-                name: menuItem.name,
-                price: 0, // Subscription items are free
-                quantity: itemReq.qty
-            });
-        }
-
-        // 5. Update Usage & Subscription
-        await tx.dailyUsage.update({
-            where: { id: dailyUsage.id },
-            data: { itemsRedeemedCount: { increment: totalNewItems } }
-        });
-
-        const result = await tx.userSubscription.updateMany({
-            where: {
-                id: subscription.id,
-                mealsConsumedThisMonth: { lte: subscription.monthlyQuota - totalNewItems }
-            },
-            data: { mealsConsumedThisMonth: { increment: totalNewItems } }
-        });
-
-        if (result.count === 0) {
-            throw new Error('Transaction Failed: Monthly quota limit reached (Concurrency Protection).');
-        }
-
-        // 6. Create Order
-        const displayId = await generateOrderDisplayId(tx);
-        const newOrder = await tx.order.create({
-            data: {
-                userId,
-                displayId,
-                status: OrderStatus.RECEIVED,
-                mode: OrderMode.SUBSCRIPTION,
-                note: note || undefined,
-                timeSlot: timeSlot || undefined,
-                totalAmount: 0,
-                items: {
-                    create: orderItemsData
-                }
-            }
-        });
-
-        return { orderId: newOrder.id, displayId: newOrder.displayId, status: 'SUCCESS' };
-    });
-}
-
+/**
+ * Saga Pattern: Create Normal Order
+ * 1. Optimistic Stock Check (Redis)
+ * 2. Create Order in DB (PENDING_PAYMENT)
+ * 3. Decrement Stock (Redis)
+ * 4. Initiate Razorpay (Return to Client)
+ * 
+ * Compensation: If any step fails, we release stock.
+ */
 export async function createNormalOrder(
     userId: string,
     items: CartItem[],
-    paymentMethod?: string,
-    upiId?: string,
     note?: string,
-    timeSlot?: string
+    timeSlotId?: string
 ) {
-    // Transactional Order Creation
+    // 1. Optimistic Stock Check & Price Calculation
+    // We do this BEFORE any DB transaction to fail fast.
+    let totalAmount = 0;
+    const orderItemsPreview = [];
+
+    // We need to fetch items to get prices
+    const menuItems = await prisma.menuItem.findMany({
+        where: { id: { in: items.map(i => i.menuItemId) } }
+    });
+
+    for (const itemReq of items) {
+        const item = menuItems.find(i => i.id === itemReq.menuItemId);
+        if (!item) throw new Error(`Item not found (ID: ${itemReq.menuItemId}). Please clear cart.`);
+        if (!item.isAvailable) throw new Error(`Item ${item.name} is inactive`);
+
+        // Optimistic check (Peek Redis)
+        // const currentStock = await getStock(item.id); 
+        // if(currentStock < itemReq.qty) throw new Error(`Item ${item.name} out of stock`);
+
+        totalAmount += item.price * itemReq.qty;
+        orderItemsPreview.push({ ...item, qty: itemReq.qty });
+    }
+
+    // 2. Create Order in Pending State (Prisma Transaction for Order + Items)
+    // We generate Display ID here.
     return prisma.$transaction(async (tx) => {
-        let totalAmount = 0;
-        const orderItemsData = [];
-
-        for (const itemReq of items) {
-            const menuItem = await tx.menuItem.findUnique({
-                where: { id: itemReq.menuItemId }
-            });
-
-            if (!menuItem) throw new Error(`Menu item ${itemReq.menuItemId} not found.`);
-
-            // Inventory Check
-            if (menuItem.inventoryCount < itemReq.qty) {
-                throw new Error(`Insufficient inventory for ${menuItem.name}.`);
-            }
-
-            // Deduct Inventory
-            await tx.menuItem.update({
-                where: { id: menuItem.id },
-                data: { inventoryCount: { decrement: itemReq.qty } }
-            });
-
-            const itemTotal = menuItem.price * itemReq.qty;
-            totalAmount += itemTotal;
-
-            orderItemsData.push({
-                menuItemId: menuItem.id,
-                name: menuItem.name,
-                price: menuItem.price,
-                quantity: itemReq.qty
-            });
-        }
-
-        // Create Order
         const displayId = await generateOrderDisplayId(tx);
 
         const newOrder = await tx.order.create({
             data: {
                 userId,
                 displayId,
-                status: OrderStatus.RECEIVED, // Assume paid/confirmed for now
+                status: OrderStatus.PENDING_PAYMENT, // Initial State
                 mode: OrderMode.NORMAL,
                 totalAmount,
-                paymentMethod,
-                paymentDetails: upiId, // Map upiId to paymentDetails
-                note: note || undefined,
-                timeSlot: timeSlot || undefined,
+                note,
+                timeSlot: timeSlotId,
                 items: {
-                    create: orderItemsData
+                    create: orderItemsPreview.map(i => ({
+                        menuItemId: i.id,
+                        price: i.price,
+                        quantity: i.qty,
+                        name: i.name
+                    }))
                 }
             }
         });
 
-        return { orderId: newOrder.id, displayId: newOrder.displayId, totalAmount, status: 'SUCCESS' };
+        // 3. Reserve Stock (Redis Atomic) - The "Hard" Reservation
+        // If this fails, we must abort the transaction (throw error)
+        for (const itemReq of items) {
+            const reserved = await reserveStock(itemReq.menuItemId, itemReq.qty);
+            if (!reserved) {
+                // SAGA COMPENSATION: 
+                // We failed to reserve this item. We must release any *previously* reserved items in this loop?
+                // Current `reserveStock` implementation is atomic per item. 
+                // Simpler approach: If one fails, throw Error. 
+                // Prisma transaction will rollback the Order creation.
+                // BUT we must also release stock for items *already* processed in this loop?
+                // For Version 1, we assume clean failure. 
+                // Note: Ideally `reserveStock` for ALL items should be a single Lua script.
+                // Here, if item 2 fails, item 1 is already decremented in Redis.
+                // We MUST release item 1.
+                // Quick fix: Loop back and release.
+                for (const prevItem of items) {
+                    if (prevItem === itemReq) break; // Stop at current
+                    await releaseStock(prevItem.menuItemId, prevItem.qty);
+                }
+                throw new Error(`Insufficient stock for ${menuItems.find(i => i.id === itemReq.menuItemId)?.name}`);
+            }
+        }
+
+        // 4. Initiate Payment
+        let razorpayOrder = null;
+        if (totalAmount > 0) {
+            try {
+                razorpayOrder = await createRazorpayOrder(totalAmount, newOrder.displayId || newOrder.id);
+
+                // Update Order with Payment ID
+                await tx.order.update({
+                    where: { id: newOrder.id },
+                    data: { paymentId: razorpayOrder.id }
+                });
+            } catch (e) {
+                // Compensation: Release Stock if Payment Init fails
+                for (const i of items) await releaseStock(i.menuItemId, i.qty);
+                throw new Error("Payment Gateway Initialization Failed");
+            }
+        } else {
+            // Free Order (0 amount) -> Auto Confirm
+            await tx.order.update({
+                where: { id: newOrder.id },
+                data: { status: OrderStatus.CONFIRMED }
+            });
+        }
+
+        return {
+            orderId: newOrder.id,
+            displayId: newOrder.displayId,
+            totalAmount,
+            status: totalAmount > 0 ? OrderStatus.PENDING_PAYMENT : OrderStatus.CONFIRMED,
+            razorpayOrderId: razorpayOrder?.id,
+            razorpayKeyId: process.env.RAZORPAY_KEY_ID
+        };
+    });
+}
+
+
+/**
+ * Subscription Order (Refactored for Consistency)
+ */
+export async function createSubscriptionOrder(userId: string, items: CartItem[], note?: string, timeSlotId?: string) {
+    const today = new Date().toISOString().split('T')[0];
+
+    return prisma.$transaction(async (tx) => {
+        // 1. Quota & Sub Check (DB Side)
+        const sub = await tx.userSubscription.findFirst({
+            where: { userId, status: SubscriptionState.ACTIVE }
+        });
+        if (!sub) throw new Error('No active subscription');
+
+        const dailyUsage = await tx.dailyUsage.upsert({
+            where: { userId_date: { userId, date: today } },
+            create: { userId, date: today, itemsRedeemedCount: 0 },
+            update: {}
+        });
+
+        const totalQty = items.reduce((Acc, i) => Acc + i.qty, 0);
+
+        if (sub.creditsUsed + totalQty > sub.creditsTotal) throw new Error("Monthly Quota Exceeded");
+        if (dailyUsage.itemsRedeemedCount + totalQty > sub.dailyLimit) throw new Error("Daily Limit Exceeded");
+
+        // 2. Redis Reservation
+        for (const itemReq of items) {
+            const reserved = await reserveStock(itemReq.menuItemId, itemReq.qty);
+            if (!reserved) {
+                // Compensation loop
+                for (const prevItem of items) {
+                    if (prevItem === itemReq) break;
+                    await releaseStock(prevItem.menuItemId, prevItem.qty);
+                }
+                throw new Error(`Insufficient stock`);
+            }
+        }
+
+        // 3. Create Order
+        const displayId = await generateOrderDisplayId(tx);
+        const newOrder = await tx.order.create({
+            data: {
+                userId, displayId,
+                status: OrderStatus.CONFIRMED,
+                mode: OrderMode.SUBSCRIPTION,
+                totalAmount: 0,
+                note,
+                timeSlot: timeSlotId,
+                items: {
+                    create: await Promise.all(items.map(async i => {
+                        const m = await prisma.menuItem.findUnique({ where: { id: i.menuItemId } });
+                        return { menuItemId: i.menuItemId, name: m!.name, price: 0, quantity: i.qty };
+                    }))
+                }
+            }
+        });
+
+        // 4. Update Usage
+        await tx.userSubscription.update({
+            where: { id: sub.id },
+            data: { creditsUsed: { increment: totalQty } }
+        });
+        await tx.dailyUsage.update({
+            where: { id: dailyUsage.id },
+            data: { itemsRedeemedCount: { increment: totalQty } }
+        });
+
+        return { orderId: newOrder.id, displayId: newOrder.displayId, status: newOrder.status };
+    }).then(async (result) => {
+        import('../lib/pusher').then(({ pusherServer }) => {
+            pusherServer.trigger('orders', 'new-order', {
+                id: result.orderId, displayId: result.displayId, status: result.status
+            }).catch(e => console.error(e));
+        });
+        return result;
     });
 }

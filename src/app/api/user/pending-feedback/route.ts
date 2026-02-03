@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         const lastOrder = await prisma.order.findFirst({
             where: {
                 userId: userId,
-                status: { in: ['DONE', 'SOLD', 'COMPLETED', 'RECEIVED'] }, // Broad check for finished orders
+                status: { in: ['COMPLETED'] }, // Only check completed orders
                 feedback: { is: null }, // No feedback yet
                 createdAt: {
                     // Check if order was created MORE than 30 minutes ago

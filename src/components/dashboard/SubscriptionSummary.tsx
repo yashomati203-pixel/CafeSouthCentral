@@ -3,21 +3,21 @@ import styles from './SubscriptionSummary.module.css';
 interface SubscriptionSummaryProps {
     dailyLimit?: number;
     itemsRedeemedToday: number; // 0 to 4
-    monthlyQuota: number;
-    mealsConsumedThisMonth: number;
+    creditsTotal: number;
+    creditsUsed: number;
     validUntil: Date;
 }
 
 export default function SubscriptionSummary({
     dailyLimit = 4,
     itemsRedeemedToday,
-    monthlyQuota,
-    mealsConsumedThisMonth,
+    creditsTotal,
+    creditsUsed,
     validUntil
 }: SubscriptionSummaryProps) {
 
     const remainingDaily = dailyLimit - itemsRedeemedToday;
-    const remainingMonthly = monthlyQuota - mealsConsumedThisMonth;
+    const remainingMonthly = creditsTotal - creditsUsed;
 
     // Generate boxes for visual indicator
     // If itemsRedeemedToday = 1, then box 1 is filled (red/unavailable), others valid (green).
@@ -50,7 +50,7 @@ export default function SubscriptionSummary({
                   a 15.9155 15.9155 0 0 1 0 -31.831"
                             />
                             <path className={styles.circleLine}
-                                strokeDasharray={`${(remainingMonthly / monthlyQuota) * 100}, 100`}
+                                strokeDasharray={`${(remainingMonthly / creditsTotal) * 100}, 100`}
                                 d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -63,7 +63,7 @@ export default function SubscriptionSummary({
                     </div>
                     <div className={styles.quotaDetails}>
                         <span className={styles.quotaLabel}>Monthly Quota</span>
-                        <span className={styles.quotaValue}>{mealsConsumedThisMonth} / {monthlyQuota} Used</span>
+                        <span className={styles.quotaValue}>{creditsUsed} / {creditsTotal} Used</span>
                     </div>
                 </div>
             </div>

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Manrope, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import ClickSpark from '@/components/ui/ClickSpark';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 export const metadata: Metadata = {
     title: 'Cafe South Central',
@@ -25,7 +27,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className} style={{ background: '#fefaef', minHeight: '100vh' }}>
+            <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} font-sans`} style={{ background: '#e2e9e0', minHeight: '100vh' }}>
                 <SmoothScroll />
                 <CartProvider>
                     {children}

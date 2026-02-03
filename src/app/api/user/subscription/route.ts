@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { whatsappNotifications } from '@/services/whatsappService';
 
 const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || ''); // Empty string will fail verification safely compared to a known default
 
@@ -42,7 +43,13 @@ export async function GET(req: NextRequest) {
 
         // 1. Get Subscription
         const subscription = await prisma.userSubscription.findFirst({
-            where: { userId, isActive: true }
+            where: {
+                userId: authUser.userId,
+                status: 'ACTIVE'
+            },
+            include: {
+                user: { select: { name: true, phone: true } }
+            }
         });
 
         if (!subscription) {
@@ -56,8 +63,8 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({
             itemsRedeemedToday: dailyUsage?.itemsRedeemedCount || 0,
-            monthlyQuota: subscription.monthlyQuota,
-            mealsConsumedThisMonth: subscription.mealsConsumedThisMonth,
+            creditsTotal: subscription.creditsTotal,
+            creditsUsed: subscription.creditsUsed,
             validUntil: subscription.endDate,
             startDate: subscription.startDate,
             planType: subscription.planType
@@ -92,21 +99,29 @@ export async function POST(req: NextRequest) {
         // Logic to determine plan details
         // In a real app, fetch from DB. For now, hardcode matches frontend.
         let durationDays = 30;
-        let monthlyQuota = 60; // Default
+        let creditsTotal = 60; // Default
+        let dailyLimit = 3;
         let price = 3000;
+        let planType = 'FEAST_FUEL'; // Default to a valid enum
 
         if (planId === 'monthly') {
             durationDays = 30;
-            monthlyQuota = 60;
+            creditsTotal = 60;
+            dailyLimit = 3;
             price = 3000;
+            planType = 'FEAST_FUEL';
         } else if (planId === 'student') {
             durationDays = 30;
-            monthlyQuota = 45; // 3 items * 15 days? or just diff limit
+            creditsTotal = 45;
+            dailyLimit = 2;
             price = 2500;
+            planType = 'LIGHT_BITE';
         } else if (planId === 'weekly') {
             durationDays = 7;
-            monthlyQuota = 14;
+            creditsTotal = 14;
+            dailyLimit = 2;
             price = 800;
+            planType = 'TRIAL';
         }
 
         const startDate = new Date();
@@ -115,25 +130,42 @@ export async function POST(req: NextRequest) {
 
         // Deactivate old subscriptions?
         await prisma.userSubscription.updateMany({
-            where: { userId, isActive: true },
-            data: { isActive: false }
+            where: { userId, status: 'ACTIVE' },
+            data: { status: 'EXPIRED' }
         });
 
         // Create new
         const newSub = await prisma.userSubscription.create({
             data: {
                 userId,
-                planType: 'MONTHLY_MESS', // Enum restriction, mapping everything to this for now or need to update Enum
-                monthlyQuota,
-                mealsConsumedThisMonth: 0,
+                planType: planType as any, // Cast because we are deriving string
+                creditsTotal,
+                creditsUsed: 0,
+                dailyLimit,
+                dailyUsed: 0,
                 startDate,
                 endDate,
-                isActive: true
+                status: 'ACTIVE'
             }
         });
 
         // Reset user role to indicate they might be special now? 
         // Or just rely on subscription table. API/Frontend relies on sub table.
+
+        const userName = authUser.role === 'ADMIN' ? 'Customer' : (authUser as any)?.name || 'Valued Guest';
+        // Note: we need to ensure we have the user name. 
+        // In the current route, we only have userId. 
+        // I will pull the name from the `newSub.user` if included, or use a default.
+
+        // Actually, let's pull the user object to get the phone number.
+        const userWithPhone = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true, name: true } });
+        if (userWithPhone) {
+            whatsappNotifications.sendSubscriptionWelcome(
+                userWithPhone.phone,
+                userWithPhone.name || 'Member',
+                planId === 'monthly' ? 'Monthly Mess' : planId
+            ).catch(e => console.error('WhatsApp Error:', e));
+        }
 
         return NextResponse.json(newSub);
 

@@ -23,7 +23,7 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
     try {
         const body = await req.json();
-        const { id, isAvailable, inventoryCount } = body;
+        const { id, isAvailable, stock } = body;
 
         if (!id) {
             return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
             where: { id },
             data: {
                 isAvailable: isAvailable !== undefined ? isAvailable : undefined,
-                inventoryCount: inventoryCount !== undefined ? inventoryCount : undefined
+                stock: stock !== undefined ? stock : undefined
             }
         });
 

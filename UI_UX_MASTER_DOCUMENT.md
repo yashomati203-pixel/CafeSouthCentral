@@ -59,6 +59,7 @@ This document serves as the **Single Source of Truth** for the User Interface, U
 *   **Goal:** Wow the user and drive immediate action.
 *   **Key Components:**
     *   **Hero Section:** Cinematic video or parallax food image with bold headline ("Taste of Tradition, Speed of Now"). floating "Explore Menu" CTA.
+    *   **How It Works:** 3-Step Visual Guide (Order -> Cook -> Enjoy) with SVG icons.
     *   **Bestsellers Ticker:** Horizontal scroll of top 3 items with medals (🥇🥈🥉).
     *   **Login Modal:** Glassmorphism overlay for Name + Phone entry (Passwordless).
 
@@ -108,7 +109,8 @@ This document serves as the **Single Source of Truth** for the User Interface, U
 ### B. Admin Dashboard (Command Center)
 
 #### 1. Live Orders Dashboard
-*   **Layout:** Kanban or Grid.
+*   **Layout:** Vertical Sidebar Navigation (Dashboard, POS, Members, Stock, Analytics).
+*   **Order Queue:** Kanban or Grid.
 *   **Visual Urgency:**
     *   🟢 Low (Recent)
     *   🟡 Medium (>10 warned)

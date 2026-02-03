@@ -32,6 +32,17 @@ export async function PATCH(
             }
         }
 
+        // WhatsApp Notification if Ready
+        if (status === 'READY') {
+            import('@/services/whatsappService').then(({ whatsappNotifications }) => {
+                whatsappNotifications.sendOrderReady(
+                    updatedOrder.user.phone,
+                    updatedOrder.user.name || 'Customer',
+                    updatedOrder.displayId || updatedOrder.id
+                ).catch(e => console.error('WhatsApp Error:', e));
+            });
+        }
+
         return NextResponse.json(updatedOrder);
     } catch (error) {
         console.error("Failed to update order:", error);

@@ -20,16 +20,16 @@ interface StockItemProps {
 }
 
 export default function StockItem({ item, onUpdate }: StockItemProps) {
-    const [count, setCount] = useState(item.inventoryCount);
+    const [count, setCount] = useState(item.stock);
     const [isAvailable, setIsAvailable] = useState(item.isAvailable);
     const [clickCount, setClickCount] = useState(0);
     const [previousCount, setPreviousCount] = useState<number | null>(null);
 
     // Sync local state if prop changes (external update)
     useEffect(() => {
-        setCount(item.inventoryCount);
+        setCount(item.stock);
         setIsAvailable(item.isAvailable);
-    }, [item.inventoryCount, item.isAvailable]);
+    }, [item.stock, item.isAvailable]);
 
     // API Update Function
     const updateApi = async (id: string, newCount: number, newAvail: boolean) => {
@@ -37,9 +37,9 @@ export default function StockItem({ item, onUpdate }: StockItemProps) {
             await fetch('/api/admin/inventory', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, inventoryCount: newCount, isAvailable: newAvail })
+                body: JSON.stringify({ id, stock: newCount, isAvailable: newAvail })
             });
-            onUpdate(id, { inventoryCount: newCount, isAvailable: newAvail });
+            onUpdate(id, { stock: newCount, isAvailable: newAvail });
         } catch (e) {
             console.error("Failed to update stock", e);
         }

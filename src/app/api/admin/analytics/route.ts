@@ -18,7 +18,11 @@ export async function GET(req: NextRequest) {
         // Orders (Completed/Sold)
         const orders = await prisma.order.findMany({
             where: {
-                status: { in: ['SOLD', 'DONE', 'COMPLETED'] }
+                status: {
+                    in: ['CONFIRMED', 'PREPARING', 'READY', 'COMPLETED']
+                    // Removed 'SOLD', 'DONE' as they are not in OrderStatus enum.
+                    // Keep valid terminal states or "paid" states.
+                }
             },
             include: {
                 items: { include: { menuItem: true } }

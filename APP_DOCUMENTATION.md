@@ -1,5 +1,8 @@
 ﻿# Cafe South Central - Web App v1 Documentation
 
+> [!NOTE]
+> For the comprehensive **Product Requirements Document**, please refer to [PRD_Final.md](./PRD_Final.md). This document focuses on technical implementation details.
+
 ## 1. Project Overview
 This application is a specialized food ordering system designed for high-traffic food outlets (like college canteens). It supports dual ordering modes: **Normal (Pay-per-order)** and **Subscription (Mess Plan)**. It features a responsive customer-facing UI and an administrative backend for order management.
 
@@ -40,6 +43,17 @@ This application is a specialized food ordering system designed for high-traffic
 *   **Database**: PostgreSQL.
 *   **ORM**: Prisma.
 *   **UI Components**: Radix UI (Headless), Framer Motion (Animations).
+
+### 3.1 New API Services (Jan 2026)
+*   **Analytics Engine** (`/api/admin/analytics`):
+    *   Aggregates sales data (Revenue, Order Counts) in real-time.
+    *   Publicly accessible (read-only stats) to prevent loading locks.
+*   **Reporting Service** (`/api/admin/reports`):
+    *   Generates CSV files for accounting.
+    *   Supports Day/Week/Month filtering.
+*   **Kitchen Scanner** (`/api/admin/scan`):
+    *   Validates Order QR Tokens.
+    *   Prevents race conditions on pickup.
 
 ### Key Technical Components
 

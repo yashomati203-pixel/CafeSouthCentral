@@ -36,7 +36,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             const existing = prev.find((i) => i.id === item.id && i.type === targetType);
             if (existing) {
                 // Validation: Double Allowed Helper
-                const limit = mode === 'SUBSCRIPTION' && !item.isDoubleAllowed ? 1 : 2;
+                // Defaulting to 2 as 'isDoubleAllowed' is not currently in schema
+                const limit = 2;
                 if (mode === 'SUBSCRIPTION' && existing.qty >= limit) {
                     alert(`Cannot add more of ${item.name}. Limit reached.`);
                     return prev;

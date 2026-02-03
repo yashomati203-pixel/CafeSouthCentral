@@ -20,7 +20,7 @@ export async function GET(req: Request) {
         // 4. No Feedback given yet
         const pendingOrders = await prisma.order.findMany({
             where: {
-                status: "DONE",
+                status: "COMPLETED", // Replaced DONE with COMPLETED
                 updatedAt: {
                     lt: thirtyMinutesAgo
                 },

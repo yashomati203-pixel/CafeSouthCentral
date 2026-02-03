@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         const pendingOrder = await prisma.order.findFirst({
             where: {
                 userId: userId,
-                status: "DONE",
+                status: "COMPLETED", // Replaced DONE with COMPLETED
                 updatedAt: {
                     lt: thirtyMinutesAgo
                 },

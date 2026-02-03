@@ -5,14 +5,14 @@
 :root {
   /* 🎨 Primary Brand Colors */
   --color-coconut-brown: #5C3A1A;
-  --color-palm-green-dark: #2F4F2F;
+  --color-palm-green-dark: #005001;
   --color-palm-green-light: #4B6F44;
 
   /* 🌴 Accent Colors */
-  --color-tropical-yellow: #F5B700;
+  --color-tropical-yellow: #F7E231;
 
   /* Backgrounds & Text */
-  --color-sand-beige: #F9F6F0;
+  --color-sand-beige: #E2E9E0;
   --color-charcoal-black: #1F1F1F;
   --color-white: #FFFFFF;
 
@@ -163,7 +163,7 @@ html.lenis body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 103 14% 90%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;

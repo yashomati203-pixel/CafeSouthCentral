@@ -27,7 +27,7 @@ export default function DesktopHeader({
             borderBottom: '1px solid #e5e7eb',
             position: 'sticky',
             top: 0,
-            backgroundColor: '#FFF8F0',
+            backgroundColor: '#e2e9e0',
             zIndex: 50
         }}>
             {/* Left: Logo */}
@@ -37,7 +37,7 @@ export default function DesktopHeader({
                     style={{ cursor: 'pointer' }}
                 >
                     <Image
-                        src="/logo.png"
+                        src="/Final web logo.png"
                         alt="Cafe South Central"
                         width={200}
                         height={60}
@@ -51,24 +51,7 @@ export default function DesktopHeader({
             <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'flex-end' }}>
                 {/* Navigation Links */}
                 <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
-                    <button
-                        onClick={() => router.push('/')}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#5C3A1A',
-                            fontSize: '1rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            padding: '0.5rem 0',
-                            transition: 'color 0.2s',
-                            fontFamily: 'inherit'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
-                    >
-                        Home
-                    </button>
+
                     <button
                         onClick={() => {
                             // Scroll to menu or navigate
@@ -136,8 +119,6 @@ export default function DesktopHeader({
 
                 {/* Right Actions: Cart & Profile/Login */}
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                    {/* Cart Icon (only if logged in or always? Screenshot didn't show it but good to keep if compatible) */}
-                    {/* Temporarily hiding Cart for Guest to match screenshot exactly? No, usually Cart is essential. Keeping it but maybe lighter. */}
 
                     {/* Login Button - Pill Shape */}
                     {user ? (
@@ -182,9 +163,9 @@ export default function DesktopHeader({
                             <button
                                 onClick={() => router.push('/account')}
                                 style={{
-                                    width: '36px',
                                     height: '36px',
-                                    borderRadius: '50%',
+                                    padding: '0 1rem',
+                                    borderRadius: '999px',
                                     backgroundColor: '#5C3A1A',
                                     color: 'white',
                                     border: 'none',
@@ -192,12 +173,12 @@ export default function DesktopHeader({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '1rem',
+                                    fontSize: '0.9rem',
                                     fontWeight: 'bold'
                                 }}
-                                title={user.name || 'Profile'}
+                                title="Profile"
                             >
-                                {user.name?.[0]?.toUpperCase() || '👤'}
+                                {user.name || 'User'}
                             </button>
                         </div>
                     ) : (

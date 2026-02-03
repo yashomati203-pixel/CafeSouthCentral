@@ -35,10 +35,7 @@ export async function POST(req: NextRequest) {
         const result = await createNormalOrder(
             user.id,
             items,
-            paymentMethod || 'CASH', // Default to CASH for counter orders
-            undefined, // No UPI ID usually for counter unless specified in paymentDetails? 
-            // Actually createNormalOrder takes (userId, items, paymentMethod, upiId, note, timeSlot)
-            note, // note
+            note, // note passed directly
             undefined // timeSlot
         );
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { SignJWT } from 'jose';
-import { cookies } from 'next/headers';
+import { createSession } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
     try {
@@ -15,51 +14,20 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Upsert user: Update name if exists, or create new
-        // Logic to determine role (Simple check for Admin name)
-        const role = name === 'Admin' ? 'ADMIN' : 'CUSTOMER';
+        // WARNING: This is a legacy insecure check. Anyone named "Admin" becomes Super Admin.
+        // TODO: Remove this in production. Use proper Admin Login flow.
+        const role = name === 'Admin' ? 'SUPER_ADMIN' : 'CUSTOMER';
 
-        // Upsert user: Update name/role if exists, or create new
         const user = await prisma.user.upsert({
             where: { phone },
-            update: {
-                name,
-                role: role // Update role if logging in as Admin
-            },
-            create: {
-                name,
-                phone,
-                email: null,
-                role: role
-            },
-            include: {
-                _count: {
-                    select: { orders: true }
-                }
-            }
+            update: { name, role },
+            create: { name, phone, role },
         });
 
-        // Generate JWT
-        const secretStr = process.env.JWT_SECRET;
-        if (!secretStr) {
-            throw new Error('JWT_SECRET is not defined in environment variables');
-        }
-        const secret = new TextEncoder().encode(secretStr);
-        const token = await new SignJWT({ userId: user.id, role: user.role })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('24h')
-            .sign(secret);
+        // Create Secure HTTP-Only Session
+        await createSession(user.id, user.role);
 
-        // Set Cookie
-        cookies().set('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax', // Lax needed for top-level navigation often
-            maxAge: 60 * 60 * 24, // 1 day
-            path: '/'
-        });
-
-        return NextResponse.json(user, { status: 200 });
+        return NextResponse.json({ success: true, user }, { status: 200 });
     } catch (error: any) {
         console.error('Login Failed:', error);
         return NextResponse.json(

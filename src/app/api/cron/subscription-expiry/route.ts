@@ -15,9 +15,19 @@ export async function GET(req: Request) {
         // Adjust logic as needed (e.g., exactly 2 days out, or within the window)
         // Here we look for end dates strictly between now and 2 days out
 
+        const expiredSubs = await prisma.userSubscription.updateMany({
+            where: {
+                endDate: { lt: new Date() },
+                status: 'ACTIVE'
+            },
+            data: {
+                status: 'EXPIRED'
+            }
+        });
+
         const expiringSubscriptions = await prisma.userSubscription.findMany({
             where: {
-                isActive: true,
+                status: 'ACTIVE',
                 endDate: {
                     gte: now,
                     lte: twoDaysFromNow

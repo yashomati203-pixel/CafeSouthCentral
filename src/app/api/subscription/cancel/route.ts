@@ -6,48 +6,46 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { userId, subscriptionId, reason } = body;
+        const { userId, reason } = body;
 
-        if (!userId || !subscriptionId) {
+        if (!userId) {
             return NextResponse.json(
-                { error: 'userId and subscriptionId are required' },
+                { error: 'userId is required' },
                 { status: 400 }
             );
         }
 
-        // Find the subscription
-        const subscription = await prisma.userSubscription.findFirst({
+        // Find the active subscription
+        const sub = await prisma.userSubscription.findFirst({
             where: {
-                id: subscriptionId,
-                userId: userId
-            }
+                userId: userId,
+                status: 'ACTIVE'
+            },
+            include: { user: true } // Optional: include user details if needed
         });
 
-        if (!subscription) {
-            return NextResponse.json(
-                { error: 'Subscription not found' },
-                { status: 404 }
-            );
+        if (!sub) {
+            return NextResponse.json({ error: 'No active subscription found for this user' }, { status: 404 });
         }
 
-        // Mark subscription as cancelled but keep it active until endDate
+        // Update the subscription status to 'CANCELLED'
+        // User keeps benefits until endDate (logic handled in cron/expiry or middleware checks)
         const cancelledSubscription = await prisma.userSubscription.update({
-            where: { id: subscriptionId },
+            where: { id: sub.id },
             data: {
-                isCancelled: true,
-                cancelledAt: new Date(),
-                cancellationReason: reason || null
-                // We DO NOT set isActive to false here, as the user keeps benefits until endDate
+                status: 'CANCELLED',
+                cancellationReason: reason || null,
+                cancelledAt: new Date()
             }
         });
 
         return NextResponse.json({
             success: true,
             subscription: cancelledSubscription,
-            message: `Subscription cancelled. Access continues until ${new Date(subscription.endDate).toLocaleDateString()}`
+            message: `Subscription cancelled. Access continues until ${new Date(sub.endDate).toLocaleDateString()}`
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Subscription cancellation error:', error);
         return NextResponse.json(
             { error: 'Failed to cancel subscription' },

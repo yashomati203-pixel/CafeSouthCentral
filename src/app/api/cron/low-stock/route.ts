@@ -11,7 +11,7 @@ export async function GET(req: Request) {
         // 1. Find items with low stock
         const lowStockItems = await prisma.menuItem.findMany({
             where: {
-                inventoryCount: {
+                stock: {
                     lt: LOW_STOCK_THRESHOLD
                 },
                 type: {
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
             },
             select: {
                 name: true,
-                inventoryCount: true
+                stock: true
             }
         });
 
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
         // 2. Format the message
         // Example: "Low Stock: Milk (2), Eggs (5)..."
         const itemSummary = lowStockItems
-            .map(item => `${item.name} (${item.inventoryCount})`)
+            .map(item => `${item.name} (${item.stock})`)
             .join(", ");
 
         console.log(`[Cron] Low stock detected: ${itemSummary}`);
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
         // 3. Find Admins with FCM Tokens
         const admins = await prisma.user.findMany({
             where: {
-                role: "ADMIN",
+                role: "SUPER_ADMIN",
                 fcmToken: {
                     not: null
                 }

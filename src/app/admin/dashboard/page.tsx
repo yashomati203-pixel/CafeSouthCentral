@@ -250,15 +250,24 @@ export default function AdminDashboard() {
     };
 
     const markAsReady = (id: string) => {
-        updateStatus(id, 'DONE'); // Or 'READY'? Using DONE as per current schema
+        updateStatus(id, 'READY');
         // "sends a notification to the user" - backend logic usually, or status polling on frontend
     };
 
-    const STATUS_OPTIONS = ['RECEIVED', 'PREPARING', 'DONE', 'SOLD'];
+    const STATUS_OPTIONS = ['CONFIRMED', 'PREPARING', 'READY', 'COMPLETED'];
 
     // Filter and Group Orders
-    const activeOrders = orders.filter(o => o.status !== 'SOLD' && o.status !== 'CANCELLED');
-    const soldOrders = orders.filter(o => o.status === 'SOLD' || o.status === 'CANCELLED');
+    // Active = Not Completed and Not Cancelled
+    const activeOrders = orders.filter(o =>
+        o.status !== 'COMPLETED' &&
+        o.status !== 'CANCELLED_USER' &&
+        o.status !== 'CANCELLED_ADMIN'
+    );
+    const soldOrders = orders.filter(o =>
+        o.status === 'COMPLETED' ||
+        o.status === 'CANCELLED_USER' ||
+        o.status === 'CANCELLED_ADMIN'
+    );
 
     // Group sold orders by date
     const soldOrdersByDate = soldOrders.reduce((acc, order) => {
@@ -609,7 +618,7 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
 
-                                        {order.status !== 'DONE' && (
+                                        {order.status !== 'READY' && order.status !== 'COMPLETED' && (
                                             <button
                                                 onClick={() => markAsReady(order.id)}
                                                 style={{

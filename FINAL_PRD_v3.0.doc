@@ -1,0 +1,5027 @@
+<h1 id="product-requirements-document-prd">Product Requirements Document (PRD)</h1>
+<p><strong>Project:</strong> Cafe South Central - Web App v1<br><strong>Version:</strong> 3.0 (Production-Ready - Corrected)<br><strong>Status:</strong> Ready for Development<br><strong>Last Updated:</strong> February 1, 2026<br><strong>Reviewed By:</strong> Senior Full-Stack Architect</p>
+<hr>
+<h2 id="document-control--approval">Document Control &amp; Approval</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Signature</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Product Owner</td>
+<td>_____________</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>Tech Lead</td>
+<td>_____________</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>Security Lead</td>
+<td>_____________</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>QA Lead</td>
+<td>_____________</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>Legal/Compliance</td>
+<td>_____________</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+</tbody></table>
+<p><strong>Change Log:</strong></p>
+<ul>
+<li>v3.0 (Feb 1, 2026): Complete technical corrections, security hardening, compliance features</li>
+<li>v2.0 (Feb 1, 2026): Technical specifications added (incomplete)</li>
+<li>v1.0 (Jan 31, 2026): Initial design and functional requirements</li>
+</ul>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-executive-summary">Executive Summary</a></li>
+<li><a href="#2-product-vision--design-philosophy">Product Vision &amp; Design Philosophy</a></li>
+<li><a href="#3-functional-requirements">Functional Requirements</a></li>
+<li><a href="#4-technical-architecture">Technical Architecture</a></li>
+<li><a href="#5-user-authentication-system">User Authentication System</a></li>
+<li><a href="#6-payment-processing">Payment Processing</a></li>
+<li><a href="#7-subscription-business-rules">Subscription Business Rules</a></li>
+<li><a href="#8-inventory-management">Inventory Management</a></li>
+<li><a href="#9-security--compliance">Security &amp; Compliance</a></li>
+<li><a href="#10-error-handling--resilience">Error Handling &amp; Resilience</a></li>
+<li><a href="#11-performance--scalability">Performance &amp; Scalability</a></li>
+<li><a href="#12-database-schema">Database Schema</a></li>
+<li><a href="#13-api-specifications">API Specifications</a></li>
+<li><a href="#14-testing--quality-assurance">Testing &amp; Quality Assurance</a></li>
+<li><a href="#15-monitoring--observability">Monitoring &amp; Observability</a></li>
+<li><a href="#16-deployment--infrastructure">Deployment &amp; Infrastructure</a></li>
+<li><a href="#17-future-roadmap">Future Roadmap</a></li>
+</ol>
+<hr>
+<h2 id="1-executive-summary">1. Executive Summary</h2>
+<p><strong>Cafe South Central Web App</strong> is a Progressive Web Application (PWA) designed for high-traffic food service operations, serving two distinct customer segments:</p>
+<ol>
+<li><strong>Pay-per-order customers</strong> - Casual diners seeking quick, one-time orders</li>
+<li><strong>Subscription-based members</strong> - Regular customers (students, office workers) with meal plans</li>
+</ol>
+<h3 id="11-core-value-proposition">1.1 Core Value Proposition</h3>
+<p><strong>For Customers:</strong></p>
+<ul>
+<li>Zero app downloads (PWA installable from browser)</li>
+<li>Sub-second ordering experience (optimistic UI)</li>
+<li>Flexible subscription plans with transparent quota management</li>
+<li>Real-time order tracking with QR-based contactless pickup</li>
+<li>Premium &quot;Warm Luxury&quot; digital experience</li>
+</ul>
+<p><strong>For Operations:</strong></p>
+<ul>
+<li>Automated inventory control with race-condition prevention</li>
+<li>Real-time kitchen display system (KDS)</li>
+<li>Data-driven analytics and forecasting</li>
+<li>70% reduction in queue wait times</li>
+<li>90% reduction in order errors</li>
+</ul>
+<p><strong>For Business:</strong></p>
+<ul>
+<li>Predictable revenue from subscriptions</li>
+<li>Reduced transaction costs (₹12/order vs ₹25/order for cash handling)</li>
+<li>Customer lifetime value increase (3x with subscriptions)</li>
+<li>Data-driven menu optimization</li>
+</ul>
+<h3 id="12-success-metrics-6-month-targets">1.2 Success Metrics (6-Month Targets)</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Current (Manual)</th>
+<th>Target (With App)</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Average Order Time</td>
+<td>8 minutes</td>
+<td>2 minutes</td>
+<td>Time from order to kitchen</td>
+</tr>
+<tr>
+<td>Queue Wait Time</td>
+<td>15 minutes</td>
+<td>4 minutes</td>
+<td>Customer time in queue</td>
+</tr>
+<tr>
+<td>Order Error Rate</td>
+<td>12%</td>
+<td>&lt;1%</td>
+<td>Incorrect orders / total</td>
+</tr>
+<tr>
+<td>Subscription Retention</td>
+<td>N/A</td>
+<td>85%</td>
+<td>Active after 3 months</td>
+</tr>
+<tr>
+<td>Daily Revenue</td>
+<td>₹45,000</td>
+<td>₹80,000</td>
+<td>Including subscriptions</td>
+</tr>
+<tr>
+<td>Customer Satisfaction</td>
+<td>3.2/5</td>
+<td>4.5/5</td>
+<td>NPS score</td>
+</tr>
+</tbody></table>
+<h3 id="13-out-of-scope-phase-1">1.3 Out of Scope (Phase 1)</h3>
+<ul>
+<li>Table reservations</li>
+<li>Dine-in menu (only takeaway/pickup)</li>
+<li>Delivery/logistics integration</li>
+<li>Third-party aggregator integration (Swiggy, Zomato)</li>
+<li>Loyalty points program (covered by subscriptions)</li>
+<li>Multi-location support</li>
+</ul>
+<hr>
+<h2 id="2-product-vision--design-philosophy">2. Product Vision &amp; Design Philosophy</h2>
+<h3 id="21-aesthetics-warm-luxury--modern-speed">2.1 Aesthetics: &quot;Warm Luxury &amp; Modern Speed&quot;</h3>
+<p>The design language bridges traditional hospitality with cutting-edge technology, creating a premium experience for a value-conscious audience.</p>
+<p><strong>Warm Luxury:</strong></p>
+<ul>
+<li>Evokes comfort, tradition, and culinary excellence</li>
+<li>Deep earth tones create an inviting, premium ambiance</li>
+<li>Rich food photography with professional styling</li>
+<li>Elegant serif typography for emotional connection</li>
+</ul>
+<p><strong>Modern Speed:</strong></p>
+<ul>
+<li>Instant UI feedback (optimistic updates)</li>
+<li>Skeleton screens during loading</li>
+<li>Smooth 60fps animations (Framer Motion)</li>
+<li>App-like responsiveness (no page refreshes)</li>
+</ul>
+<h3 id="22-design-system">2.2 Design System</h3>
+<h4 id="typography">Typography</h4>
+<pre><code class="language-css">/* Primary Font Stack */
+font-family: &#39;Manrope&#39;, -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, sans-serif;
+
+/* Display Font (Headings, Emotional Content) */
+font-family: &#39;Californian FB&#39;, &#39;Playfair Display&#39;, serif;
+
+/* Monospace (Order IDs, Prices) */
+font-family: &#39;JetBrains Mono&#39;, &#39;Fira Code&#39;, monospace;
+</code></pre>
+<p><strong>Type Scale (Tailwind Classes):</strong></p>
+<ul>
+<li><code>text-xs</code> (12px): Captions, timestamps</li>
+<li><code>text-sm</code> (14px): Body text, descriptions</li>
+<li><code>text-base</code> (16px): Default UI text</li>
+<li><code>text-lg</code> (18px): Subheadings</li>
+<li><code>text-xl</code> (20px): Card titles</li>
+<li><code>text-2xl</code> (24px): Section headers</li>
+<li><code>text-4xl</code> (36px): Hero headings</li>
+</ul>
+<h4 id="color-palette">Color Palette</h4>
+<pre><code class="language-css">/* Primary Colors */
+:root {
+  --primary-brand: #005001;     /* Dark Green - Brand, primary actions */
+  --secondary-brand: #5C3A1A;   /* Coconut Brown - Subheadings, secondary actions */
+  --accent-gold: #F7E231;       /* Bright Gold/Yellow - Buttons text, critical highlights */
+  --page-bg: #E2E9E0;           /* Light Greenish Grey - Body background */
+  --card-bg: #FAFAFA;           /* Off-white - Card backgrounds */
+  
+  /* Semantic Colors */
+  --success: #10B981;           /* Order confirmed, in stock */
+  --warning: #F59E0B;           /* Low stock, warnings */
+  --error: #EF4444;             /* Sold out, errors */
+  --info: #3B82F6;              /* Informational */
+  
+  /* Order Status Colors */
+  --status-new: #10B981;        /* Received */
+  --status-preparing: #F59E0B;  /* In kitchen */
+  --status-ready: #3B82F6;      /* Ready for pickup */
+  --status-completed: #6B7280;  /* Picked up */
+  --status-cancelled: #EF4444;  /* Cancelled */
+  
+  /* Neutral Grays */
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+}
+</code></pre>
+<h4 id="component-library">Component Library</h4>
+<p><strong>Buttons:</strong></p>
+<pre><code class="language-css">/* Primary */
+.btn-primary {
+  @apply bg-[#005001] text-[#F7E231] px-6 py-3 rounded-full font-bold;
+  @apply hover:bg-opacity-90 transition-all duration-200;
+  @apply active:scale-95 shadow-lg hover:shadow-xl;
+  font-family: &#39;Manrope&#39;, sans-serif;
+}
+
+/* Secondary */
+.btn-secondary {
+  @apply bg-[#5C3A1A] text-white px-6 py-3 rounded-full font-bold;
+  @apply hover:opacity-90 transition-all duration-200;
+}
+
+/* Ghost */
+.btn-ghost {
+  @apply text-[#4a3b32] px-4 py-2 rounded-lg font-bold;
+  @apply hover:bg-white/50 transition-colors duration-150;
+}
+</code></pre>
+<p><strong>Cards:</strong></p>
+<pre><code class="language-css">.card {
+  @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6;
+  @apply border border-white/20;
+  @apply transition-all duration-200;
+  @apply hover:shadow-xl hover:-translate-y-1;
+}
+
+.card-interactive {
+  @apply card cursor-pointer;
+  @apply active:scale-98;
+}
+</code></pre>
+<p><strong>Badges:</strong></p>
+<pre><code class="language-css">.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-fresh {
+  @apply bg-[#e6f0e6] border border-[#1a2e1a] text-[#002200];
+}
+
+.badge-success {
+  @apply badge bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply badge bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply badge bg-red-100 text-red-800;
+}
+</code></pre>
+<h4 id="visual-language">Visual Language</h4>
+<p><strong>Spacing (8px Grid):</strong></p>
+<ul>
+<li>Micro: <code>space-1</code> (4px)</li>
+<li>Small: <code>space-2</code> (8px)</li>
+<li>Medium: <code>space-4</code> (16px)</li>
+<li>Large: <code>space-6</code> (24px)</li>
+<li>X-Large: <code>space-8</code> (32px)</li>
+</ul>
+<p><strong>Shadows:</strong></p>
+<pre><code class="language-css">/* Elevation System */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+</code></pre>
+<p><strong>Animations:</strong></p>
+<pre><code class="language-css">/* Micro-interactions (200ms) */
+.transition-fast { transition-duration: 200ms; }
+
+/* Standard interactions (300ms) */
+.transition-normal { transition-duration: 300ms; }
+
+/* Slow reveals (500ms) */
+.transition-slow { transition-duration: 500ms; }
+</code></pre>
+<hr>
+<h2 id="3-functional-requirements">3. Functional Requirements</h2>
+<h3 id="31-user-roles--permissions">3.1 User Roles &amp; Permissions</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Capabilities</th>
+<th>Access Level</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Guest</td>
+<td>Browse menu, view prices</td>
+<td>Public</td>
+</tr>
+<tr>
+<td>Customer</td>
+<td>Place orders, manage subscriptions, view history</td>
+<td>Authenticated</td>
+</tr>
+<tr>
+<td>Kitchen Staff</td>
+<td>View order queue, update order status</td>
+<td>Admin Portal (Read/Write Orders)</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>All kitchen + inventory + analytics</td>
+<td>Admin Portal (Full Operations)</td>
+</tr>
+<tr>
+<td>Super Admin</td>
+<td>All manager + user management + financial reports</td>
+<td>Admin Portal (Full System)</td>
+</tr>
+</tbody></table>
+<h3 id="32-core-user-journeys">3.2 Core User Journeys</h3>
+<h4 id="321-first-time-customer-pay-per-order">3.2.1 First-Time Customer (Pay-per-order)</h4>
+<pre><code>1. Land on homepage → See hero, bestsellers, &quot;How It Works&quot;
+2. Click &quot;Order Now&quot; → Prompt to login
+3. Enter name + phone → Receive OTP
+4. Enter OTP → Session created
+5. Browse menu → Filter by category/preferences
+6. Add items to cart → See real-time total
+7. Review cart → Edit quantities, remove items
+8. Select pickup time → ASAP or future slot (30-min intervals)
+9. Choose payment → Cash (max ₹500) or UPI
+10. Place order → Razorpay modal (if UPI)
+11. Payment success → Order confirmation screen
+12. Receive order ID + QR code → Save to device
+13. Track status → Real-time updates (Preparing → Ready)
+14. Go to counter → Scan QR code
+15. Receive food → Order marked completed
+</code></pre>
+<h4 id="322-subscription-member-recurring-customer">3.2.2 Subscription Member (Recurring Customer)</h4>
+<pre><code>1. Login → See subscription dashboard
+2. Check daily quota → &quot;2 meals used, 1 remaining today&quot;
+3. Browse eligible items → Only items covered by plan
+4. Add to cart → Auto-deducted from quota (no payment)
+5. Schedule pickup → Same as pay-per-order
+6. Place order → Instant confirmation (no payment step)
+7. Pickup → Same QR flow
+</code></pre>
+<h4 id="323-adminkitchen-order-fulfillment">3.2.3 Admin/Kitchen (Order Fulfillment)</h4>
+<pre><code>1. Login to admin portal → See live order dashboard
+2. New order arrives → Hear audio chime
+3. View order card → Customer name, items, time, special instructions
+4. Mark &quot;Preparing&quot; → Starts kitchen timer
+5. Food ready → Mark &quot;Ready for Pickup&quot;
+6. Customer arrives → Scan QR code (mobile scanner)
+7. System validates → Mark &quot;Completed&quot;
+8. End of shift → Download daily sales report (CSV)
+</code></pre>
+<h3 id="33-feature-specifications">3.3 Feature Specifications</h3>
+<h4 id="331-menu-browsing">3.3.1 Menu Browsing</h4>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Display all available items with photos, names, prices</li>
+<li>Categories: South Indian, Chinese, Snacks, Beverages, Desserts</li>
+<li>Filters: Vegetarian/Non-Vegetarian, Spice Level, Price Range</li>
+<li>Search: Fuzzy matching on item names (e.g., &quot;dosa&quot; matches &quot;Masala Dosa&quot;)</li>
+<li>Sort: Price (Low/High), Popularity, Alphabetical</li>
+<li>Stock indicators:<ul>
+<li>&quot;Available&quot; (green badge)</li>
+<li>&quot;Low Stock&quot; (yellow badge, &lt;10 remaining)</li>
+<li>&quot;Sold Out&quot; (red badge, disabled, grayed out)</li>
+</ul>
+</li>
+</ul>
+<p><strong>UI Components:</strong></p>
+<ul>
+<li>Grid view (desktop 3 columns, tablet 2, mobile 1)</li>
+<li>Card per item showing:<ul>
+<li>High-quality food photo (16:9 aspect ratio)</li>
+<li>Item name (Californian FB font)</li>
+<li>Description (1-2 lines, truncated)</li>
+<li>Price (₹ symbol, monospace font)</li>
+<li>Add to cart button</li>
+<li>Veg/Non-Veg icon (green dot / red triangle)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Performance:</strong></p>
+<ul>
+<li>Initial load: &lt;150ms (cached menu data)</li>
+<li>Search response: &lt;50ms (client-side filtering)</li>
+<li>Image lazy loading (below fold)</li>
+</ul>
+<h4 id="332-cart-management">3.3.2 Cart Management</h4>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Persistent cart (survives page refresh, stored in localStorage)</li>
+<li>Slide-in drawer from right side</li>
+<li>Real-time total calculation (including taxes, if applicable)</li>
+<li>Quantity adjustment (- / + buttons, max 10 per item)</li>
+<li>Item removal (swipe-to-delete on mobile, X button on desktop)</li>
+<li>Empty cart warning before navigating away</li>
+<li>Promo code application (future: currently hardcoded coupons)</li>
+</ul>
+<p><strong>Validation:</strong></p>
+<ul>
+<li>Check stock availability on &quot;Proceed to Checkout&quot;</li>
+<li>Show error if item sold out since adding to cart</li>
+<li>Offer to remove sold-out items or return to menu</li>
+</ul>
+<p><strong>Cart State Management:</strong></p>
+<pre><code class="language-typescript">interface CartItem {
+  itemId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl: string;
+  maxQuantity: number; // Current stock
+  isSubscriptionEligible: boolean;
+}
+
+interface CartState {
+  items: CartItem[];
+  total: number;
+  itemCount: number;
+  lastUpdated: Date;
+}
+</code></pre>
+<h4 id="333-checkout-flow">3.3.3 Checkout Flow</h4>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><p><strong>Cart Review:</strong></p>
+<ul>
+<li>Display all items with quantities</li>
+<li>Show subtotal</li>
+<li>Option to add special instructions (max 200 chars)</li>
+</ul>
+</li>
+<li><p><strong>Pickup Time Selection:</strong></p>
+<ul>
+<li>&quot;ASAP&quot; (default): Ready in 15-20 minutes</li>
+<li>Future slots: 30-minute intervals, up to 3 hours ahead</li>
+<li>Example: 12:30 PM, 1:00 PM, 1:30 PM, 2:00 PM</li>
+<li>Disable past times dynamically</li>
+<li>Show estimated ready time on selection</li>
+</ul>
+</li>
+<li><p><strong>Payment Method (Pay-per-order only):</strong></p>
+<ul>
+<li>Cash on Delivery: Max ₹500 (fraud prevention)</li>
+<li>UPI/Card: Razorpay integration</li>
+<li>Subscription members skip this step</li>
+</ul>
+</li>
+<li><p><strong>Order Confirmation:</strong></p>
+<ul>
+<li>Display order summary</li>
+<li>&quot;Place Order&quot; button (primary, disabled until all steps complete)</li>
+<li>Loading state during payment processing</li>
+</ul>
+</li>
+</ol>
+<p><strong>Validation:</strong></p>
+<ul>
+<li>All items still in stock</li>
+<li>Pickup time is valid (not in past, within operating hours)</li>
+<li>Payment method selected (if applicable)</li>
+<li>Subscription quota available (if subscription order)</li>
+</ul>
+<h4 id="334-order-tracking">3.3.4 Order Tracking</h4>
+<p><strong>Statuses:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Description</th>
+<th>Customer View</th>
+<th>Kitchen View</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RECEIVED</td>
+<td>Order placed, payment confirmed</td>
+<td>&quot;We&#39;ve received your order&quot;</td>
+<td>New order (green)</td>
+</tr>
+<tr>
+<td>PREPARING</td>
+<td>Kitchen is cooking</td>
+<td>&quot;Your food is being prepared&quot;</td>
+<td>In progress (yellow)</td>
+</tr>
+<tr>
+<td>READY</td>
+<td>Ready for pickup</td>
+<td>&quot;Your order is ready! Please proceed to counter&quot;</td>
+<td>Ready (blue)</td>
+</tr>
+<tr>
+<td>COMPLETED</td>
+<td>Customer picked up</td>
+<td>&quot;Enjoy your meal!&quot;</td>
+<td>Archived</td>
+</tr>
+<tr>
+<td>CANCELLED</td>
+<td>Order cancelled</td>
+<td>&quot;Order cancelled. Refund initiated&quot;</td>
+<td>Archived</td>
+</tr>
+</tbody></table>
+<p><strong>Real-Time Updates:</strong></p>
+<ul>
+<li>WebSocket connection (Pusher/Ably) for instant status changes</li>
+<li>Fallback: Polling every 10 seconds</li>
+<li>Push notification on status change (if PWA installed)</li>
+<li>Email notification on order confirmation</li>
+</ul>
+<p><strong>Order History:</strong></p>
+<ul>
+<li>Infinite scroll list of past orders</li>
+<li>Each order shows:<ul>
+<li>Order ID (e.g., &quot;ORD-20260201-1234&quot;)</li>
+<li>Date/time</li>
+<li>Items (collapsed by default, expandable)</li>
+<li>Total amount</li>
+<li>Status badge</li>
+<li>Reorder button</li>
+<li>Receipt download (PDF)</li>
+</ul>
+</li>
+</ul>
+<p><strong>QR Code Generation:</strong></p>
+<pre><code class="language-typescript">interface OrderQRPayload {
+  orderId: string;
+  userId: string;
+  timestamp: number;
+  signature: string; // HMAC-SHA256(orderId + userId + timestamp, SECRET_KEY)
+}
+
+// QR code contains:
+// {&quot;oid&quot;:&quot;abc123&quot;,&quot;uid&quot;:&quot;xyz789&quot;,&quot;ts&quot;:1738395600,&quot;sig&quot;:&quot;abc...&quot;}
+</code></pre>
+<hr>
+<h2 id="4-technical-architecture">4. Technical Architecture</h2>
+<h3 id="41-tech-stack">4.1 Tech Stack</h3>
+<p><strong>Frontend:</strong></p>
+<ul>
+<li><strong>Framework:</strong> Next.js 14.2+ (App Router)</li>
+<li><strong>Language:</strong> TypeScript 5.3+ (Strict Mode)</li>
+<li><strong>Styling:</strong> Tailwind CSS 3.4+</li>
+<li><strong>State Management:</strong> <ul>
+<li>React Context (global user state)</li>
+<li>TanStack Query v5 (server state, caching)</li>
+<li>Zustand (local UI state - cart, modals)</li>
+</ul>
+</li>
+<li><strong>Animation:</strong> Framer Motion 11+</li>
+<li><strong>Forms:</strong> React Hook Form + Zod validation</li>
+<li><strong>Icons:</strong> Lucide React</li>
+<li><strong>QR Codes:</strong> qrcode.react</li>
+<li><strong>PWA:</strong> next-pwa</li>
+</ul>
+<p><strong>Backend:</strong></p>
+<ul>
+<li><strong>Runtime:</strong> Next.js API Routes (Node.js 20+)</li>
+<li><strong>Database:</strong> PostgreSQL 16 (Supabase/Neon)</li>
+<li><strong>ORM:</strong> Prisma 5.8+</li>
+<li><strong>Caching:</strong> Redis (Upstash or self-hosted)</li>
+<li><strong>File Storage:</strong> AWS S3 or Supabase Storage</li>
+<li><strong>Authentication:</strong> Custom (OTP-based)</li>
+<li><strong>Payment Gateway:</strong> Razorpay</li>
+<li><strong>SMS:</strong> Twilio (primary), AWS SNS (fallback)</li>
+<li><strong>Email:</strong> Resend or SendGrid</li>
+</ul>
+<p><strong>DevOps:</strong></p>
+<ul>
+<li><strong>Hosting:</strong> Vercel (Hobby → Pro as needed)</li>
+<li><strong>Database:</strong> Supabase (Pro plan) or Railway</li>
+<li><strong>Monitoring:</strong> Sentry (errors), Datadog (metrics)</li>
+<li><strong>Logging:</strong> Better Stack (formerly Logtail)</li>
+<li><strong>CI/CD:</strong> GitHub Actions</li>
+<li><strong>Testing:</strong> Jest, Playwright, K6</li>
+</ul>
+<h3 id="42-system-architecture-diagram">4.2 System Architecture Diagram</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                        CLOUDFLARE CDN                        │
+│                    (Static Assets, Images)                   │
+└───────────────────────────┬──────────────────────────────────┘
+                            │
+┌───────────────────────────▼──────────────────────────────────┐
+│                      VERCEL (Frontend)                        │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │         Next.js 14 (App Router + API Routes)        │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │    │
+│  │  │ Landing Page │  │  Menu/Cart   │  │  Orders   │ │    │
+│  │  └──────────────┘  └──────────────┘  └───────────┘ │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │    │
+│  │  │  Admin Panel │  │ Subscription │  │   Auth    │ │    │
+│  │  └──────────────┘  └──────────────┘  └───────────┘ │    │
+│  └─────────────────────────────────────────────────────┘    │
+└──────────┬──────────┬──────────┬──────────┬───────────┬─────┘
+           │          │          │          │           │
+    ┌──────▼───┐ ┌───▼────┐ ┌───▼────┐ ┌───▼─────┐ ┌──▼────┐
+    │PostgreSQL│ │ Redis  │ │ Razorpay│ │ Twilio  │ │ AWS S3│
+    │(Supabase)│ │(Upstash)│ │         │ │         │ │       │
+    └──────────┘ └────────┘ └─────────┘ └─────────┘ └───────┘
+         │            │           │           │           │
+    ┌────▼────┐  ┌───▼────┐ ┌────▼─────┐ ┌──▼──────┐   │
+    │ Prisma  │  │ Cache  │ │ Webhooks │ │  OTP    │   │
+    │  ORM    │  │ Menu   │ │ Payments │ │  SMS    │   │
+    └─────────┘  │ Orders │ └──────────┘ └─────────┘   │
+                 └────────┘                              │
+                                                    ┌────▼────┐
+                                                    │ Product │
+                                                    │ Images  │
+                                                    └─────────┘
+</code></pre>
+<h3 id="43-data-flow-order-creation">4.3 Data Flow (Order Creation)</h3>
+<pre><code>[Customer] → [Frontend]
+    ↓
+    Add items to cart (Zustand local state)
+    ↓
+    Click &quot;Place Order&quot;
+    ↓
+    [POST /api/orders/create]
+    ↓
+    Validate cart items (check stock)
+    ↓
+    Create order in DB (status: PAYMENT_PENDING)
+    ↓
+    Reserve inventory (atomic update)
+    ↓
+    If payment method = UPI:
+        ↓
+        Create Razorpay order
+        ↓
+        Return Razorpay order ID to frontend
+        ↓
+        [Frontend] Open Razorpay modal
+        ↓
+        User completes payment
+        ↓
+        Razorpay sends webhook to [POST /api/webhooks/razorpay]
+        ↓
+        Verify signature, check replay attacks
+        ↓
+        Update order status to CONFIRMED
+        ↓
+        Send confirmation SMS/email
+        ↓
+    Else (Cash):
+        ↓
+        Update order status to CONFIRMED
+        ↓
+    Return order confirmation to frontend
+    ↓
+    [Frontend] Show success screen with QR code
+</code></pre>
+<h3 id="44-folder-structure">4.4 Folder Structure</h3>
+<pre><code>cafe-south-central/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   └── verify-otp/
+│   │       └── page.tsx
+│   ├── (customer)/
+│   │   ├── menu/
+│   │   │   └── page.tsx
+│   │   ├── cart/
+│   │   │   └── page.tsx
+│   │   ├── checkout/
+│   │   │   └── page.tsx
+│   │   ├── orders/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   └── subscription/
+│   │       ├── page.tsx
+│   │       └── plans/
+│   │           └── page.tsx
+│   ├── (admin)/
+│   │   └── admin/
+│   │       ├── dashboard/
+│   │       │   └── page.tsx
+│   │       ├── orders/
+│   │       │   └── page.tsx
+│   │       ├── inventory/
+│   │       │   └── page.tsx
+│   │       ├── analytics/
+│   │       │   └── page.tsx
+│   │       └── scanner/
+│   │           └── page.tsx
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── send-otp/
+│   │   │   │   └── route.ts
+│   │   │   ├── verify-otp/
+│   │   │   │   └── route.ts
+│   │   │   └── logout/
+│   │   │       └── route.ts
+│   │   ├── menu/
+│   │   │   └── route.ts
+│   │   ├── cart/
+│   │   │   ├── add/
+│   │   │   │   └── route.ts
+│   │   │   └── remove/
+│   │   │       └── route.ts
+│   │   ├── orders/
+│   │   │   ├── create/
+│   │   │   │   └── route.ts
+│   │   │   ├── [id]/
+│   │   │   │   └── route.ts
+│   │   │   └── cancel/
+│   │   │       └── route.ts
+│   │   ├── subscription/
+│   │   │   ├── subscribe/
+│   │   │   │   └── route.ts
+│   │   │   └── cancel/
+│   │   │       └── route.ts
+│   │   ├── webhooks/
+│   │   │   └── razorpay/
+│   │   │       └── route.ts
+│   │   └── admin/
+│   │       ├── inventory/
+│   │       │   └── route.ts
+│   │       └── analytics/
+│   │           └── route.ts
+│   ├── layout.tsx
+│   └── page.tsx (Homepage)
+├── components/
+│   ├── ui/ (shadcn components)
+│   ├── menu/
+│   ├── cart/
+│   ├── orders/
+│   └── admin/
+├── lib/
+│   ├── prisma.ts
+│   ├── redis.ts
+│   ├── razorpay.ts
+│   ├── twilio.ts
+│   └── utils.ts
+├── prisma/
+│   └── schema.prisma
+├── public/
+│   ├── images/
+│   └── icons/
+├── styles/
+│   └── globals.css
+├── types/
+│   └── index.ts
+├── .env.local
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
+</code></pre>
+<hr>
+<h2 id="5-user-authentication-system">5. User Authentication System</h2>
+<h3 id="51-customer-authentication-passwordless">5.1 Customer Authentication (Passwordless)</h3>
+<p><strong>Method:</strong> Phone Number + OTP</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li><p><strong>Login Screen:</strong></p>
+<ul>
+<li>Input: Name (2-50 chars, letters/spaces only)</li>
+<li>Input: Phone (10 digits, Indian format: starts with 6/7/8/9)</li>
+<li>Submit button (primary)</li>
+<li>&quot;Smiley&quot; eye-tracking animation (Framer Motion)</li>
+</ul>
+</li>
+<li><p><strong>OTP Generation:</strong></p>
+<ul>
+<li>6-digit random number (100000-999999)</li>
+<li>Hash with bcrypt (cost factor 10)</li>
+<li>Store in Redis with 5-minute TTL</li>
+<li>Key: <code>otp:{phone_number}</code></li>
+<li>Value: <code>{ hashedOTP, attempts: 0, createdAt, lockedUntil? }</code></li>
+</ul>
+</li>
+<li><p><strong>OTP Delivery:</strong></p>
+<ul>
+<li>Primary: Twilio SMS</li>
+<li>Fallback: AWS SNS (if Twilio fails)</li>
+<li>Template: &quot;Your Cafe South Central OTP is {otp}. Valid for 5 minutes. Do not share.&quot;</li>
+<li>Rate limit: Max 3 SMS per phone number per 5 minutes</li>
+</ul>
+</li>
+<li><p><strong>OTP Verification:</strong></p>
+<ul>
+<li>Input: 6-digit OTP</li>
+<li>Compare hash with stored value</li>
+<li>On success:<ul>
+<li>Create session token (32-byte random hex)</li>
+<li>Store in Redis: <code>session:{token}</code> → <code>{ userId, createdAt, expiresAt }</code></li>
+<li>Set HTTP-only cookie: <code>session_token</code> (7-day expiry)</li>
+<li>Delete OTP from Redis</li>
+</ul>
+</li>
+<li>On failure:<ul>
+<li>Increment attempts counter</li>
+<li>If attempts &gt;= 3: Lock for 15 minutes</li>
+<li>Show error: &quot;Invalid OTP. X attempts remaining&quot;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Session Management:</strong></p>
+<ul>
+<li>Access token: JWT (15-minute expiry)</li>
+<li>Refresh token: Stored in Redis (7-day expiry)</li>
+<li>Silent refresh: At 12-minute mark</li>
+<li>Logout: Delete session from Redis, clear cookie</li>
+</ul>
+</li>
+</ol>
+<p><strong>Security Measures:</strong></p>
+<ul>
+<li>OTP hashing (bcrypt, never store plaintext)</li>
+<li>Rate limiting (3 OTP requests per 5 minutes per phone)</li>
+<li>Account locking (after 3 failed attempts, 15-minute lock)</li>
+<li>IP-based anomaly detection (flag if &gt;5 phones from same IP in 1 hour)</li>
+<li>Phone number validation (regex: <code>^[6-9]\d{9}$</code>)</li>
+<li>SMS provider fallback (Twilio → AWS SNS)</li>
+</ul>
+<p><strong>Code Example:</strong></p>
+<pre><code class="language-typescript">// Send OTP
+export async function sendOTP(phone: string): Promise&lt;void&gt; {
+  // 1. Validate phone
+  if (!/^[6-9]\d{9}$/.test(phone)) {
+    throw new Error(&#39;Invalid phone number&#39;);
+  }
+  
+  // 2. Check rate limit
+  const rateLimitKey = `ratelimit:otp:${phone}`;
+  const requestCount = await redis.incr(rateLimitKey);
+  if (requestCount === 1) {
+    await redis.expire(rateLimitKey, 300); // 5 minutes
+  }
+  if (requestCount &gt; 3) {
+    throw new Error(&#39;Too many requests. Try again in 5 minutes.&#39;);
+  }
+  
+  // 3. Check if already locked
+  const otpKey = `otp:${phone}`;
+  const existing = await redis.get(otpKey);
+  if (existing) {
+    const record = JSON.parse(existing);
+    if (record.lockedUntil &amp;&amp; new Date(record.lockedUntil) &gt; new Date()) {
+      const remainingTime = Math.ceil((new Date(record.lockedUntil).getTime() - Date.now()) / 60000);
+      throw new Error(`Account locked. Try again in ${remainingTime} minutes.`);
+    }
+  }
+  
+  // 4. Generate OTP
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const hashedOTP = await bcrypt.hash(otp, 10);
+  
+  // 5. Store in Redis
+  const record = {
+    hashedOTP,
+    attempts: 0,
+    createdAt: new Date().toISOString()
+  };
+  await redis.setex(otpKey, 300, JSON.stringify(record));
+  
+  // 6. Send SMS
+  try {
+    await twilioClient.messages.create({
+      to: `+91${phone}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      body: `Your Cafe South Central OTP is ${otp}. Valid for 5 minutes.`
+    });
+  } catch (twilioError) {
+    // Fallback to AWS SNS
+    await snsClient.publish({
+      PhoneNumber: `+91${phone}`,
+      Message: `Your Cafe South Central OTP is ${otp}. Valid for 5 minutes.`
+    });
+  }
+}
+
+// Verify OTP
+export async function verifyOTP(phone: string, otp: string): Promise&lt;string&gt; {
+  const otpKey = `otp:${phone}`;
+  const existing = await redis.get(otpKey);
+  
+  if (!existing) {
+    throw new Error(&#39;OTP expired or not found&#39;);
+  }
+  
+  const record = JSON.parse(existing);
+  
+  // Check lock
+  if (record.lockedUntil &amp;&amp; new Date(record.lockedUntil) &gt; new Date()) {
+    throw new Error(&#39;Account locked. Too many failed attempts.&#39;);
+  }
+  
+  // Verify OTP
+  const isValid = await bcrypt.compare(otp, record.hashedOTP);
+  
+  if (!isValid) {
+    // Increment attempts
+    record.attempts += 1;
+    if (record.attempts &gt;= 3) {
+      record.lockedUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    }
+    await redis.setex(otpKey, 300, JSON.stringify(record));
+    
+    const remaining = 3 - record.attempts;
+    throw new Error(`Invalid OTP. ${remaining} attempts remaining.`);
+  }
+  
+  // Success - create session
+  const sessionToken = crypto.randomBytes(32).toString(&#39;hex&#39;);
+  
+  // Get or create user
+  let user = await prisma.user.findUnique({ where: { phone } });
+  if (!user) {
+    user = await prisma.user.create({
+      data: { phone, role: &#39;CUSTOMER&#39; }
+    });
+  }
+  
+  // Store session in Redis
+  const sessionData = {
+    userId: user.id,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  };
+  await redis.setex(`session:${sessionToken}`, 604800, JSON.stringify(sessionData));
+  
+  // Delete OTP
+  await redis.del(otpKey);
+  
+  return sessionToken;
+}
+</code></pre>
+<h3 id="52-admin-authentication">5.2 Admin Authentication</h3>
+<p><strong>Method:</strong> Username + Password + TOTP (2FA)</p>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Password: Min 12 chars, must include uppercase, lowercase, number, special char</li>
+<li>Hashing: Argon2id (NOT bcrypt for admin accounts)</li>
+<li>2FA: Mandatory Google Authenticator (TOTP)</li>
+<li>Session timeout: 30 minutes idle, 8 hours absolute</li>
+<li>IP whitelisting: Optional (for production environments)</li>
+</ul>
+<p><strong>Flow:</strong></p>
+<ol>
+<li><p><strong>Admin Registration (One-time setup):</strong></p>
+<ul>
+<li>Create admin account via CLI script</li>
+<li>Generate TOTP secret (32-char base32)</li>
+<li>Encrypt secret with AES-256-GCM (key from env)</li>
+<li>Store in database</li>
+<li>Display QR code for Google Authenticator</li>
+</ul>
+</li>
+<li><p><strong>Admin Login:</strong></p>
+<ul>
+<li>Input: Username, Password, 6-digit TOTP code</li>
+<li>Verify password (Argon2)</li>
+<li>Verify TOTP (allow ±30 seconds clock drift)</li>
+<li>Create session with strict timeout</li>
+<li>Log login to audit table</li>
+</ul>
+</li>
+<li><p><strong>Session Management:</strong></p>
+<ul>
+<li>Idle timeout: Reset on every request (30 minutes)</li>
+<li>Absolute timeout: 8 hours from login</li>
+<li>Concurrent session limit: 1 (new login invalidates old session)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Code Example:</strong></p>
+<pre><code class="language-typescript">// Admin login
+export async function adminLogin(
+  username: string, 
+  password: string, 
+  totpCode: string
+): Promise&lt;string&gt; {
+  // 1. Find admin
+  const admin = await prisma.user.findUnique({
+    where: { username, role: { in: [&#39;SUPER_ADMIN&#39;, &#39;MANAGER&#39;, &#39;KITCHEN_STAFF&#39;] } }
+  });
+  
+  if (!admin) {
+    throw new Error(&#39;Invalid credentials&#39;);
+  }
+  
+  // 2. Verify password (Argon2)
+  const isValidPassword = await argon2.verify(admin.password_hash, password);
+  if (!isValidPassword) {
+    throw new Error(&#39;Invalid credentials&#39;);
+  }
+  
+  // 3. Decrypt TOTP secret
+  const decipher = crypto.createDecipheriv(
+    &#39;aes-256-gcm&#39;,
+    Buffer.from(process.env.ENCRYPTION_KEY, &#39;hex&#39;),
+    Buffer.from(admin.totp_iv, &#39;hex&#39;)
+  );
+  decipher.setAuthTag(Buffer.from(admin.totp_tag, &#39;hex&#39;));
+  let decryptedSecret = decipher.update(admin.totp_secret_encrypted, &#39;hex&#39;, &#39;utf8&#39;);
+  decryptedSecret += decipher.final(&#39;utf8&#39;);
+  
+  // 4. Verify TOTP
+  const isValidTOTP = speakeasy.totp.verify({
+    secret: decryptedSecret,
+    encoding: &#39;base32&#39;,
+    token: totpCode,
+    window: 1 // ±30 seconds
+  });
+  
+  if (!isValidTOTP) {
+    throw new Error(&#39;Invalid 2FA code&#39;);
+  }
+  
+  // 5. Invalidate existing sessions
+  await prisma.adminSession.deleteMany({ where: { admin_id: admin.id } });
+  
+  // 6. Create new session
+  const sessionToken = crypto.randomBytes(32).toString(&#39;hex&#39;);
+  await prisma.adminSession.create({
+    data: {
+      admin_id: admin.id,
+      session_token: sessionToken,
+      ip_address: req.ip,
+      user_agent: req.headers[&#39;user-agent&#39;],
+      created_at: new Date(),
+      last_activity: new Date(),
+      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000) // 8 hours
+    }
+  });
+  
+  // 7. Audit log
+  await prisma.auditLog.create({
+    data: {
+      admin_id: admin.id,
+      action: &#39;ADMIN_LOGIN&#39;,
+      ip_address: req.ip,
+      user_agent: req.headers[&#39;user-agent&#39;],
+      created_at: new Date()
+    }
+  });
+  
+  return sessionToken;
+}
+
+// Session validation middleware
+export async function validateAdminSession(sessionToken: string): Promise&lt;User&gt; {
+  const session = await prisma.adminSession.findUnique({
+    where: { session_token: sessionToken },
+    include: { admin: true }
+  });
+  
+  if (!session) {
+    throw new Error(&#39;Invalid session&#39;);
+  }
+  
+  // Check idle timeout (30 minutes)
+  const idleTime = Date.now() - session.last_activity.getTime();
+  if (idleTime &gt; 30 * 60 * 1000) {
+    await prisma.adminSession.delete({ where: { id: session.id } });
+    throw new Error(&#39;Session expired due to inactivity&#39;);
+  }
+  
+  // Check absolute timeout (8 hours)
+  if (new Date() &gt; session.expires_at) {
+    await prisma.adminSession.delete({ where: { id: session.id } });
+    throw new Error(&#39;Session expired&#39;);
+  }
+  
+  // Update last activity
+  await prisma.adminSession.update({
+    where: { id: session.id },
+    data: { last_activity: new Date() }
+  });
+  
+  return session.admin;
+}
+</code></pre>
+<hr>
+<h2 id="6-payment-processing">6. Payment Processing</h2>
+<h3 id="61-supported-payment-methods">6.1 Supported Payment Methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Max Amount</th>
+<th>Processing Time</th>
+<th>Fees</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cash on Delivery</td>
+<td>₹500</td>
+<td>Instant</td>
+<td>₹0</td>
+<td>Small orders, low-value</td>
+</tr>
+<tr>
+<td>UPI</td>
+<td>Unlimited</td>
+<td>2-5 seconds</td>
+<td>1.5%</td>
+<td>Primary method</td>
+</tr>
+<tr>
+<td>Cards (Debit/Credit)</td>
+<td>Unlimited</td>
+<td>3-10 seconds</td>
+<td>2%</td>
+<td>Backup</td>
+</tr>
+<tr>
+<td>Subscription</td>
+<td>N/A</td>
+<td>Instant</td>
+<td>₹0 (quota deduction)</td>
+<td>Members only</td>
+</tr>
+</tbody></table>
+<h3 id="62-razorpay-integration">6.2 Razorpay Integration</h3>
+<p><strong>Setup:</strong></p>
+<pre><code class="language-typescript">import Razorpay from &#39;razorpay&#39;;
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+</code></pre>
+<p><strong>Payment Flow (UPI/Cards):</strong></p>
+<pre><code class="language-typescript">// Step 1: Create Razorpay order (backend)
+export async function createRazorpayOrder(amount: number, orderId: string) {
+  const options = {
+    amount: amount * 100, // Paise (₹100 = 10000 paise)
+    currency: &#39;INR&#39;,
+    receipt: orderId,
+    notes: {
+      cafe_order_id: orderId
+    }
+  };
+  
+  const razorpayOrder = await razorpay.orders.create(options);
+  return razorpayOrder;
+}
+
+// Step 2: Open Razorpay modal (frontend)
+const options = {
+  key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  amount: razorpayOrder.amount,
+  currency: &#39;INR&#39;,
+  name: &#39;Cafe South Central&#39;,
+  description: `Order ${orderId}`,
+  order_id: razorpayOrder.id,
+  handler: function (response) {
+    // Payment successful
+    verifyPayment(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+  },
+  prefill: {
+    name: user.name,
+    contact: user.phone
+  },
+  theme: {
+    color: &#39;#5C3A1A&#39; // Deep brown
+  }
+};
+
+const razorpayInstance = new window.Razorpay(options);
+razorpayInstance.open();
+
+// Step 3: Verify payment signature (backend)
+export async function verifyPaymentSignature(
+  razorpayPaymentId: string,
+  razorpayOrderId: string,
+  razorpaySignature: string
+): Promise&lt;boolean&gt; {
+  const body = razorpayOrderId + &#39;|&#39; + razorpayPaymentId;
+  const expectedSignature = crypto
+    .createHmac(&#39;sha256&#39;, process.env.RAZORPAY_KEY_SECRET)
+    .update(body)
+    .digest(&#39;hex&#39;);
+  
+  return expectedSignature === razorpaySignature;
+}
+</code></pre>
+<h3 id="63-webhook-handling-critical">6.3 Webhook Handling (CRITICAL)</h3>
+<p><strong>Endpoint:</strong> <code>POST /api/webhooks/razorpay</code></p>
+<p><strong>Security Checklist:</strong></p>
+<ul>
+<li>✅ IP whitelist (Razorpay IPs only)</li>
+<li>✅ Signature verification (HMAC-SHA256)</li>
+<li>✅ Timestamp validation (max 5 minutes old)</li>
+<li>✅ Replay attack prevention (idempotency keys)</li>
+<li>✅ Retry handling (idempotent processing)</li>
+</ul>
+<p><strong>Implementation:</strong></p>
+<pre><code class="language-typescript">const RAZORPAY_WEBHOOK_IPS = [
+  &#39;43.204.126.64/27&#39;,
+  &#39;3.109.122.64/27&#39;,
+  &#39;13.232.140.64/27&#39;
+];
+
+export async function POST(req: Request) {
+  // 1. IP Whitelist
+  const clientIP = req.headers.get(&#39;x-forwarded-for&#39;)?.split(&#39;,&#39;)[0].trim();
+  const isAllowedIP = RAZORPAY_WEBHOOK_IPS.some(range =&gt; 
+    ipInRange(clientIP, range)
+  );
+  
+  if (!isAllowedIP) {
+    console.warn(`Blocked webhook from unauthorized IP: ${clientIP}`);
+    return new Response(&#39;Forbidden&#39;, { status: 403 });
+  }
+  
+  // 2. Verify Signature
+  const signature = req.headers.get(&#39;x-razorpay-signature&#39;);
+  const body = await req.text();
+  
+  const expectedSignature = crypto
+    .createHmac(&#39;sha256&#39;, process.env.RAZORPAY_WEBHOOK_SECRET)
+    .update(body)
+    .digest(&#39;hex&#39;);
+  
+  if (signature !== expectedSignature) {
+    console.warn(&#39;Invalid webhook signature&#39;);
+    return new Response(&#39;Unauthorized&#39;, { status: 401 });
+  }
+  
+  // 3. Parse payload
+  const payload = JSON.parse(body);
+  const event = payload.event; // e.g., &#39;payment.captured&#39;
+  const paymentEntity = payload.payload.payment.entity;
+  
+  // 4. Timestamp validation (max 5 minutes old)
+  const createdAt = new Date(paymentEntity.created_at * 1000);
+  const age = (Date.now() - createdAt.getTime()) / 1000;
+  if (age &gt; 300) {
+    console.warn(`Webhook too old: ${age} seconds`);
+    return new Response(&#39;Webhook expired&#39;, { status: 400 });
+  }
+  
+  // 5. Replay prevention (idempotency)
+  const idempotencyKey = `webhook:${paymentEntity.id}:${event}`;
+  const exists = await redis.get(idempotencyKey);
+  if (exists) {
+    console.log(&#39;Duplicate webhook, already processed&#39;);
+    return new Response(&#39;OK&#39;, { status: 200 }); // Return 200 to stop retries
+  }
+  
+  // 6. Process payment based on event
+  try {
+    switch (event) {
+      case &#39;payment.captured&#39;:
+        await handlePaymentCaptured(paymentEntity);
+        break;
+      case &#39;payment.failed&#39;:
+        await handlePaymentFailed(paymentEntity);
+        break;
+      case &#39;refund.processed&#39;:
+        await handleRefundProcessed(paymentEntity);
+        break;
+      default:
+        console.log(`Unhandled event: ${event}`);
+    }
+    
+    // 7. Mark as processed (24-hour TTL)
+    await redis.setex(idempotencyKey, 86400, &#39;processed&#39;);
+    
+    return new Response(&#39;OK&#39;, { status: 200 });
+  } catch (error) {
+    console.error(&#39;Webhook processing error:&#39;, error);
+    
+    // Log to orphaned payments table for manual reconciliation
+    await prisma.orphanedPayment.create({
+      data: {
+        razorpay_payment_id: paymentEntity.id,
+        amount: paymentEntity.amount / 100,
+        error_message: error.message,
+        payload: JSON.stringify(payload),
+        created_at: new Date()
+      }
+    });
+    
+    // Return 500 so Razorpay retries
+    return new Response(&#39;Processing error&#39;, { status: 500 });
+  }
+}
+
+async function handlePaymentCaptured(payment) {
+  const orderId = payment.notes.cafe_order_id;
+  
+  // Begin transaction
+  await prisma.$transaction(async (tx) =&gt; {
+    // 1. Update order status
+    const order = await tx.order.update({
+      where: { id: orderId },
+      data: {
+        status: &#39;CONFIRMED&#39;,
+        payment_id: payment.id,
+        payment_method: &#39;UPI&#39;, // or &#39;CARD&#39;
+        updated_at: new Date()
+      },
+      include: { user: true, items: { include: { item: true } } }
+    });
+    
+    // 2. Deduct inventory (already reserved during cart, now confirm)
+    for (const orderItem of order.items) {
+      await tx.menuItem.update({
+        where: { id: orderItem.item_id },
+        data: {
+          reserved_stock: { decrement: orderItem.quantity }
+        }
+      });
+    }
+    
+    // 3. Send confirmation SMS
+    await sendOrderConfirmationSMS(order);
+    
+    // 4. Send email receipt
+    await sendOrderConfirmationEmail(order);
+  });
+}
+
+async function handlePaymentFailed(payment) {
+  const orderId = payment.notes.cafe_order_id;
+  
+  // Release reserved inventory
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: true }
+  });
+  
+  await prisma.$transaction(async (tx) =&gt; {
+    // Update order status
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status: &#39;CANCELLED&#39;, updated_at: new Date() }
+    });
+    
+    // Release inventory
+    for (const orderItem of order.items) {
+      await tx.menuItem.update({
+        where: { id: orderItem.item_id },
+        data: {
+          stock: { increment: orderItem.quantity },
+          reserved_stock: { decrement: orderItem.quantity }
+        }
+      });
+    }
+  });
+  
+  // Notify user
+  await sendPaymentFailedSMS(order.user.phone, orderId);
+}
+</code></pre>
+<h3 id="64-refund-policy--implementation">6.4 Refund Policy &amp; Implementation</h3>
+<p><strong>Refund Scenarios:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Refund Amount</th>
+<th>Processing Time</th>
+<th>Initiated By</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>User cancels within 2 minutes</td>
+<td>100%</td>
+<td>Instant (auto)</td>
+<td>User</td>
+</tr>
+<tr>
+<td>Payment captured but order failed</td>
+<td>100%</td>
+<td>5-7 business days</td>
+<td>System</td>
+</tr>
+<tr>
+<td>Admin cancels order</td>
+<td>100%</td>
+<td>Manual approval required</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>Food quality issue</td>
+<td>50-100% (case by case)</td>
+<td>Manual approval</td>
+<td>Support team</td>
+</tr>
+</tbody></table>
+<p><strong>Auto-Refund Logic:</strong></p>
+<pre><code class="language-typescript">// User cancellation (within 2 minutes)
+export async function cancelOrder(orderId: string, userId: string) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId, user_id: userId }
+  });
+  
+  if (!order) {
+    throw new Error(&#39;Order not found&#39;);
+  }
+  
+  // Check if within 2-minute window
+  const elapsedTime = Date.now() - order.created_at.getTime();
+  if (elapsedTime &gt; 2 * 60 * 1000) {
+    throw new Error(&#39;Cancellation window expired (2 minutes)&#39;);
+  }
+  
+  // Check if payment method was UPI/Card
+  if (order.payment_method === &#39;UPI&#39; || order.payment_method === &#39;CARD&#39;) {
+    // Initiate refund via Razorpay
+    const refund = await razorpay.payments.refund(order.payment_id, {
+      amount: order.total_amount * 100, // Paise
+      speed: &#39;normal&#39;, // or &#39;optimum&#39; for instant refunds (higher fees)
+      notes: {
+        reason: &#39;User cancellation within 2 minutes&#39;,
+        cafe_order_id: orderId
+      }
+    });
+    
+    // Update order
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: &#39;CANCELLED&#39;,
+        refund_id: refund.id,
+        refund_status: &#39;PROCESSING&#39;,
+        updated_at: new Date()
+      }
+    });
+    
+    // Release inventory
+    await releaseInventory(orderId);
+    
+    // Send confirmation
+    await sendRefundConfirmationSMS(order.user.phone, orderId, order.total_amount);
+  } else {
+    // Cash orders - just cancel
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: &#39;CANCELLED&#39;, updated_at: new Date() }
+    });
+    await releaseInventory(orderId);
+  }
+}
+
+// Daily reconciliation cron job (runs at 2 AM)
+async function reconcileOrphanedPayments() {
+  // Find payments where order creation failed but payment succeeded
+  const orphanedPayments = await prisma.orphanedPayment.findMany({
+    where: { resolved: false, created_at: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } }
+  });
+  
+  for (const orphaned of orphanedPayments) {
+    // Check if order exists
+    const order = await prisma.order.findUnique({
+      where: { payment_id: orphaned.razorpay_payment_id }
+    });
+    
+    if (!order) {
+      // No order found - refund the payment
+      try {
+        await razorpay.payments.refund(orphaned.razorpay_payment_id, {
+          amount: orphaned.amount * 100,
+          notes: { reason: &#39;Orphaned payment - order not found&#39; }
+        });
+        
+        await prisma.orphanedPayment.update({
+          where: { id: orphaned.id },
+          data: { resolved: true, resolved_at: new Date() }
+        });
+        
+        console.log(`Refunded orphaned payment: ${orphaned.razorpay_payment_id}`);
+      } catch (error) {
+        console.error(`Failed to refund orphaned payment: ${orphaned.razorpay_payment_id}`, error);
+      }
+    } else {
+      // Order exists - mark as resolved
+      await prisma.orphanedPayment.update({
+        where: { id: orphaned.id },
+        data: { resolved: true, resolved_at: new Date() }
+      });
+    }
+  }
+}
+</code></pre>
+<hr>
+<h2 id="7-subscription-business-rules">7. Subscription Business Rules</h2>
+<h3 id="71-plan-structure">7.1 Plan Structure</h3>
+<table>
+<thead>
+<tr>
+<th>Plan Tier</th>
+<th>Monthly Price</th>
+<th>Daily Meal Limit</th>
+<th>Monthly Credit Quota</th>
+<th>Features</th>
+<th>Target Audience</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Trial</strong></td>
+<td>₹0</td>
+<td>1 meal</td>
+<td>7 credits (7 days)</td>
+<td>Basic menu only, no beverages</td>
+<td>New users, trial period</td>
+</tr>
+<tr>
+<td><strong>Light Bite</strong></td>
+<td>₹999</td>
+<td>2 meals</td>
+<td>30 credits</td>
+<td>Standard menu, select beverages</td>
+<td>Light eaters, occasional users</td>
+</tr>
+<tr>
+<td><strong>Feast &amp; Fuel</strong></td>
+<td>₹1,799</td>
+<td>3 meals</td>
+<td>60 credits</td>
+<td>Full menu including beverages</td>
+<td>Regular users, office workers</td>
+</tr>
+<tr>
+<td><strong>Total Wellness</strong></td>
+<td>₹2,499</td>
+<td>4 meals</td>
+<td>90 credits</td>
+<td>Full menu, priority support</td>
+<td>Heavy users, students with hostel mess</td>
+</tr>
+<tr>
+<td><strong>Ultimate</strong></td>
+<td>₹3,999</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+<td>Everything + priority support, exclusive items</td>
+<td>VIP users, corporate groups</td>
+</tr>
+</tbody></table>
+<p><strong>Credit System:</strong></p>
+<ul>
+<li>1 credit = 1 eligible meal item (breakfast/lunch/dinner)</li>
+<li>Snacks: 0.5 credits</li>
+<li>Beverages: 0.25 credits (included in plan)</li>
+<li>Extra items beyond quota: Pay per order</li>
+</ul>
+<h3 id="72-quota-management">7.2 Quota Management</h3>
+<p><strong>Reset Logic:</strong></p>
+<pre><code class="language-typescript">// Credits reset on subscription anniversary (NOT 1st of month)
+// Example: Joined Jan 15 → Resets Feb 15, Mar 15, etc.
+
+interface Subscription {
+  userId: string;
+  planType: &#39;TRIAL&#39; | &#39;LIGHT_BITE&#39; | &#39;FEAST_FUEL&#39; | &#39;TOTAL_WELLNESS&#39; | &#39;ULTIMATE&#39;;
+  creditsTotal: number;     // e.g., 30 for Light Bite
+  creditsUsed: number;      // Current cycle usage
+  dailyLimit: number;       // e.g., 2 for Light Bite
+  dailyUsed: number;        // Today&#39;s usage
+  startsAt: Date;           // Subscription start date
+  expiresAt: Date;          // Next billing date (1 month from start)
+  anniversaryDay: number;   // Day of month for reset (e.g., 15)
+  isActive: boolean;
+  autoRenew: boolean;
+}
+
+// Daily reset (runs at 00:00 IST)
+async function resetDailyQuotas() {
+  await prisma.subscription.updateMany({
+    where: { isActive: true },
+    data: { dailyUsed: 0 }
+  });
+}
+
+// Monthly reset (runs hourly, checks for anniversaries)
+async function resetMonthlyQuotas() {
+  const today = new Date();
+  const currentDay = today.getDate();
+  
+  // Find subscriptions whose anniversary is today
+  const subscriptionsToReset = await prisma.subscription.findMany({
+    where: {
+      isActive: true,
+      anniversaryDay: currentDay
+    }
+  });
+  
+  for (const sub of subscriptionsToReset) {
+    // Reset credits
+    await prisma.subscription.update({
+      where: { id: sub.id },
+      data: {
+        creditsUsed: 0,
+        dailyUsed: 0,
+        expiresAt: addMonths(sub.expiresAt, 1) // Extend by 1 month
+      }
+    });
+    
+    // Process auto-renewal if enabled
+    if (sub.autoRenew) {
+      await processSubscriptionRenewal(sub.userId, sub.planType);
+    }
+  }
+}
+
+// Check quota before placing order
+export async function validateSubscriptionQuota(
+  userId: string,
+  itemIds: string[]
+): Promise&lt;boolean&gt; {
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId, isActive: true }
+  });
+  
+  if (!subscription) {
+    throw new Error(&#39;No active subscription found&#39;);
+  }
+  
+  // Calculate credit cost of items
+  const items = await prisma.menuItem.findMany({
+    where: { id: { in: itemIds }, isSubscriptionEligible: true }
+  });
+  
+  let creditCost = 0;
+  for (const item of items) {
+    if (item.category === &#39;SNACK&#39;) creditCost += 0.5;
+    else if (item.category === &#39;BEVERAGE&#39;) creditCost += 0.25;
+    else creditCost += 1; // Main meals
+  }
+  
+  // Check daily limit
+  if (subscription.dailyUsed + items.length &gt; subscription.dailyLimit) {
+    throw new Error(`Daily limit exceeded (${subscription.dailyLimit} meals/day)`);
+  }
+  
+  // Check monthly quota (for non-unlimited plans)
+  if (subscription.planType !== &#39;ULTIMATE&#39;) {
+    const remainingCredits = subscription.creditsTotal - subscription.creditsUsed;
+    if (creditCost &gt; remainingCredits) {
+      throw new Error(`Insufficient credits (${remainingCredits} remaining, ${creditCost} required)`);
+    }
+  }
+  
+  return true;
+}
+
+// Deduct quota after order confirmation
+export async function deductSubscriptionQuota(
+  userId: string,
+  itemIds: string[]
+) {
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId }
+  });
+  
+  const items = await prisma.menuItem.findMany({
+    where: { id: { in: itemIds } }
+  });
+  
+  let creditCost = 0;
+  for (const item of items) {
+    if (item.category === &#39;SNACK&#39;) creditCost += 0.5;
+    else if (item.category === &#39;BEVERAGE&#39;) creditCost += 0.25;
+    else creditCost += 1;
+  }
+  
+  await prisma.subscription.update({
+    where: { userId },
+    data: {
+      creditsUsed: { increment: creditCost },
+      dailyUsed: { increment: items.length }
+    }
+  });
+}
+</code></pre>
+<h3 id="73-pro-rata-pricing-mid-month-joining">7.3 Pro-Rata Pricing (Mid-Month Joining)</h3>
+<p><strong>Formula:</strong></p>
+<pre><code class="language-typescript">function calculateProRataCharge(
+  planPrice: number,
+  joinDate: Date
+): { charge: number, daysRemaining: number } {
+  // Get the anniversary date (same day next month)
+  const anniversaryDate = new Date(joinDate);
+  anniversaryDate.setMonth(anniversaryDate.getMonth() + 1);
+  anniversaryDate.setHours(0, 0, 0, 0);
+  
+  // Calculate days in the subscription period
+  const totalDays = Math.ceil(
+    (anniversaryDate.getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  
+  // Calculate days remaining (including join day)
+  const daysRemaining = totalDays;
+  
+  // Pro-rata calculation
+  const charge = Math.round((daysRemaining / totalDays) * planPrice);
+  
+  return { charge, daysRemaining };
+}
+
+// Example:
+// Join: Jan 15, 2026 at 3:00 PM
+// Plan: Feast &amp; Fuel (₹1,799)
+// Anniversary: Feb 15, 2026 at 00:00 AM
+// Days: 31 (Jan 15 to Feb 15 inclusive)
+// Charge: (31/31) × ₹1,799 = ₹1,799 (first month is always full price)
+
+// BUT if join on Jan 20:
+// Join: Jan 20, 2026
+// Anniversary: Feb 20, 2026
+// Days: 31 (Jan 20 to Feb 20)
+// Charge: ₹1,799 (still full price, as it&#39;s a complete billing cycle)
+
+// For TRUE pro-rata (joining mid-cycle):
+// Join: Jan 20, Anniversary should be Feb 1 (to align with others)
+// Days remaining: 12 (Jan 20 to Feb 1)
+// Total days in Jan: 31
+// Charge: (12/31) × ₹1,799 = ₹696
+// (But this complicates anniversary tracking - NOT RECOMMENDED)
+</code></pre>
+<p><strong>Recommendation:</strong> <strong>Always charge full price for first month.</strong> Pro-rata adds complexity without significant benefit. Users joining on Jan 20 get 11 extra days for free, which is an acceptable marketing cost.</p>
+<p><strong>Simplified Approach:</strong></p>
+<pre><code class="language-typescript">async function subscribeToplan(userId: string, planType: PlanType) {
+  const planPricing = {
+    TRIAL: 0,
+    LIGHT_BITE: 999,
+    FEAST_FUEL: 1799,
+    TOTAL_WELLNESS: 2499,
+    ULTIMATE: 3999
+  };
+  
+  const planQuotas = {
+    TRIAL: { daily: 1, monthly: 7 },
+    LIGHT_BITE: { daily: 2, monthly: 30 },
+    FEAST_FUEL: { daily: 3, monthly: 60 },
+    TOTAL_WELLNESS: { daily: 4, monthly: 90 },
+    ULTIMATE: { daily: 999, monthly: 999999 } // Effectively unlimited
+  };
+  
+  const price = planPricing[planType];
+  const quota = planQuotas[planType];
+  
+  const startDate = new Date();
+  const anniversaryDate = new Date(startDate);
+  anniversaryDate.setMonth(anniversaryDate.getMonth() + 1);
+  anniversaryDate.setHours(0, 0, 0, 0);
+  
+  // Create subscription
+  await prisma.subscription.create({
+    data: {
+      userId,
+      planType,
+      creditsTotal: quota.monthly,
+      creditsUsed: 0,
+      dailyLimit: quota.daily,
+      dailyUsed: 0,
+      startsAt: startDate,
+      expiresAt: anniversaryDate,
+      anniversaryDay: startDate.getDate(),
+      isActive: true,
+      autoRenew: true
+    }
+  });
+  
+  // Process payment (if not trial)
+  if (price &gt; 0) {
+    await processSubscriptionPayment(userId, price, planType);
+  }
+}
+</code></pre>
+<h3 id="74-renewal--grace-period">7.4 Renewal &amp; Grace Period</h3>
+<p><strong>Auto-Renewal Flow:</strong></p>
+<pre><code class="language-typescript">// Runs daily at 00:00 IST
+async function processSubscriptionRenewals() {
+  // Find subscriptions expiring in 3 days
+  const expiringSubscriptions = await prisma.subscription.findMany({
+    where: {
+      isActive: true,
+      autoRenew: true,
+      expiresAt: {
+        lte: addDays(new Date(), 3),
+        gte: new Date()
+      }
+    },
+    include: { user: true }
+  });
+  
+  for (const sub of expiringSubscriptions) {
+    try {
+      // Attempt to charge saved payment method
+      const payment = await razorpay.subscriptions.create({
+        plan_id: sub.planType,
+        customer_id: sub.user.razorpay_customer_id,
+        total_count: 1,
+        notify: 1,
+        notes: {
+          user_id: sub.userId,
+          subscription_id: sub.id
+        }
+      });
+      
+      // Extend subscription
+      await prisma.subscription.update({
+        where: { id: sub.id },
+        data: {
+          creditsUsed: 0,
+          dailyUsed: 0,
+          expiresAt: addMonths(sub.expiresAt, 1)
+        }
+      });
+      
+      // Send confirmation
+      await sendRenewalConfirmationSMS(sub.user.phone, sub.planType);
+    } catch (error) {
+      // Payment failed - enter grace period
+      await prisma.subscription.update({
+        where: { id: sub.id },
+        data: { gracePeridEnd: addDays(sub.expiresAt, 2) } // 2-day grace
+      });
+      
+      // Send reminder
+      await sendRenewalFailedSMS(sub.user.phone, sub.planType);
+    }
+  }
+  
+  // Deactivate subscriptions past grace period
+  await prisma.subscription.updateMany({
+    where: {
+      isActive: true,
+      gracePeriodEnd: { lt: new Date() }
+    },
+    data: { isActive: false }
+  });
+}
+</code></pre>
+<p><strong>Grace Period Rules:</strong></p>
+<ul>
+<li>Day 0: Payment attempt, send reminder SMS</li>
+<li>Day 1: Second payment attempt, send email</li>
+<li>Day 2: Final payment attempt, send urgent SMS</li>
+<li>Day 3: Deactivate subscription, downgrade to normal mode</li>
+</ul>
+<h3 id="75-plan-switching">7.5 Plan Switching</h3>
+<pre><code class="language-typescript">// Upgrade (immediate, pro-rata billing)
+async function upgradeSubscription(
+  userId: string,
+  newPlanType: PlanType
+) {
+  const currentSub = await prisma.subscription.findUnique({
+    where: { userId }
+  });
+  
+  const planPricing = {
+    LIGHT_BITE: 999,
+    FEAST_FUEL: 1799,
+    TOTAL_WELLNESS: 2499,
+    ULTIMATE: 3999
+  };
+  
+  const currentPrice = planPricing[currentSub.planType];
+  const newPrice = planPricing[newPlanType];
+  
+  if (newPrice &lt;= currentPrice) {
+    throw new Error(&#39;Cannot upgrade to a lower-priced plan&#39;);
+  }
+  
+  // Calculate days remaining in current cycle
+  const daysRemaining = Math.ceil(
+    (currentSub.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  );
+  const totalDays = Math.ceil(
+    (currentSub.expiresAt.getTime() - currentSub.startsAt.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  
+  // Pro-rata charge for upgrade
+  const priceDifference = newPrice - currentPrice;
+  const upgradeCharge = Math.round((daysRemaining / totalDays) * priceDifference);
+  
+  // Process payment
+  await processPayment(userId, upgradeCharge);
+  
+  // Update subscription
+  const newQuotas = {
+    FEAST_FUEL: { daily: 3, monthly: 60 },
+    TOTAL_WELLNESS: { daily: 4, monthly: 90 },
+    ULTIMATE: { daily: 999, monthly: 999999 }
+  };
+  
+  await prisma.subscription.update({
+    where: { userId },
+    data: {
+      planType: newPlanType,
+      creditsTotal: newQuotas[newPlanType].monthly,
+      dailyLimit: newQuotas[newPlanType].daily
+      // Keep same anniversary date
+    }
+  });
+}
+
+// Downgrade (takes effect on next renewal)
+async function downgradeSubscription(
+  userId: string,
+  newPlanType: PlanType
+) {
+  const currentSub = await prisma.subscription.findUnique({
+    where: { userId }
+  });
+  
+  // Store downgrade request
+  await prisma.subscription.update({
+    where: { userId },
+    data: {
+      pendingDowngrade: newPlanType,
+      // Will be applied on next renewal
+    }
+  });
+  
+  // Notify user
+  await sendDowngradeScheduledEmail(
+    currentSub.user.email,
+    currentSub.planType,
+    newPlanType,
+    currentSub.expiresAt
+  );
+}
+</code></pre>
+<h3 id="76-fraud-prevention">7.6 Fraud Prevention</h3>
+<pre><code class="language-typescript">// Device fingerprinting
+async function trackSubscriptionDevice(userId: string, req: Request) {
+  const fingerprint = {
+    userAgent: req.headers.get(&#39;user-agent&#39;),
+    ipAddress: req.headers.get(&#39;x-forwarded-for&#39;),
+    acceptLanguage: req.headers.get(&#39;accept-language&#39;),
+    screenResolution: req.headers.get(&#39;sec-ch-viewport-width&#39;),
+    timezone: req.headers.get(&#39;sec-ch-ua-timezone&#39;)
+  };
+  
+  const fingerprintHash = crypto
+    .createHash(&#39;sha256&#39;)
+    .update(JSON.stringify(fingerprint))
+    .digest(&#39;hex&#39;);
+  
+  // Check if device is already registered
+  const deviceCount = await prisma.subscriptionDevice.count({
+    where: { userId }
+  });
+  
+  if (deviceCount &gt;= 3) {
+    // Flag for review
+    await prisma.fraudAlert.create({
+      data: {
+        userId,
+        reason: &#39;TOO_MANY_DEVICES&#39;,
+        details: `User has ${deviceCount} registered devices`,
+        created_at: new Date()
+      }
+    });
+  }
+  
+  // Register device
+  await prisma.subscriptionDevice.upsert({
+    where: { fingerprintHash },
+    update: { lastSeenAt: new Date() },
+    create: {
+      userId,
+      fingerprintHash,
+      userAgent: fingerprint.userAgent,
+      ipAddress: fingerprint.ipAddress,
+      createdAt: new Date()
+    }
+  });
+}
+
+// Account sharing detection (IP clustering)
+async function detectAccountSharing(userId: string) {
+  const devices = await prisma.subscriptionDevice.findMany({
+    where: { userId },
+    orderBy: { lastSeenAt: &#39;desc&#39; },
+    take: 10 // Last 10 devices
+  });
+  
+  // Group by IP prefix (first 3 octets)
+  const ipPrefixes = devices.map(d =&gt; 
+    d.ipAddress.split(&#39;.&#39;).slice(0, 3).join(&#39;.&#39;)
+  );
+  
+  const uniqueLocations = new Set(ipPrefixes).size;
+  
+  if (uniqueLocations &gt; 5) {
+    // User is accessing from &gt;5 different locations - likely sharing
+    await prisma.fraudAlert.create({
+      data: {
+        userId,
+        reason: &#39;ACCOUNT_SHARING_SUSPECTED&#39;,
+        details: `User accessed from ${uniqueLocations} different locations`,
+        created_at: new Date()
+      }
+    });
+    
+    // Send warning email
+    await sendAccountSharingWarning(userId);
+  }
+}
+
+// Unusual ordering patterns
+async function detectAnomalousOrdering(userId: string, orderTime: Date) {
+  const hour = orderTime.getHours();
+  
+  // Flag orders at unusual times (2 AM - 6 AM)
+  if (hour &gt;= 2 &amp;&amp; hour &lt; 6) {
+    await prisma.fraudAlert.create({
+      data: {
+        userId,
+        reason: &#39;UNUSUAL_ORDER_TIME&#39;,
+        details: `Order placed at ${hour}:${orderTime.getMinutes()}`,
+        created_at: new Date()
+      }
+    });
+  }
+  
+  // Check for rapid-fire orders (&gt;5 orders in 1 hour)
+  const recentOrders = await prisma.order.count({
+    where: {
+      userId,
+      created_at: { gte: new Date(Date.now() - 60 * 60 * 1000) }
+    }
+  });
+  
+  if (recentOrders &gt; 5) {
+    await prisma.fraudAlert.create({
+      data: {
+        userId,
+        reason: &#39;RAPID_ORDERING&#39;,
+        details: `${recentOrders} orders in 1 hour`,
+        created_at: new Date()
+      }
+    });
+  }
+}
+</code></pre>
+<hr>
+<h2 id="8-inventory-management">8. Inventory Management</h2>
+<h3 id="81-the-race-condition-problem">8.1 The Race Condition Problem</h3>
+<p><strong>Scenario:</strong></p>
+<pre><code>Item: Masala Dosa (Stock: 1)
+Time: 12:00:00 - User A adds to cart
+Time: 12:00:01 - User B adds to cart
+Time: 12:00:05 - User A checks out → Success (stock: 0)
+Time: 12:00:06 - User B checks out → Success (stock: -1) ❌ OVERSOLD!
+</code></pre>
+<h3 id="82-three-layer-protection">8.2 Three-Layer Protection</h3>
+<p><strong>Layer 1: Cart Reservation (Soft Lock)</strong></p>
+<pre><code class="language-sql">-- When user adds item to cart
+UPDATE menu_items
+SET reserved_stock = reserved_stock + :quantity
+WHERE id = :item_id
+  AND (stock - reserved_stock) &gt;= :quantity
+RETURNING stock, reserved_stock;
+</code></pre>
+<pre><code class="language-typescript">async function addToCart(itemId: string, quantity: number, userId: string) {
+  // Use Prisma raw query for atomic operation
+  const result = await prisma.$queryRaw&lt;MenuItemUpdate&gt;`
+    UPDATE menu_items
+    SET reserved_stock = reserved_stock + ${quantity}
+    WHERE id = ${itemId}
+      AND (stock - reserved_stock) &gt;= ${quantity}
+    RETURNING stock, reserved_stock
+  `;
+  
+  if (result.length === 0) {
+    throw new Error(&#39;Insufficient stock&#39;);
+  }
+  
+  // Create cart reservation with expiry
+  await redis.setex(
+    `cart:${userId}:${itemId}`,
+    300, // 5 minutes
+    JSON.stringify({ quantity, reservedAt: new Date() })
+  );
+  
+  return result[0];
+}
+</code></pre>
+<p><strong>Background Job: Release Expired Reservations</strong></p>
+<pre><code class="language-typescript">// Runs every minute
+async function releaseExpiredReservations() {
+  // Find all cart reservations older than 5 minutes
+  const keys = await redis.keys(&#39;cart:*&#39;);
+  
+  for (const key of keys) {
+    const reservation = JSON.parse(await redis.get(key));
+    const age = (Date.now() - new Date(reservation.reservedAt).getTime()) / 1000;
+    
+    if (age &gt; 300) {
+      // Extract itemId from key (cart:{userId}:{itemId})
+      const itemId = key.split(&#39;:&#39;)[2];
+      
+      // Release reserved stock
+      await prisma.menuItem.update({
+        where: { id: itemId },
+        data: {
+          reserved_stock: { decrement: reservation.quantity }
+        }
+      });
+      
+      // Delete reservation
+      await redis.del(key);
+    }
+  }
+}
+</code></pre>
+<p><strong>Layer 2: Checkout Validation (Row-Level Lock)</strong></p>
+<pre><code class="language-typescript">async function createOrder(userId: string, cartItems: CartItem[]) {
+  return await prisma.$transaction(async (tx) =&gt; {
+    // 1. Lock all item rows for update
+    const itemIds = cartItems.map(item =&gt; item.itemId);
+    const items = await tx.$queryRaw&lt;MenuItem[]&gt;`
+      SELECT * FROM menu_items
+      WHERE id = ANY(${itemIds}::uuid[])
+      FOR UPDATE
+    `;
+    
+    // 2. Validate stock availability
+    for (const cartItem of cartItems) {
+      const item = items.find(i =&gt; i.id === cartItem.itemId);
+      if (!item || item.stock &lt; cartItem.quantity) {
+        throw new Error(`Insufficient stock for ${cartItem.name}`);
+      }
+    }
+    
+    // 3. Deduct inventory atomically
+    for (const cartItem of cartItems) {
+      await tx.menuItem.update({
+        where: { id: cartItem.itemId },
+        data: {
+          stock: { decrement: cartItem.quantity },
+          reserved_stock: { decrement: cartItem.quantity }
+        }
+      });
+    }
+    
+    // 4. Create order
+    const order = await tx.order.create({
+      data: {
+        userId,
+        status: &#39;PAYMENT_PENDING&#39;,
+        totalAmount: cartItems.reduce((sum, item) =&gt; sum + item.price * item.quantity, 0),
+        items: {
+          create: cartItems.map(item =&gt; ({
+            itemId: item.itemId,
+            quantity: item.quantity,
+            priceAtPurchase: item.price
+          }))
+        }
+      },
+      include: { items: true }
+    });
+    
+    // 5. Clear cart reservations
+    for (const item of cartItems) {
+      await redis.del(`cart:${userId}:${item.itemId}`);
+    }
+    
+    return order;
+  }, {
+    maxWait: 5000, // Max 5 seconds to acquire transaction lock
+    timeout: 10000 // Max 10 seconds for entire transaction
+  });
+}
+</code></pre>
+<p><strong>Layer 3: Real-Time Stock Sync (WebSockets)</strong></p>
+<pre><code class="language-typescript">// Server-side: Broadcast stock updates
+async function updateInventory(itemId: string, newStock: number) {
+  await prisma.menuItem.update({
+    where: { id: itemId },
+    data: { stock: newStock }
+  });
+  
+  // Invalidate menu cache
+  await redis.del(&#39;menu:latest&#39;);
+  
+  // Broadcast to all connected clients
+  await pusher.trigger(&#39;inventory&#39;, &#39;stock-updated&#39;, {
+    itemId,
+    stock: newStock,
+    isAvailable: newStock &gt; 0
+  });
+}
+
+// Client-side: Listen for updates
+const channel = pusher.subscribe(&#39;inventory&#39;);
+channel.bind(&#39;stock-updated&#39;, (data: { itemId: string; stock: number }) =&gt; {
+  // Update UI immediately
+  queryClient.setQueryData([&#39;menu&#39;], (oldData) =&gt; {
+    return oldData.map(item =&gt;
+      item.id === data.itemId
+        ? { ...item, stock: data.stock, isAvailable: data.stock &gt; 0 }
+        : item
+    );
+  });
+  
+  // Show toast if item in cart just sold out
+  if (data.stock === 0 &amp;&amp; isInCart(data.itemId)) {
+    toast.error(`${getItemName(data.itemId)} just sold out!`);
+  }
+});
+</code></pre>
+<h3 id="83-admin-inventory-management">8.3 Admin Inventory Management</h3>
+<pre><code class="language-typescript">// Bulk stock update (end of day)
+export async function bulkUpdateInventory(updates: InventoryUpdate[]) {
+  await prisma.$transaction(
+    updates.map(update =&gt;
+      prisma.menuItem.update({
+        where: { id: update.itemId },
+        data: {
+          stock: update.newStock,
+          isAvailable: update.newStock &gt; 0
+        }
+      })
+    )
+  );
+  
+  // Clear cache
+  await redis.del(&#39;menu:latest&#39;);
+  
+  // Broadcast all updates
+  for (const update of updates) {
+    await pusher.trigger(&#39;inventory&#39;, &#39;stock-updated&#39;, {
+      itemId: update.itemId,
+      stock: update.newStock,
+      isAvailable: update.newStock &gt; 0
+    });
+  }
+  
+  // Audit log
+  await prisma.auditLog.create({
+    data: {
+      adminId: req.user.id,
+      action: &#39;BULK_INVENTORY_UPDATE&#39;,
+      resourceType: &#39;MENU_ITEMS&#39;,
+      newValue: updates,
+      createdAt: new Date()
+    }
+  });
+}
+
+// Low stock alerts
+async function checkLowStockItems() {
+  const lowStockItems = await prisma.menuItem.findMany({
+    where: {
+      stock: { lte: 10 },
+      isAvailable: true
+    }
+  });
+  
+  if (lowStockItems.length &gt; 0) {
+    // Send alert to manager
+    await sendSlackNotification(
+      `⚠️ Low Stock Alert: ${lowStockItems.map(i =&gt; `${i.name} (${i.stock} left)`).join(&#39;, &#39;)}`
+    );
+  }
+}
+</code></pre>
+<hr>
+<h2 id="9-security--compliance">9. Security &amp; Compliance</h2>
+<h3 id="91-data-protection--dpdp-act-2023-compliance">9.1 Data Protection &amp; DPDP Act 2023 Compliance</h3>
+<p><strong>Legal Framework:</strong> Digital Personal Data Protection Act, 2023 (India)</p>
+<p><strong>Classification of Data:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Category</th>
+<th>Retention Period</th>
+<th>Encryption Required</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Phone Number</td>
+<td>Personal Data</td>
+<td>Until account deletion</td>
+<td>At rest + in transit</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>Personal Data</td>
+<td>Until account deletion</td>
+<td>At rest + in transit</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>Personal Data</td>
+<td>Until account deletion</td>
+<td>At rest + in transit</td>
+</tr>
+<tr>
+<td>Order History</td>
+<td>Financial Record</td>
+<td>7 years (GST compliance)</td>
+<td>At rest</td>
+</tr>
+<tr>
+<td>Payment Details</td>
+<td>Sensitive Financial</td>
+<td>Never stored (tokenized)</td>
+<td>N/A (Razorpay handles)</td>
+</tr>
+<tr>
+<td>Admin Credentials</td>
+<td>Authentication</td>
+<td>Active employment + 1 year</td>
+<td>At rest (Argon2)</td>
+</tr>
+<tr>
+<td>Session Tokens</td>
+<td>Temporary</td>
+<td>7 days max</td>
+<td>In transit only</td>
+</tr>
+</tbody></table>
+<h4 id="911-data-principal-rights-implementation">9.1.1 Data Principal Rights Implementation</h4>
+<p><strong>Right to Access (Section 11):</strong></p>
+<pre><code class="language-typescript">// User data export
+export async function exportUserData(userId: string): Promise&lt;Blob&gt; {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      phone: true,
+      name: true,
+      email: true,
+      created_at: true,
+      last_login: true
+    }
+  });
+  
+  const orders = await prisma.order.findMany({
+    where: { user_id: userId },
+    include: {
+      items: {
+        include: {
+          item: { select: { name: true, price: true } }
+        }
+      }
+    },
+    orderBy: { created_at: &#39;desc&#39; }
+  });
+  
+  const subscription = await prisma.subscription.findUnique({
+    where: { user_id: userId }
+  });
+  
+  const consentRecords = await prisma.consentRecord.findMany({
+    where: { user_id: userId },
+    orderBy: { granted_at: &#39;desc&#39; }
+  });
+  
+  const exportData = {
+    generated_at: new Date().toISOString(),
+    user: {
+      id: user.id,
+      phone: user.phone,
+      name: user.name,
+      email: user.email,
+      account_created: user.created_at,
+      last_login: user.last_login
+    },
+    orders: orders.map(order =&gt; ({
+      order_id: order.id,
+      date: order.created_at,
+      total: order.total_amount,
+      status: order.status,
+      items: order.items.map(item =&gt; ({
+        name: item.item.name,
+        quantity: item.quantity,
+        price: item.price_at_purchase
+      }))
+    })),
+    subscription: subscription ? {
+      plan: subscription.plan_type,
+      status: subscription.is_active ? &#39;Active&#39; : &#39;Inactive&#39;,
+      credits_remaining: subscription.credits_total - subscription.credits_used,
+      expires_at: subscription.expires_at
+    } : null,
+    consent: consentRecords.map(c =&gt; ({
+      purpose: c.purpose,
+      granted_at: c.granted_at,
+      withdrawn_at: c.withdrawn_at,
+      status: c.withdrawn_at ? &#39;Withdrawn&#39; : &#39;Active&#39;
+    }))
+  };
+  
+  return new Blob(
+    [JSON.stringify(exportData, null, 2)],
+    { type: &#39;application/json&#39; }
+  );
+}
+</code></pre>
+<p><strong>Right to Correction (Section 12):</strong></p>
+<pre><code class="language-typescript">// Allow users to update their personal information
+export async function updateUserProfile(
+  userId: string,
+  updates: { name?: string; email?: string }
+) {
+  // Validate inputs
+  if (updates.name &amp;&amp; (updates.name.length &lt; 2 || updates.name.length &gt; 50)) {
+    throw new Error(&#39;Name must be 2-50 characters&#39;);
+  }
+  
+  if (updates.email &amp;&amp; !isValidEmail(updates.email)) {
+    throw new Error(&#39;Invalid email format&#39;);
+  }
+  
+  // Update user
+  await prisma.user.update({
+    where: { id: userId },
+    data: updates
+  });
+  
+  // Audit log
+  await prisma.auditLog.create({
+    data: {
+      user_id: userId,
+      action: &#39;PROFILE_UPDATED&#39;,
+      old_value: { /* previous values */ },
+      new_value: updates,
+      created_at: new Date()
+    }
+  });
+}
+</code></pre>
+<p><strong>Right to Erasure (Section 13):</strong></p>
+<pre><code class="language-typescript">// Account deletion (anonymization for financial compliance)
+export async function deleteUserAccount(userId: string) {
+  await prisma.$transaction(async (tx) =&gt; {
+    // 1. Anonymize user data
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        name: &#39;DELETED_USER&#39;,
+        phone: `DELETED_${crypto.randomUUID().slice(0, 8)}`,
+        email: null,
+        deleted_at: new Date()
+      }
+    });
+    
+    // 2. Deactivate subscription
+    await tx.subscription.updateMany({
+      where: { user_id: userId },
+      data: { is_active: false }
+    });
+    
+    // 3. Withdraw all consents
+    await tx.consentRecord.updateMany({
+      where: { user_id: userId, withdrawn_at: null },
+      data: { withdrawn_at: new Date() }
+    });
+    
+    // 4. Clear sessions
+    await redis.del(`session:${userId}`);
+    
+    // 5. Note: Orders are retained (7-year GST requirement)
+    // but user_id foreign key is set to NULL
+    await tx.order.updateMany({
+      where: { user_id: userId },
+      data: { user_id: null }
+    });
+  });
+  
+  // Send confirmation
+  await sendAccountDeletionConfirmation(userId);
+}
+</code></pre>
+<h4 id="912-consent-management">9.1.2 Consent Management</h4>
+<p><strong>Consent Types:</strong></p>
+<pre><code class="language-typescript">enum ConsentPurpose {
+  ORDER_PROCESSING = &#39;order_processing&#39;,      // Required (cannot withdraw)
+  MARKETING_SMS = &#39;marketing_sms&#39;,            // Optional
+  MARKETING_EMAIL = &#39;marketing_email&#39;,        // Optional
+  ANALYTICS = &#39;analytics&#39;,                    // Optional
+  PERSONALIZATION = &#39;personalization&#39;         // Optional
+}
+
+interface ConsentRecord {
+  id: string;
+  userId: string;
+  purpose: ConsentPurpose;
+  grantedAt: Date;
+  withdrawnAt?: Date;
+  ipAddress: string;
+  userAgent: string;
+}
+</code></pre>
+<p><strong>Consent Collection (Registration Flow):</strong></p>
+<pre><code class="language-typescript">// During signup
+export async function collectConsent(
+  userId: string,
+  consents: { purpose: ConsentPurpose; granted: boolean }[],
+  metadata: { ipAddress: string; userAgent: string }
+) {
+  const records = consents
+    .filter(c =&gt; c.granted)
+    .map(c =&gt; ({
+      user_id: userId,
+      purpose: c.purpose,
+      granted_at: new Date(),
+      ip_address: metadata.ipAddress,
+      user_agent: metadata.userAgent
+    }));
+  
+  await prisma.consentRecord.createMany({
+    data: records
+  });
+}
+
+// Consent withdrawal
+export async function withdrawConsent(userId: string, purpose: ConsentPurpose) {
+  if (purpose === ConsentPurpose.ORDER_PROCESSING) {
+    throw new Error(&#39;Cannot withdraw consent for order processing (required for service)&#39;);
+  }
+  
+  await prisma.consentRecord.updateMany({
+    where: {
+      user_id: userId,
+      purpose: purpose,
+      withdrawn_at: null
+    },
+    data: {
+      withdrawn_at: new Date()
+    }
+  });
+}
+</code></pre>
+<h4 id="913-data-breach-notification">9.1.3 Data Breach Notification</h4>
+<p><strong>Incident Response Plan:</strong></p>
+<pre><code class="language-typescript">// Data breach detection and notification
+export async function handleDataBreach(incident: {
+  type: &#39;unauthorized_access&#39; | &#39;data_leak&#39; | &#39;system_compromise&#39;;
+  affectedUsers: string[];
+  dataTypes: string[];
+  discoveredAt: Date;
+}) {
+  // 1. Log incident
+  await prisma.securityIncident.create({
+    data: {
+      type: incident.type,
+      affected_user_count: incident.affectedUsers.length,
+      data_types_affected: incident.dataTypes,
+      discovered_at: incident.discoveredAt,
+      status: &#39;UNDER_INVESTIGATION&#39;
+    }
+  });
+  
+  // 2. Notify users within 72 hours (DPDP Act requirement)
+  if (incident.affectedUsers.length &gt; 0) {
+    for (const userId of incident.affectedUsers) {
+      await sendBreachNotification(userId, {
+        incidentType: incident.type,
+        dataAffected: incident.dataTypes,
+        actionRequired: getRequiredActions(incident.type)
+      });
+    }
+  }
+  
+  // 3. Notify Data Protection Board if &gt;1000 users affected
+  if (incident.affectedUsers.length &gt; 1000) {
+    await notifyDataProtectionBoard(incident);
+  }
+  
+  // 4. Internal escalation
+  await sendSlackAlert(&#39;security-incidents&#39;, {
+    severity: &#39;CRITICAL&#39;,
+    message: `Data breach detected: ${incident.type}`,
+    affectedUsers: incident.affectedUsers.length
+  });
+}
+</code></pre>
+<h4 id="914-data-localization">9.1.4 Data Localization</h4>
+<p><strong>Server Locations:</strong></p>
+<ul>
+<li><strong>Database:</strong> Supabase (Asia South - Mumbai region)</li>
+<li><strong>Application:</strong> Vercel (BOM1 - Mumbai deployment)</li>
+<li><strong>Cache:</strong> Upstash Redis (Mumbai region)</li>
+<li><strong>File Storage:</strong> AWS S3 (ap-south-1 - Mumbai)</li>
+</ul>
+<p><strong>Compliance Notes:</strong></p>
+<ul>
+<li>All personal data stored within India</li>
+<li>No cross-border data transfer</li>
+<li>CDN static assets (images) served globally (non-personal data)</li>
+</ul>
+<h3 id="92-encryption-standards">9.2 Encryption Standards</h3>
+<h4 id="921-data-at-rest">9.2.1 Data at Rest</h4>
+<pre><code class="language-typescript">// Database-level encryption (Supabase default: AES-256)
+// Application-level encryption for sensitive fields
+
+// Encrypt TOTP secrets for admins
+export function encryptTOTPSecret(secret: string): {
+  encrypted: string;
+  iv: string;
+  tag: string;
+} {
+  const key = Buffer.from(process.env.ENCRYPTION_KEY, &#39;hex&#39;); // 32-byte key
+  const iv = crypto.randomBytes(16); // 16-byte IV
+  
+  const cipher = crypto.createCipheriv(&#39;aes-256-gcm&#39;, key, iv);
+  let encrypted = cipher.update(secret, &#39;utf8&#39;, &#39;hex&#39;);
+  encrypted += cipher.final(&#39;hex&#39;);
+  
+  const tag = cipher.getAuthTag();
+  
+  return {
+    encrypted,
+    iv: iv.toString(&#39;hex&#39;),
+    tag: tag.toString(&#39;hex&#39;)
+  };
+}
+
+export function decryptTOTPSecret(
+  encrypted: string,
+  iv: string,
+  tag: string
+): string {
+  const key = Buffer.from(process.env.ENCRYPTION_KEY, &#39;hex&#39;);
+  
+  const decipher = crypto.createDecipheriv(
+    &#39;aes-256-gcm&#39;,
+    key,
+    Buffer.from(iv, &#39;hex&#39;)
+  );
+  decipher.setAuthTag(Buffer.from(tag, &#39;hex&#39;));
+  
+  let decrypted = decipher.update(encrypted, &#39;hex&#39;, &#39;utf8&#39;);
+  decrypted += decipher.final(&#39;utf8&#39;);
+  
+  return decrypted;
+}
+</code></pre>
+<h4 id="922-data-in-transit">9.2.2 Data in Transit</h4>
+<pre><code class="language-typescript">// All API endpoints enforce HTTPS only
+export function middleware(req: NextRequest) {
+  // Redirect HTTP to HTTPS in production
+  if (process.env.NODE_ENV === &#39;production&#39; &amp;&amp; req.headers.get(&#39;x-forwarded-proto&#39;) !== &#39;https&#39;) {
+    return NextResponse.redirect(
+      `https://${req.headers.get(&#39;host&#39;)}${req.nextUrl.pathname}`,
+      301
+    );
+  }
+  
+  // Set security headers
+  const response = NextResponse.next();
+  
+  response.headers.set(&#39;Strict-Transport-Security&#39;, &#39;max-age=63072000; includeSubDomains; preload&#39;);
+  response.headers.set(&#39;X-Content-Type-Options&#39;, &#39;nosniff&#39;);
+  response.headers.set(&#39;X-Frame-Options&#39;, &#39;DENY&#39;);
+  response.headers.set(&#39;X-XSS-Protection&#39;, &#39;1; mode=block&#39;);
+  response.headers.set(&#39;Referrer-Policy&#39;, &#39;strict-origin-when-cross-origin&#39;);
+  response.headers.set(
+    &#39;Content-Security-Policy&#39;,
+    &quot;default-src &#39;self&#39;; script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39; https://checkout.razorpay.com; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; data:;&quot;
+  );
+  
+  return response;
+}
+</code></pre>
+<h3 id="93-role-based-access-control-rbac">9.3 Role-Based Access Control (RBAC)</h3>
+<h4 id="931-permission-matrix">9.3.1 Permission Matrix</h4>
+<pre><code class="language-typescript">enum Permission {
+  // Order permissions
+  VIEW_ORDERS = &#39;orders:view&#39;,
+  CREATE_ORDER = &#39;orders:create&#39;,
+  UPDATE_ORDER_STATUS = &#39;orders:update_status&#39;,
+  CANCEL_ORDER = &#39;orders:cancel&#39;,
+  
+  // Inventory permissions
+  VIEW_INVENTORY = &#39;inventory:view&#39;,
+  UPDATE_INVENTORY = &#39;inventory:update&#39;,
+  
+  // User management
+  VIEW_USER_PII = &#39;users:view_pii&#39;,
+  DELETE_USER = &#39;users:delete&#39;,
+  
+  // Financial
+  VIEW_FINANCIALS = &#39;financials:view&#39;,
+  PROCESS_REFUND = &#39;financials:refund&#39;,
+  DOWNLOAD_REPORTS = &#39;reports:download&#39;,
+  
+  // System
+  MANAGE_ADMINS = &#39;system:manage_admins&#39;,
+  VIEW_AUDIT_LOGS = &#39;system:audit_logs&#39;
+}
+
+const ROLE_PERMISSIONS: Record&lt;UserRole, Permission[]&gt; = {
+  CUSTOMER: [
+    Permission.VIEW_ORDERS,
+    Permission.CREATE_ORDER,
+    Permission.CANCEL_ORDER
+  ],
+  
+  KITCHEN_STAFF: [
+    Permission.VIEW_ORDERS,
+    Permission.UPDATE_ORDER_STATUS,
+    Permission.VIEW_INVENTORY
+  ],
+  
+  MANAGER: [
+    Permission.VIEW_ORDERS,
+    Permission.UPDATE_ORDER_STATUS,
+    Permission.CANCEL_ORDER,
+    Permission.VIEW_INVENTORY,
+    Permission.UPDATE_INVENTORY,
+    Permission.VIEW_FINANCIALS,
+    Permission.DOWNLOAD_REPORTS
+  ],
+  
+  SUPER_ADMIN: [
+    ...Object.values(Permission) // All permissions
+  ]
+};
+
+// Permission check middleware
+export function requirePermission(permission: Permission) {
+  return async (req: NextRequest) =&gt; {
+    const user = await getCurrentUser(req);
+    
+    if (!user) {
+      return new Response(&#39;Unauthorized&#39;, { status: 401 });
+    }
+    
+    const userPermissions = ROLE_PERMISSIONS[user.role];
+    
+    if (!userPermissions.includes(permission)) {
+      // Audit log
+      await prisma.auditLog.create({
+        data: {
+          user_id: user.id,
+          action: &#39;PERMISSION_DENIED&#39;,
+          resource_type: permission,
+          ip_address: req.headers.get(&#39;x-forwarded-for&#39;),
+          created_at: new Date()
+        }
+      });
+      
+      return new Response(&#39;Forbidden&#39;, { status: 403 });
+    }
+    
+    return null; // Permission granted
+  };
+}
+</code></pre>
+<h4 id="932-audit-logging">9.3.2 Audit Logging</h4>
+<pre><code class="language-typescript">// Comprehensive audit trail for compliance
+export async function auditLog(params: {
+  userId: string;
+  action: string;
+  resourceType: string;
+  resourceId?: string;
+  oldValue?: any;
+  newValue?: any;
+  ipAddress: string;
+  userAgent: string;
+}) {
+  await prisma.auditLog.create({
+    data: {
+      user_id: params.userId,
+      action: params.action,
+      resource_type: params.resourceType,
+      resource_id: params.resourceId,
+      old_value: params.oldValue ? JSON.stringify(params.oldValue) : null,
+      new_value: params.newValue ? JSON.stringify(params.newValue) : null,
+      ip_address: params.ipAddress,
+      user_agent: params.userAgent,
+      created_at: new Date()
+    }
+  });
+}
+
+// Example usage
+export async function updateMenuItem(itemId: string, updates: any, adminId: string) {
+  const oldItem = await prisma.menuItem.findUnique({ where: { id: itemId } });
+  
+  const newItem = await prisma.menuItem.update({
+    where: { id: itemId },
+    data: updates
+  });
+  
+  // Audit log
+  await auditLog({
+    userId: adminId,
+    action: &#39;UPDATE_MENU_ITEM&#39;,
+    resourceType: &#39;MENU_ITEM&#39;,
+    resourceId: itemId,
+    oldValue: oldItem,
+    newValue: newItem,
+    ipAddress: req.ip,
+    userAgent: req.headers[&#39;user-agent&#39;]
+  });
+  
+  return newItem;
+}
+</code></pre>
+<h3 id="94-api-security">9.4 API Security</h3>
+<h4 id="941-rate-limiting">9.4.1 Rate Limiting</h4>
+<pre><code class="language-typescript">// Redis-based rate limiting
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowSeconds: number
+): Promise&lt;{ allowed: boolean; remaining: number; resetAt: Date }&gt; {
+  const current = await redis.incr(key);
+  
+  if (current === 1) {
+    await redis.expire(key, windowSeconds);
+  }
+  
+  const ttl = await redis.ttl(key);
+  const resetAt = new Date(Date.now() + ttl * 1000);
+  
+  return {
+    allowed: current &lt;= limit,
+    remaining: Math.max(0, limit - current),
+    resetAt
+  };
+}
+
+// Rate limit middleware
+export async function rateLimitMiddleware(req: NextRequest) {
+  const ip = req.headers.get(&#39;x-forwarded-for&#39;)?.split(&#39;,&#39;)[0].trim();
+  const endpoint = req.nextUrl.pathname;
+  
+  // Different limits for different endpoints
+  const limits = {
+    &#39;/api/auth/send-otp&#39;: { limit: 3, window: 300 },      // 3 per 5 minutes
+    &#39;/api/orders/create&#39;: { limit: 10, window: 60 },      // 10 per minute
+    &#39;/api/menu&#39;: { limit: 100, window: 60 },              // 100 per minute
+    &#39;default&#39;: { limit: 60, window: 60 }                  // 60 per minute
+  };
+  
+  const config = limits[endpoint] || limits.default;
+  const key = `ratelimit:${ip}:${endpoint}`;
+  
+  const result = await rateLimit(key, config.limit, config.window);
+  
+  if (!result.allowed) {
+    return new Response(
+      JSON.stringify({
+        error: &#39;RATE_LIMIT_EXCEEDED&#39;,
+        message: &#39;Too many requests&#39;,
+        retryAfter: result.resetAt
+      }),
+      {
+        status: 429,
+        headers: {
+          &#39;Retry-After&#39;: String(Math.ceil((result.resetAt.getTime() - Date.now()) / 1000)),
+          &#39;X-RateLimit-Limit&#39;: String(config.limit),
+          &#39;X-RateLimit-Remaining&#39;: String(result.remaining),
+          &#39;X-RateLimit-Reset&#39;: result.resetAt.toISOString()
+        }
+      }
+    );
+  }
+  
+  return null; // Rate limit not exceeded
+}
+</code></pre>
+<h4 id="942-csrf-protection">9.4.2 CSRF Protection</h4>
+<pre><code class="language-typescript">// Double-submit cookie pattern
+export function generateCSRFToken(userId: string): string {
+  const token = crypto.randomBytes(32).toString(&#39;hex&#39;);
+  
+  // Store in Redis (1-hour expiry)
+  redis.setex(`csrf:${userId}`, 3600, token);
+  
+  return token;
+}
+
+export async function validateCSRFToken(
+  userId: string,
+  token: string
+): Promise&lt;boolean&gt; {
+  const storedToken = await redis.get(`csrf:${userId}`);
+  return storedToken === token;
+}
+
+// CSRF middleware for state-changing operations
+export async function csrfProtection(req: NextRequest) {
+  if ([&#39;POST&#39;, &#39;PUT&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;].includes(req.method)) {
+    const user = await getCurrentUser(req);
+    const token = req.headers.get(&#39;x-csrf-token&#39;);
+    
+    if (!user || !token) {
+      return new Response(&#39;CSRF token missing&#39;, { status: 403 });
+    }
+    
+    const isValid = await validateCSRFToken(user.id, token);
+    
+    if (!isValid) {
+      return new Response(&#39;Invalid CSRF token&#39;, { status: 403 });
+    }
+  }
+  
+  return null;
+}
+</code></pre>
+<h4 id="943-input-validation">9.4.3 Input Validation</h4>
+<pre><code class="language-typescript">import { z } from &#39;zod&#39;;
+
+// Zod schemas for all API inputs
+export const schemas = {
+  createOrder: z.object({
+    items: z.array(z.object({
+      itemId: z.string().uuid(),
+      quantity: z.number().int().min(1).max(10)
+    })).min(1).max(20),
+    scheduledFor: z.string().datetime().optional(),
+    specialInstructions: z.string().max(200).optional(),
+    paymentMethod: z.enum([&#39;CASH&#39;, &#39;UPI&#39;, &#39;CARD&#39;, &#39;SUBSCRIPTION&#39;])
+  }),
+  
+  updateInventory: z.object({
+    itemId: z.string().uuid(),
+    stock: z.number().int().min(0).max(1000)
+  }),
+  
+  sendOTP: z.object({
+    phone: z.string().regex(/^[6-9]\d{9}$/, &#39;Invalid Indian mobile number&#39;)
+  }),
+  
+  verifyOTP: z.object({
+    phone: z.string().regex(/^[6-9]\d{9}$/),
+    otp: z.string().length(6).regex(/^\d{6}$/)
+  })
+};
+
+// Validation middleware
+export function validateInput&lt;T&gt;(schema: z.ZodSchema&lt;T&gt;) {
+  return async (req: NextRequest) =&gt; {
+    const body = await req.json();
+    
+    try {
+      const validated = schema.parse(body);
+      return { validated };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return new Response(
+          JSON.stringify({
+            error: &#39;INVALID_INPUT&#39;,
+            details: error.errors
+          }),
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
+  };
+}
+</code></pre>
+<hr>
+<h2 id="10-error-handling--resilience">10. Error Handling &amp; Resilience</h2>
+<h3 id="101-standardized-error-responses">10.1 Standardized Error Responses</h3>
+<pre><code class="language-typescript">// Error code registry
+export enum ErrorCode {
+  // Authentication
+  AUTH_INVALID = &#39;AUTH_INVALID&#39;,
+  AUTH_EXPIRED = &#39;AUTH_EXPIRED&#39;,
+  OTP_INVALID = &#39;OTP_INVALID&#39;,
+  OTP_EXPIRED = &#39;OTP_EXPIRED&#39;,
+  ACCOUNT_LOCKED = &#39;ACCOUNT_LOCKED&#39;,
+  
+  // Authorization
+  PERMISSION_DENIED = &#39;PERMISSION_DENIED&#39;,
+  
+  // Rate Limiting
+  RATE_LIMIT_EXCEEDED = &#39;RATE_LIMIT_EXCEEDED&#39;,
+  
+  // Inventory
+  INSUFFICIENT_STOCK = &#39;INSUFFICIENT_STOCK&#39;,
+  ITEM_NOT_AVAILABLE = &#39;ITEM_NOT_AVAILABLE&#39;,
+  
+  // Subscription
+  QUOTA_EXCEEDED = &#39;QUOTA_EXCEEDED&#39;,
+  SUBSCRIPTION_INACTIVE = &#39;SUBSCRIPTION_INACTIVE&#39;,
+  
+  // Payment
+  PAYMENT_FAILED = &#39;PAYMENT_FAILED&#39;,
+  REFUND_FAILED = &#39;REFUND_FAILED&#39;,
+  
+  // Orders
+  ORDER_NOT_FOUND = &#39;ORDER_NOT_FOUND&#39;,
+  ORDER_ALREADY_CANCELLED = &#39;ORDER_ALREADY_CANCELLED&#39;,
+  CANCELLATION_WINDOW_EXPIRED = &#39;CANCELLATION_WINDOW_EXPIRED&#39;,
+  
+  // Validation
+  INVALID_INPUT = &#39;INVALID_INPUT&#39;,
+  
+  // System
+  DATABASE_ERROR = &#39;DATABASE_ERROR&#39;,
+  EXTERNAL_SERVICE_ERROR = &#39;EXTERNAL_SERVICE_ERROR&#39;,
+  INTERNAL_ERROR = &#39;INTERNAL_ERROR&#39;
+}
+
+export interface APIError {
+  success: false;
+  error: {
+    code: ErrorCode;
+    message: string;
+    details?: any;
+    timestamp: string;
+    requestId: string;
+  };
+}
+
+export class AppError extends Error {
+  constructor(
+    public code: ErrorCode,
+    public message: string,
+    public statusCode: number = 400,
+    public details?: any
+  ) {
+    super(message);
+    this.name = &#39;AppError&#39;;
+  }
+}
+
+// Global error handler
+export function handleError(error: Error, requestId: string): Response {
+  // Log to Sentry
+  Sentry.captureException(error, {
+    tags: { requestId }
+  });
+  
+  if (error instanceof AppError) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          timestamp: new Date().toISOString(),
+          requestId
+        }
+      } as APIError),
+      {
+        status: error.statusCode,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; }
+      }
+    );
+  }
+  
+  // Unknown error - don&#39;t leak internal details
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: {
+        code: ErrorCode.INTERNAL_ERROR,
+        message: &#39;An unexpected error occurred&#39;,
+        timestamp: new Date().toISOString(),
+        requestId
+      }
+    } as APIError),
+    {
+      status: 500,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; }
+    }
+  );
+}
+</code></pre>
+<h3 id="102-critical-failure-scenarios">10.2 Critical Failure Scenarios</h3>
+<h4 id="1021-payment-success-but-order-creation-fails">10.2.1 Payment Success but Order Creation Fails</h4>
+<pre><code class="language-typescript">export async function handleOrphanedPayment(paymentId: string) {
+  try {
+    // 1. Fetch payment details from Razorpay
+    const payment = await razorpay.payments.fetch(paymentId);
+    
+    // 2. Check if order exists
+    const order = await prisma.order.findFirst({
+      where: { payment_id: paymentId }
+    });
+    
+    if (order) {
+      // Order exists - just an orphaned payment record
+      await prisma.orphanedPayment.update({
+        where: { razorpay_payment_id: paymentId },
+        data: { resolved: true, resolved_at: new Date() }
+      });
+      return;
+    }
+    
+    // 3. No order found - attempt to recreate from payment notes
+    const orderData = payment.notes;
+    
+    if (orderData &amp;&amp; orderData.cart_items) {
+      // Try to recreate order
+      await prisma.$transaction(async (tx) =&gt; {
+        const order = await tx.order.create({
+          data: {
+            user_id: orderData.user_id,
+            status: &#39;CONFIRMED&#39;,
+            total_amount: payment.amount / 100,
+            payment_method: &#39;UPI&#39;,
+            payment_id: paymentId,
+            items: {
+              create: JSON.parse(orderData.cart_items)
+            }
+          }
+        });
+        
+        // Deduct inventory
+        for (const item of JSON.parse(orderData.cart_items)) {
+          await tx.menuItem.update({
+            where: { id: item.itemId },
+            data: { stock: { decrement: item.quantity } }
+          });
+        }
+      });
+      
+      // Mark as resolved
+      await prisma.orphanedPayment.update({
+        where: { razorpay_payment_id: paymentId },
+        data: { resolved: true, resolved_at: new Date() }
+      });
+    } else {
+      // Cannot recreate - refund
+      await razorpay.payments.refund(paymentId, {
+        amount: payment.amount,
+        notes: { reason: &#39;Orphaned payment - order creation failed&#39; }
+      });
+      
+      await prisma.orphanedPayment.update({
+        where: { razorpay_payment_id: paymentId },
+        data: { resolved: true, resolved_at: new Date(), refunded: true }
+      });
+    }
+  } catch (error) {
+    console.error(&#39;Failed to handle orphaned payment:&#39;, error);
+    // Will retry on next cron run
+  }
+}
+
+// Cron job (runs every 10 minutes)
+export async function reconcileOrphanedPayments() {
+  const orphaned = await prisma.orphanedPayment.findMany({
+    where: {
+      resolved: false,
+      created_at: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24 hours
+    }
+  });
+  
+  for (const payment of orphaned) {
+    await handleOrphanedPayment(payment.razorpay_payment_id);
+  }
+}
+</code></pre>
+<h4 id="1022-database-connection-pool-exhaustion">10.2.2 Database Connection Pool Exhaustion</h4>
+<pre><code class="language-typescript">// Circuit breaker pattern
+class CircuitBreaker {
+  private failures = 0;
+  private lastFailureTime: number = 0;
+  private state: &#39;CLOSED&#39; | &#39;OPEN&#39; | &#39;HALF_OPEN&#39; = &#39;CLOSED&#39;;
+  
+  constructor(
+    private threshold: number = 5,
+    private timeout: number = 60000 // 1 minute
+  ) {}
+  
+  async execute&lt;T&gt;(fn: () =&gt; Promise&lt;T&gt;): Promise&lt;T&gt; {
+    if (this.state === &#39;OPEN&#39;) {
+      if (Date.now() - this.lastFailureTime &gt; this.timeout) {
+        this.state = &#39;HALF_OPEN&#39;;
+      } else {
+        throw new AppError(
+          ErrorCode.DATABASE_ERROR,
+          &#39;Service temporarily unavailable&#39;,
+          503
+        );
+      }
+    }
+    
+    try {
+      const result = await fn();
+      
+      if (this.state === &#39;HALF_OPEN&#39;) {
+        this.state = &#39;CLOSED&#39;;
+        this.failures = 0;
+      }
+      
+      return result;
+    } catch (error) {
+      this.failures++;
+      this.lastFailureTime = Date.now();
+      
+      if (this.failures &gt;= this.threshold) {
+        this.state = &#39;OPEN&#39;;
+      }
+      
+      throw error;
+    }
+  }
+}
+
+const dbCircuitBreaker = new CircuitBreaker();
+
+// Wrap database operations
+export async function queryWithCircuitBreaker&lt;T&gt;(
+  query: () =&gt; Promise&lt;T&gt;
+): Promise&lt;T&gt; {
+  return dbCircuitBreaker.execute(query);
+}
+</code></pre>
+<h4 id="1023-external-service-failures">10.2.3 External Service Failures</h4>
+<pre><code class="language-typescript">// Retry with exponential backoff
+export async function retryWithBackoff&lt;T&gt;(
+  fn: () =&gt; Promise&lt;T&gt;,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise&lt;T&gt; {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt &lt; maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt &lt; maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        await new Promise(resolve =&gt; setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+// Example: SMS sending with fallback
+export async function sendSMS(phone: string, message: string) {
+  try {
+    // Primary: Twilio
+    await retryWithBackoff(() =&gt;
+      twilioClient.messages.create({
+        to: `+91${phone}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        body: message
+      })
+    );
+  } catch (twilioError) {
+    console.error(&#39;Twilio failed, falling back to AWS SNS:&#39;, twilioError);
+    
+    try {
+      // Fallback: AWS SNS
+      await snsClient.publish({
+        PhoneNumber: `+91${phone}`,
+        Message: message
+      });
+    } catch (snsError) {
+      console.error(&#39;Both SMS providers failed:&#39;, snsError);
+      
+      // Log to monitoring
+      Sentry.captureException(snsError, {
+        tags: { service: &#39;sms&#39;, fallback: &#39;sns&#39; },
+        contexts: {
+          phone: { last4: phone.slice(-4) }
+        }
+      });
+      
+      throw new AppError(
+        ErrorCode.EXTERNAL_SERVICE_ERROR,
+        &#39;Failed to send SMS. Please contact support.&#39;,
+        503
+      );
+    }
+  }
+}
+</code></pre>
+<h3 id="103-idempotency">10.3 Idempotency</h3>
+<pre><code class="language-typescript">// Idempotency for critical operations
+export async function withIdempotency&lt;T&gt;(
+  key: string,
+  fn: () =&gt; Promise&lt;T&gt;,
+  ttlSeconds: number = 3600
+): Promise&lt;T&gt; {
+  const idempotencyKey = `idempotency:${key}`;
+  
+  // Check if already processed
+  const existing = await redis.get(idempotencyKey);
+  if (existing) {
+    return JSON.parse(existing) as T;
+  }
+  
+  // Execute function
+  const result = await fn();
+  
+  // Store result
+  await redis.setex(idempotencyKey, ttlSeconds, JSON.stringify(result));
+  
+  return result;
+}
+
+// Example: Idempotent order creation
+export async function createOrder(orderData: OrderData, idempotencyKey: string) {
+  return withIdempotency(
+    idempotencyKey,
+    async () =&gt; {
+      // Create order logic
+      const order = await prisma.order.create({ data: orderData });
+      return order;
+    },
+    3600 // 1 hour
+  );
+}
+</code></pre>
+<hr>
+<h2 id="12-complete-database-schema">12. Complete Database Schema</h2>
+<h3 id="121-schema-overview">12.1 Schema Overview</h3>
+<pre><code class="language-prisma">// schema.prisma
+
+generator client {
+  provider = &quot;prisma-client-js&quot;
+}
+
+datasource db {
+  provider = &quot;postgresql&quot;
+  url      = env(&quot;DATABASE_URL&quot;)
+  directUrl = env(&quot;DIRECT_URL&quot;)
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+enum UserRole {
+  CUSTOMER
+  KITCHEN_STAFF
+  MANAGER
+  SUPER_ADMIN
+}
+
+model User {
+  id            String   @id @default(uuid())
+  phone         String   @unique @db.VarChar(15)
+  name          String?  @db.VarChar(100)
+  email         String?  @db.VarChar(255)
+  role          UserRole @default(CUSTOMER)
+  
+  // Admin-only fields
+  username      String?  @unique @db.VarChar(50)
+  passwordHash  String?  @db.VarChar(255)
+  totpSecretEncrypted String? @db.Text
+  totpIv        String?  @db.VarChar(32)
+  totpTag       String?  @db.VarChar(32)
+  
+  // Razorpay integration
+  razorpayCustomerId String? @db.VarChar(100)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  lastLogin     DateTime?
+  deletedAt     DateTime?
+  
+  // Relations
+  orders        Order[]
+  subscription  Subscription?
+  adminSessions AdminSession[]
+  auditLogs     AuditLog[]
+  consentRecords ConsentRecord[]
+  
+  @@index([phone])
+  @@index([role, deletedAt])
+}
+
+// ============================================
+// MENU MANAGEMENT
+// ============================================
+
+enum MenuCategory {
+  SOUTH_INDIAN
+  CHINESE
+  SNACKS
+  BEVERAGES
+  DESSERTS
+}
+
+model MenuItem {
+  id                      String        @id @default(uuid())
+  name                    String        @db.VarChar(100)
+  description             String?       @db.Text
+  category                MenuCategory
+  price                   Decimal       @db.Decimal(10, 2)
+  imageUrl                String?       @db.VarChar(500)
+  
+  // Inventory
+  stock                   Int           @default(0)
+  reservedStock           Int           @default(0)
+  lowStockThreshold       Int           @default(10)
+  
+  // Availability
+  isAvailable             Boolean       @default(true)
+  isSubscriptionEligible  Boolean       @default(false)
+  
+  // Dietary info
+  isVegetarian            Boolean       @default(true)
+  spiceLevel              Int           @default(0) // 0-5
+  
+  // Metadata
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  
+  // Relations
+  orderItems              OrderItem[]
+  
+  @@index([category, isAvailable])
+  @@index([isAvailable, stock])
+}
+
+// ============================================
+// ORDER MANAGEMENT
+// ============================================
+
+enum OrderStatus {
+  CREATED
+  PAYMENT_PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+  SUBSCRIPTION
+}
+
+model Order {
+  id                    String         @id @default(uuid())
+  userId                String?        // Nullable for deleted users
+  user                  User?          @relation(fields: [userId], references: [id])
+  
+  // Order details
+  status                OrderStatus    @default(CREATED)
+  totalAmount           Decimal        @db.Decimal(10, 2)
+  specialInstructions   String?        @db.Text
+  
+  // Payment
+  paymentMethod         PaymentMethod
+  paymentId             String?        @db.VarChar(255) // Razorpay payment ID
+  refundId              String?        @db.VarChar(255)
+  refundStatus          String?        @db.VarChar(50)
+  
+  // Scheduling
+  scheduledFor          DateTime?
+  
+  // QR Code
+  qrCodePayload         String?        @db.Text
+  qrCodeSignature       String?        @db.VarChar(255)
+  
+  // Timestamps
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  confirmedAt           DateTime?
+  completedAt           DateTime?
+  cancelledAt           DateTime?
+  
+  // Relations
+  items                 OrderItem[]
+  
+  @@index([userId, status])
+  @@index([status, createdAt])
+  @@index([createdAt(sort: Desc)])
+  @@index([paymentId])
+}
+
+model OrderItem {
+  id                String      @id @default(uuid())
+  orderId           String
+  order             Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  itemId            String
+  item              MenuItem    @relation(fields: [itemId], references: [id])
+  
+  quantity          Int
+  priceAtPurchase   Decimal     @db.Decimal(10, 2)
+  
+  @@index([orderId])
+  @@index([itemId])
+}
+
+// ============================================
+// SUBSCRIPTION MANAGEMENT
+// ============================================
+
+enum PlanType {
+  TRIAL
+  LIGHT_BITE
+  FEAST_FUEL
+  TOTAL_WELLNESS
+  ULTIMATE
+}
+
+model Subscription {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id])
+  
+  // Plan details
+  planType          PlanType
+  creditsTotal      Int
+  creditsUsed       Int       @default(0)
+  dailyLimit        Int
+  dailyUsed         Int       @default(0)
+  
+  // Billing
+  monthlyPrice      Decimal   @db.Decimal(10, 2)
+  anniversaryDay    Int       // Day of month (1-31)
+  
+  // Lifecycle
+  startsAt          DateTime
+  expiresAt         DateTime
+  isActive          Boolean   @default(true)
+  autoRenew         Boolean   @default(true)
+  
+  // Grace period
+  gracePeriodEnd    DateTime?
+  
+  // Plan changes
+  pendingDowngrade  PlanType?
+  
+  // Payment
+  lastPaymentId     String?   @db.VarChar(255)
+  lastPaymentAt     DateTime?
+  
+  // Metadata
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  history           SubscriptionHistory[]
+  
+  @@index([userId, isActive])
+  @@index([expiresAt])
+  @@index([anniversaryDay])
+}
+
+model SubscriptionHistory {
+  id              String        @id @default(uuid())
+  subscriptionId  String
+  subscription    Subscription  @relation(fields: [subscriptionId], references: [id])
+  
+  action          String        @db.VarChar(50) // CREATED, UPGRADED, DOWNGRADED, RENEWED, CANCELLED
+  fromPlan        PlanType?
+  toPlan          PlanType?
+  amount          Decimal?      @db.Decimal(10, 2)
+  
+  createdAt       DateTime      @default(now())
+  
+  @@index([subscriptionId, createdAt])
+}
+
+// ============================================
+// CART &amp; RESERVATIONS
+// ============================================
+
+model CartReservation {
+  id              String    @id @default(uuid())
+  userId          String
+  itemId          String
+  quantity        Int
+  reservedAt      DateTime  @default(now())
+  expiresAt       DateTime  // reservedAt + 5 minutes
+  
+  @@index([userId, expiresAt])
+  @@index([itemId])
+}
+
+// ============================================
+// PAYMENT RECONCILIATION
+// ============================================
+
+model OrphanedPayment {
+  id                  String    @id @default(uuid())
+  razorpayPaymentId   String    @unique @db.VarChar(255)
+  amount              Decimal   @db.Decimal(10, 2)
+  userId              String?
+  
+  // Reconciliation
+  errorMessage        String?   @db.Text
+  payload             String?   @db.Text
+  resolved            Boolean   @default(false)
+  refunded            Boolean   @default(false)
+  
+  // Timestamps
+  createdAt           DateTime  @default(now())
+  resolvedAt          DateTime?
+  
+  @@index([resolved, createdAt])
+}
+
+// ============================================
+// AUTHENTICATION &amp; SESSIONS
+// ============================================
+
+model AdminSession {
+  id              String    @id @default(uuid())
+  adminId         String
+  admin           User      @relation(fields: [adminId], references: [id])
+  
+  sessionToken    String    @unique @db.VarChar(255)
+  ipAddress       String?   @db.Inet
+  userAgent       String?   @db.Text
+  
+  createdAt       DateTime  @default(now())
+  lastActivity    DateTime  @default(now())
+  expiresAt       DateTime
+  
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@index([adminId])
+}
+
+// ============================================
+// CONSENT MANAGEMENT
+// ============================================
+
+enum ConsentPurpose {
+  ORDER_PROCESSING
+  MARKETING_SMS
+  MARKETING_EMAIL
+  ANALYTICS
+  PERSONALIZATION
+}
+
+model ConsentRecord {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  
+  purpose     ConsentPurpose
+  grantedAt   DateTime        @default(now())
+  withdrawnAt DateTime?
+  
+  // Metadata
+  ipAddress   String?         @db.Inet
+  userAgent   String?         @db.Text
+  
+  @@index([userId, purpose, withdrawnAt])
+}
+
+// ============================================
+// AUDIT LOGGING
+// ============================================
+
+model AuditLog {
+  id            String    @id @default(uuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  
+  action        String    @db.VarChar(100)
+  resourceType  String?   @db.VarChar(100)
+  resourceId    String?
+  
+  oldValue      Json?
+  newValue      Json?
+  
+  ipAddress     String?   @db.Inet
+  userAgent     String?   @db.Text
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+}
+
+// ============================================
+// SECURITY &amp; FRAUD DETECTION
+// ============================================
+
+model SubscriptionDevice {
+  id              String    @id @default(uuid())
+  userId          String
+  
+  fingerprintHash String    @unique @db.VarChar(64)
+  ipAddress       String    @db.Inet
+  userAgent       String    @db.Text
+  
+  createdAt       DateTime  @default(now())
+  lastSeenAt      DateTime  @default(now())
+  
+  @@index([userId])
+}
+
+model FraudAlert {
+  id          String    @id @default(uuid())
+  userId      String
+  
+  reason      String    @db.VarChar(100)
+  details     String?   @db.Text
+  severity    String    @default(&quot;MEDIUM&quot;) @db.VarChar(20) // LOW, MEDIUM, HIGH, CRITICAL
+  
+  reviewed    Boolean   @default(false)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([userId, reviewed])
+  @@index([severity, reviewed])
+}
+
+model SecurityIncident {
+  id                  String    @id @default(uuid())
+  type                String    @db.VarChar(100)
+  affectedUserCount   Int
+  dataTypesAffected   String[]
+  
+  discoveredAt        DateTime
+  status              String    @db.VarChar(50) // UNDER_INVESTIGATION, CONTAINED, RESOLVED
+  
+  notifiedUsers       Boolean   @default(false)
+  notifiedAuthorities Boolean   @default(false)
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@index([status, createdAt])
+}
+
+// ============================================
+// ANALYTICS &amp; REPORTING
+// ============================================
+
+model DailyMetrics {
+  id                String    @id @default(uuid())
+  date              DateTime  @unique @db.Date
+  
+  // Order metrics
+  totalOrders       Int       @default(0)
+  cancelledOrders   Int       @default(0)
+  completedOrders   Int       @default(0)
+  
+  // Revenue
+  totalRevenue      Decimal   @db.Decimal(12, 2)
+  cashRevenue       Decimal   @db.Decimal(12, 2)
+  upiRevenue        Decimal   @db.Decimal(12, 2)
+  subscriptionRevenue Decimal @db.Decimal(12, 2)
+  
+  // Customers
+  newCustomers      Int       @default(0)
+  returningCustomers Int      @default(0)
+  
+  // Subscriptions
+  newSubscriptions  Int       @default(0)
+  activeSubscriptions Int     @default(0)
+  cancelledSubscriptions Int  @default(0)
+  
+  // Performance
+  avgOrderValue     Decimal?  @db.Decimal(10, 2)
+  avgPreparationTime Int?    // seconds
+  
+  createdAt         DateTime  @default(now())
+  
+  @@index([date(sort: Desc)])
+}
+
+model PopularItem {
+  id          String    @id @default(uuid())
+  itemId      String
+  itemName    String    @db.VarChar(100)
+  
+  orderCount  Int
+  revenue     Decimal   @db.Decimal(12, 2)
+  
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([periodStart, orderCount(sort: Desc)])
+}
+</code></pre>
+<h3 id="122-database-migrations-strategy">12.2 Database Migrations Strategy</h3>
+<pre><code class="language-bash"># Initial migration
+npx prisma migrate dev --name init
+
+# Add indexes (separate migration)
+npx prisma migrate dev --name add_performance_indexes
+
+# Add audit tables
+npx prisma migrate dev --name add_audit_tables
+
+# Production deployment
+npx prisma migrate deploy
+</code></pre>
+<h3 id="123-data-retention-policy">12.3 Data Retention Policy</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Retention Period</th>
+<th>Cleanup Method</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Order</code></td>
+<td>7 years</td>
+<td>Automated archive to cold storage</td>
+</tr>
+<tr>
+<td><code>OrderItem</code></td>
+<td>7 years</td>
+<td>Cascade with Order</td>
+</tr>
+<tr>
+<td><code>AuditLog</code></td>
+<td>90 days</td>
+<td>Automated deletion (cron)</td>
+</tr>
+<tr>
+<td><code>AdminSession</code></td>
+<td>30 days</td>
+<td>Automated deletion (cron)</td>
+</tr>
+<tr>
+<td><code>CartReservation</code></td>
+<td>24 hours</td>
+<td>Automated deletion (cron)</td>
+</tr>
+<tr>
+<td><code>OrphanedPayment</code></td>
+<td>90 days (after resolution)</td>
+<td>Automated deletion</td>
+</tr>
+<tr>
+<td><code>ConsentRecord</code></td>
+<td>Until account deletion</td>
+<td>Manual deletion on request</td>
+</tr>
+<tr>
+<td><code>User</code></td>
+<td>Until account deletion</td>
+<td>Anonymization (not deletion)</td>
+</tr>
+</tbody></table>
+<pre><code class="language-typescript">// Cleanup cron jobs
+export async function cleanupExpiredSessions() {
+  await prisma.adminSession.deleteMany({
+    where: {
+      expiresAt: { lt: new Date() }
+    }
+  });
+}
+
+export async function cleanupExpiredReservations() {
+  await prisma.cartReservation.deleteMany({
+    where: {
+      expiresAt: { lt: new Date() }
+    }
+  });
+}
+
+export async function archiveOldAuditLogs() {
+  const cutoffDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  
+  // Export to cold storage (S3)
+  const logs = await prisma.auditLog.findMany({
+    where: {
+      createdAt: { lt: cutoffDate }
+    }
+  });
+  
+  await uploadToS3(&#39;audit-logs-archive&#39;, logs);
+  
+  // Delete from database
+  await prisma.auditLog.deleteMany({
+    where: {
+      createdAt: { lt: cutoffDate }
+    }
+  });
+}
+</code></pre>
+<hr>
+<h2 id="14-testing--quality-assurance">14. Testing &amp; Quality Assurance</h2>
+<h3 id="141-testing-strategy">14.1 Testing Strategy</h3>
+<pre><code>Testing Pyramid:
+├── E2E Tests (5%) - Critical user journeys
+├── Integration Tests (25%) - API endpoints, database operations
+└── Unit Tests (70%) - Business logic, utilities
+</code></pre>
+<p><strong>Minimum Coverage Requirements:</strong></p>
+<ul>
+<li>Overall: 80%</li>
+<li>Critical paths: 100% (payment, inventory, auth)</li>
+<li>API routes: 90%</li>
+<li>Components: 75%</li>
+</ul>
+<h3 id="142-unit-testing">14.2 Unit Testing</h3>
+<p><strong>Framework:</strong> Jest + React Testing Library</p>
+<pre><code class="language-typescript">// Example: Inventory race condition test
+describe(&#39;Inventory Management&#39;, () =&gt; {
+  beforeEach(async () =&gt; {
+    await prisma.menuItem.create({
+      data: { id: &#39;test-item&#39;, name: &#39;Test Dosa&#39;, stock: 1, price: 50 }
+    });
+  });
+  
+  it(&#39;prevents overselling with concurrent checkouts&#39;, async () =&gt; {
+    // Simulate 2 concurrent purchase attempts
+    const [result1, result2] = await Promise.allSettled([
+      createOrder({
+        userId: &#39;user1&#39;,
+        items: [{ itemId: &#39;test-item&#39;, quantity: 1 }]
+      }),
+      createOrder({
+        userId: &#39;user2&#39;,
+        items: [{ itemId: &#39;test-item&#39;, quantity: 1 }]
+      })
+    ]);
+    
+    // Assert: Only 1 should succeed
+    const successCount = [result1, result2].filter(r =&gt; r.status === &#39;fulfilled&#39;).length;
+    expect(successCount).toBe(1);
+    
+    // Verify final stock
+    const item = await prisma.menuItem.findUnique({ where: { id: &#39;test-item&#39; } });
+    expect(item.stock).toBe(0);
+  });
+  
+  it(&#39;releases reserved stock after cart expiry&#39;, async () =&gt; {
+    // Add to cart
+    await addToCart(&#39;test-item&#39;, 1, &#39;user1&#39;);
+    
+    // Verify stock reserved
+    let item = await prisma.menuItem.findUnique({ where: { id: &#39;test-item&#39; } });
+    expect(item.reservedStock).toBe(1);
+    
+    // Wait for expiry + run cleanup
+    await sleep(6000); // 6 seconds (reservation expires at 5s)
+    await releaseExpiredReservations();
+    
+    // Verify stock released
+    item = await prisma.menuItem.findUnique({ where: { id: &#39;test-item&#39; } });
+    expect(item.reservedStock).toBe(0);
+  });
+});
+
+// Example: Subscription quota validation
+describe(&#39;Subscription Quota Management&#39;, () =&gt; {
+  beforeEach(async () =&gt; {
+    await prisma.subscription.create({
+      data: {
+        userId: &#39;user1&#39;,
+        planType: &#39;LIGHT_BITE&#39;,
+        creditsTotal: 30,
+        creditsUsed: 28, // 2 remaining
+        dailyLimit: 2,
+        dailyUsed: 1, // 1 remaining today
+        startsAt: new Date(),
+        expiresAt: addMonths(new Date(), 1),
+        anniversaryDay: new Date().getDate()
+      }
+    });
+  });
+  
+  it(&#39;enforces daily limit&#39;, async () =&gt; {
+    // Try to order 2 meals (exceeds daily limit of 1 remaining)
+    await expect(
+      validateSubscriptionQuota(&#39;user1&#39;, [&#39;item1&#39;, &#39;item2&#39;])
+    ).rejects.toThrow(&#39;Daily limit exceeded&#39;);
+  });
+  
+  it(&#39;enforces monthly quota&#39;, async () =&gt; {
+    // Update to have 0.5 credits remaining
+    await prisma.subscription.update({
+      where: { userId: &#39;user1&#39; },
+      data: { creditsUsed: 29.5 }
+    });
+    
+    // Try to order 1 full meal (costs 1 credit, but only 0.5 available)
+    await expect(
+      validateSubscriptionQuota(&#39;user1&#39;, [&#39;main-meal-item&#39;])
+    ).rejects.toThrow(&#39;Insufficient credits&#39;);
+  });
+  
+  it(&#39;allows snacks with partial credits&#39;, async () =&gt; {
+    // Snacks cost 0.5 credits
+    await expect(
+      validateSubscriptionQuota(&#39;user1&#39;, [&#39;snack-item&#39;])
+    ).resolves.toBe(true);
+  });
+});
+
+// Example: Payment webhook validation
+describe(&#39;Payment Webhook Security&#39;, () =&gt; {
+  const validPayload = {
+    event: &#39;payment.captured&#39;,
+    payload: {
+      payment: {
+        entity: {
+          id: &#39;pay_123&#39;,
+          amount: 10000,
+          created_at: Math.floor(Date.now() / 1000),
+          notes: { cafe_order_id: &#39;ord_abc&#39; }
+        }
+      }
+    }
+  };
+  
+  it(&#39;rejects webhook with invalid signature&#39;, async () =&gt; {
+    const response = await POST(new Request(&#39;http://localhost/api/webhooks/razorpay&#39;, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;x-razorpay-signature&#39;: &#39;invalid_signature&#39;,
+        &#39;x-forwarded-for&#39;: &#39;43.204.126.65&#39; // Valid Razorpay IP
+      },
+      body: JSON.stringify(validPayload)
+    }));
+    
+    expect(response.status).toBe(401);
+  });
+  
+  it(&#39;rejects webhook from unauthorized IP&#39;, async () =&gt; {
+    const validSignature = generateSignature(validPayload);
+    
+    const response = await POST(new Request(&#39;http://localhost/api/webhooks/razorpay&#39;, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;x-razorpay-signature&#39;: validSignature,
+        &#39;x-forwarded-for&#39;: &#39;1.2.3.4&#39; // Invalid IP
+      },
+      body: JSON.stringify(validPayload)
+    }));
+    
+    expect(response.status).toBe(403);
+  });
+  
+  it(&#39;rejects old webhook (&gt;5 minutes)&#39;, async () =&gt; {
+    const oldPayload = {
+      ...validPayload,
+      payload: {
+        payment: {
+          entity: {
+            ...validPayload.payload.payment.entity,
+            created_at: Math.floor((Date.now() - 6 * 60 * 1000) / 1000) // 6 minutes ago
+          }
+        }
+      }
+    };
+    
+    const validSignature = generateSignature(oldPayload);
+    
+    const response = await POST(new Request(&#39;http://localhost/api/webhooks/razorpay&#39;, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;x-razorpay-signature&#39;: validSignature,
+        &#39;x-forwarded-for&#39;: &#39;43.204.126.65&#39;
+      },
+      body: JSON.stringify(oldPayload)
+    }));
+    
+    expect(response.status).toBe(400);
+  });
+  
+  it(&#39;handles duplicate webhook (idempotency)&#39;, async () =&gt; {
+    const validSignature = generateSignature(validPayload);
+    
+    // First request
+    const response1 = await POST(new Request(&#39;http://localhost/api/webhooks/razorpay&#39;, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;x-razorpay-signature&#39;: validSignature,
+        &#39;x-forwarded-for&#39;: &#39;43.204.126.65&#39;
+      },
+      body: JSON.stringify(validPayload)
+    }));
+    
+    expect(response1.status).toBe(200);
+    
+    // Duplicate request (should return 200 without processing)
+    const response2 = await POST(new Request(&#39;http://localhost/api/webhooks/razorpay&#39;, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;x-razorpay-signature&#39;: validSignature,
+        &#39;x-forwarded-for&#39;: &#39;43.204.126.65&#39;
+      },
+      body: JSON.stringify(validPayload)
+    }));
+    
+    expect(response2.status).toBe(200);
+    
+    // Verify order was only created once
+    const orders = await prisma.order.findMany({
+      where: { payment_id: &#39;pay_123&#39; }
+    });
+    expect(orders.length).toBe(1);
+  });
+});
+</code></pre>
+<h3 id="143-integration-testing">14.3 Integration Testing</h3>
+<p><strong>Framework:</strong> Playwright for E2E</p>
+<pre><code class="language-typescript">// tests/e2e/order-flow.spec.ts
+import { test, expect } from &#39;@playwright/test&#39;;
+
+test.describe(&#39;Complete Order Flow&#39;, () =&gt; {
+  test(&#39;customer can browse, order, and receive food&#39;, async ({ page }) =&gt; {
+    // 1. Land on homepage
+    await page.goto(&#39;https://app.cafesouthcentral.com&#39;);
+    await expect(page.locator(&#39;h1&#39;)).toContainText(&#39;Cafe South Central&#39;);
+    
+    // 2. Click &quot;Order Now&quot;
+    await page.click(&#39;text=Order Now&#39;);
+    
+    // 3. Login with OTP
+    await page.fill(&#39;input[name=&quot;phone&quot;]&#39;, &#39;9876543210&#39;);
+    await page.fill(&#39;input[name=&quot;name&quot;]&#39;, &#39;Test User&#39;);
+    await page.click(&#39;button:has-text(&quot;Send OTP&quot;)&#39;);
+    
+    // Wait for OTP input (in test env, use test OTP: 123456)
+    await page.waitForSelector(&#39;input[name=&quot;otp&quot;]&#39;);
+    await page.fill(&#39;input[name=&quot;otp&quot;]&#39;, &#39;123456&#39;);
+    await page.click(&#39;button:has-text(&quot;Verify&quot;)&#39;);
+    
+    // 4. Browse menu
+    await expect(page).toHaveURL(&#39;/menu&#39;);
+    await expect(page.locator(&#39;.menu-item&#39;)).toHaveCount.greaterThan(0);
+    
+    // 5. Add item to cart
+    await page.click(&#39;.menu-item:first-child button:has-text(&quot;Add to Cart&quot;)&#39;);
+    await expect(page.locator(&#39;.cart-badge&#39;)).toContainText(&#39;1&#39;);
+    
+    // 6. Open cart
+    await page.click(&#39;[aria-label=&quot;Cart&quot;]&#39;);
+    await expect(page.locator(&#39;.cart-drawer&#39;)).toBeVisible();
+    
+    // 7. Proceed to checkout
+    await page.click(&#39;button:has-text(&quot;Checkout&quot;)&#39;);
+    
+    // 8. Select pickup time (ASAP)
+    await page.click(&#39;input[value=&quot;ASAP&quot;]&#39;);
+    
+    // 9. Choose payment method (Cash)
+    await page.click(&#39;input[value=&quot;CASH&quot;]&#39;);
+    
+    // 10. Place order
+    await page.click(&#39;button:has-text(&quot;Place Order&quot;)&#39;);
+    
+    // 11. Verify order confirmation
+    await expect(page).toHaveURL(/\/orders\/ord_/);
+    await expect(page.locator(&#39;.order-status&#39;)).toContainText(&#39;Confirmed&#39;);
+    
+    // 12. Verify QR code is present
+    await expect(page.locator(&#39;img[alt=&quot;Order QR Code&quot;]&#39;)).toBeVisible();
+    
+    // 13. Check order status updates (mock WebSocket)
+    await page.evaluate(() =&gt; {
+      window.mockStatusUpdate(&#39;PREPARING&#39;);
+    });
+    await expect(page.locator(&#39;.order-status&#39;)).toContainText(&#39;Preparing&#39;);
+  });
+  
+  test(&#39;handles sold out items gracefully&#39;, async ({ page }) =&gt; {
+    // Mock API to return sold out item
+    await page.route(&#39;**/api/menu&#39;, route =&gt; {
+      route.fulfill({
+        status: 200,
+        body: JSON.stringify({
+          success: true,
+          items: [{
+            id: &#39;item_123&#39;,
+            name: &#39;Sold Out Dosa&#39;,
+            stock: 0,
+            isAvailable: false
+          }]
+        })
+      });
+    });
+    
+    await page.goto(&#39;https://app.cafesouthcentral.com/menu&#39;);
+    
+    // Verify item shows as sold out
+    const soldOutItem = page.locator(&#39;.menu-item:has-text(&quot;Sold Out Dosa&quot;)&#39;);
+    await expect(soldOutItem.locator(&#39;.badge-sold-out&#39;)).toBeVisible();
+    
+    // Verify add to cart button is disabled
+    await expect(soldOutItem.locator(&#39;button&#39;)).toBeDisabled();
+  });
+  
+  test(&#39;subscription user can order without payment&#39;, async ({ page, context }) =&gt; {
+    // Mock user with active subscription
+    await context.addCookies([{
+      name: &#39;session_token&#39;,
+      value: &#39;test_session_with_subscription&#39;,
+      domain: &#39;app.cafesouthcentral.com&#39;,
+      path: &#39;/&#39;
+    }]);
+    
+    await page.goto(&#39;https://app.cafesouthcentral.com/menu&#39;);
+    
+    // Verify subscription badge visible
+    await expect(page.locator(&#39;.subscription-badge&#39;)).toBeVisible();
+    await expect(page.locator(&#39;.subscription-badge&#39;)).toContainText(&#39;2/3 meals remaining&#39;);
+    
+    // Add item to cart
+    await page.click(&#39;.menu-item:first-child button:has-text(&quot;Add to Cart&quot;)&#39;);
+    
+    // Checkout
+    await page.click(&#39;[aria-label=&quot;Cart&quot;]&#39;);
+    await page.click(&#39;button:has-text(&quot;Checkout&quot;)&#39;);
+    
+    // Verify payment step is skipped
+    await expect(page.locator(&#39;text=Payment Method&#39;)).not.toBeVisible();
+    
+    // Place order directly
+    await page.click(&#39;button:has-text(&quot;Place Order&quot;)&#39;);
+    
+    // Verify order created
+    await expect(page).toHaveURL(/\/orders\/ord_/);
+  });
+});
+</code></pre>
+<h3 id="144-performance-testing">14.4 Performance Testing</h3>
+<p><strong>Tool:</strong> K6 (already configured in Section 11.5)</p>
+<p><strong>Test Scenarios:</strong></p>
+<ol>
+<li><strong>Smoke Test:</strong> 10 VUs for 1 minute (baseline)</li>
+<li><strong>Load Test:</strong> 100 VUs for 10 minutes (average traffic)</li>
+<li><strong>Stress Test:</strong> Ramp to 500 VUs over 20 minutes (peak load)</li>
+<li><strong>Spike Test:</strong> 0 → 1000 VUs in 1 minute (sudden spike)</li>
+<li><strong>Soak Test:</strong> 200 VUs for 2 hours (memory leaks, stability)</li>
+</ol>
+<p><strong>Pre-Launch Checklist:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> All smoke tests pass (0% error rate)</li>
+<li><input disabled="" type="checkbox"> Load test P95 latency &lt; 500ms</li>
+<li><input disabled="" type="checkbox"> Stress test error rate &lt; 1%</li>
+<li><input disabled="" type="checkbox"> Spike test recovers within 2 minutes</li>
+<li><input disabled="" type="checkbox"> Soak test shows no memory leaks</li>
+<li><input disabled="" type="checkbox"> Database connections stay below 50</li>
+<li><input disabled="" type="checkbox"> No deadlocks or timeout errors</li>
+</ul>
+<h3 id="145-security-testing">14.5 Security Testing</h3>
+<p><strong>Pre-Launch Security Audit:</strong></p>
+<pre><code class="language-bash"># 1. OWASP ZAP Automated Scan
+docker run -t owasp/zap2docker-stable zap-baseline.py \
+  -t https://app.cafesouthcentral.com \
+  -r security-report.html
+
+# 2. Dependency Vulnerability Scan
+npm audit
+snyk test
+
+# 3. SQL Injection Test (manual)
+# Try injecting in all user inputs:
+# - Phone: 9876543210&#39; OR &#39;1&#39;=&#39;1
+# - OTP: 123456&#39; UNION SELECT * FROM users--
+# - Order ID: ord_123&#39;; DROP TABLE orders;--
+
+# 4. XSS Test
+# Try injecting in special instructions:
+# &lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;
+
+# 5. CSRF Test
+# Remove CSRF token from request, verify rejection
+
+# 6. Rate Limiting Test
+for i in {1..10}; do
+  curl -X POST https://app.cafesouthcentral.com/api/auth/send-otp \
+    -H &quot;Content-Type: application/json&quot; \
+    -d &#39;{&quot;phone&quot;:&quot;9876543210&quot;}&#39;
+done
+# Verify: Request #4 should return 429
+</code></pre>
+<p><strong>Security Checklist:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> All high-severity issues from OWASP ZAP resolved</li>
+<li><input disabled="" type="checkbox"> No SQL injection vulnerabilities</li>
+<li><input disabled="" type="checkbox"> No XSS vulnerabilities</li>
+<li><input disabled="" type="checkbox"> CSRF protection working on all POST/PUT/DELETE</li>
+<li><input disabled="" type="checkbox"> Rate limiting enforced on all endpoints</li>
+<li><input disabled="" type="checkbox"> Secrets not exposed in client-side code</li>
+<li><input disabled="" type="checkbox"> HTTPS enforced (no HTTP)</li>
+<li><input disabled="" type="checkbox"> Security headers set (HSTS, CSP, X-Frame-Options)</li>
+<li><input disabled="" type="checkbox"> Session tokens in HTTP-only cookies</li>
+<li><input disabled="" type="checkbox"> Passwords hashed with Argon2</li>
+<li><input disabled="" type="checkbox"> OTPs hashed with bcrypt</li>
+<li><input disabled="" type="checkbox"> PII encrypted at rest</li>
+</ul>
+<hr>
+<h2 id="15-monitoring--observability">15. Monitoring &amp; Observability</h2>
+<h3 id="151-monitoring-stack">15.1 Monitoring Stack</h3>
+<p><strong>Components:</strong></p>
+<ul>
+<li><strong>Error Tracking:</strong> Sentry</li>
+<li><strong>Performance:</strong> Datadog APM</li>
+<li><strong>Logs:</strong> Better Stack (Logtail)</li>
+<li><strong>Uptime:</strong> UptimeRobot</li>
+<li><strong>Real User Monitoring:</strong> Datadog RUM</li>
+</ul>
+<h3 id="152-sentry-configuration">15.2 Sentry Configuration</h3>
+<pre><code class="language-typescript">// sentry.config.ts
+import * as Sentry from &#39;@sentry/nextjs&#39;;
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  
+  // Performance monitoring
+  tracesSampleRate: process.env.NODE_ENV === &#39;production&#39; ? 0.1 : 1.0,
+  
+  // Profiling
+  profilesSampleRate: 0.1,
+  
+  // Environment
+  environment: process.env.NODE_ENV,
+  release: process.env.VERCEL_GIT_COMMIT_SHA,
+  
+  // Error filtering
+  beforeSend(event, hint) {
+    // Don&#39;t send PII
+    if (event.request) {
+      delete event.request.cookies;
+      delete event.request.headers?.[&#39;authorization&#39;];
+      delete event.request.headers?.[&#39;cookie&#39;];
+    }
+    
+    // Filter out known noise
+    if (event.exception?.values?.[0]?.value?.includes(&#39;ResizeObserver&#39;)) {
+      return null;
+    }
+    
+    return event;
+  },
+  
+  // Breadcrumbs
+  integrations: [
+    new Sentry.BrowserTracing({
+      tracePropagationTargets: [&#39;app.cafesouthcentral.com&#39;, /^\//],
+    }),
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+  
+  // Session replay (on errors only)
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: 1.0,
+});
+</code></pre>
+<h3 id="153-datadog-configuration">15.3 Datadog Configuration</h3>
+<pre><code class="language-typescript">// datadog.config.ts
+import { datadogRum } from &#39;@datadog/browser-rum&#39;;
+
+datadogRum.init({
+  applicationId: process.env.NEXT_PUBLIC_DATADOG_APP_ID,
+  clientToken: process.env.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN,
+  site: &#39;datadoghq.com&#39;,
+  service: &#39;cafe-south-central&#39;,
+  env: process.env.NODE_ENV,
+  version: process.env.VERCEL_GIT_COMMIT_SHA,
+  
+  // Performance monitoring
+  sessionSampleRate: 100,
+  sessionReplaySampleRate: 20,
+  trackUserInteractions: true,
+  trackResources: true,
+  trackLongTasks: true,
+  
+  // Privacy
+  defaultPrivacyLevel: &#39;mask-user-input&#39;,
+  
+  // Custom tags
+  beforeSend: (event) =&gt; {
+    if (event.type === &#39;view&#39;) {
+      event.context.user_role = window.localStorage.getItem(&#39;user_role&#39;);
+    }
+    return event;
+  }
+});
+</code></pre>
+<h3 id="154-alert-configuration">15.4 Alert Configuration</h3>
+<pre><code class="language-yaml"># alerts.yaml
+
+alerts:
+  # P0: Page Immediately
+  - name: Order Creation Failure Spike
+    query: &quot;error_rate{service:cafe-api,endpoint:/api/orders/create} &gt; 0.05&quot;
+    window: 5m
+    channels: [pagerduty, slack-critical, sms]
+    severity: P0
+    
+  - name: Payment Webhook Failure
+    query: &quot;error_rate{service:cafe-api,endpoint:/api/webhooks/razorpay} &gt; 0.02&quot;
+    window: 1m
+    channels: [pagerduty, slack-critical, sms]
+    severity: P0
+    
+  - name: Database Connection Pool Exhausted
+    query: &quot;db.connections.active &gt;= 50&quot;
+    window: 1m
+    channels: [pagerduty, slack-critical]
+    severity: P0
+    
+  - name: Application Down
+    query: &quot;http.response.status_code{service:cafe-api} == 500&quot;
+    threshold: &quot;&gt; 10 errors in 1 minute&quot;
+    channels: [pagerduty, slack-critical, sms]
+    severity: P0
+    
+  # P1: Alert Immediately (Slack)
+  - name: High API Latency
+    query: &quot;p95{service:cafe-api} &gt; 1000&quot;
+    window: 5m
+    channels: [slack-alerts]
+    severity: P1
+    
+  - name: Stock Sync Delay
+    query: &quot;inventory.sync.delay &gt; 30&quot;
+    window: 5m
+    channels: [slack-alerts]
+    severity: P1
+    
+  - name: SMS Delivery Failure Rate High
+    query: &quot;sms.failure_rate &gt; 0.1&quot;
+    window: 5m
+    channels: [slack-alerts]
+    severity: P1
+    
+  # P2: Warning (Slack, no page)
+  - name: Low Stock Items
+    query: &quot;count(menu_item.stock &lt; 10 AND menu_item.is_available == true) &gt; 5&quot;
+    window: 10m
+    channels: [slack-warnings]
+    severity: P2
+    
+  - name: High Cart Abandonment Rate
+    query: &quot;cart.abandonment_rate &gt; 0.7&quot;
+    window: 30m
+    channels: [slack-warnings]
+    severity: P2
+</code></pre>
+<h3 id="155-dashboards">15.5 Dashboards</h3>
+<p><strong>Operations Dashboard (Real-Time):</strong></p>
+<ul>
+<li>Active orders by status (pie chart)</li>
+<li>Orders per minute (line chart)</li>
+<li>Average preparation time (gauge)</li>
+<li>Current stock levels (bar chart)</li>
+<li>Active sessions (counter)</li>
+<li>Payment success rate (gauge)</li>
+</ul>
+<p><strong>Business Dashboard (Daily):</strong></p>
+<ul>
+<li>Daily revenue (bar chart)</li>
+<li>New vs returning customers (stacked bar)</li>
+<li>Top 10 items by revenue (table)</li>
+<li>Subscription conversions (funnel)</li>
+<li>Cancellation rate (line chart)</li>
+</ul>
+<p><strong>Technical Dashboard:</strong></p>
+<ul>
+<li>API latency (P50, P95, P99)</li>
+<li>Error rate by endpoint</li>
+<li>Database query performance</li>
+<li>Cache hit rate</li>
+<li>Server resource usage (CPU, memory)</li>
+<li>WebSocket connection count</li>
+</ul>
+<h3 id="156-logging-strategy">15.6 Logging Strategy</h3>
+<pre><code class="language-typescript">// Structured logging with context
+import pino from &#39;pino&#39;;
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || &#39;info&#39;,
+  formatters: {
+    level: (label) =&gt; {
+      return { level: label };
+    },
+  },
+  redact: {
+    paths: [&#39;phone&#39;, &#39;email&#39;, &#39;password&#39;, &#39;otp&#39;, &#39;sessionToken&#39;],
+    remove: true
+  }
+});
+
+// Usage
+logger.info({
+  action: &#39;ORDER_CREATED&#39;,
+  orderId: &#39;ord_123&#39;,
+  userId: &#39;usr_abc&#39;,
+  totalAmount: 120,
+  paymentMethod: &#39;UPI&#39;,
+  duration: 543 // ms
+}, &#39;Order created successfully&#39;);
+
+logger.error({
+  action: &#39;PAYMENT_FAILED&#39;,
+  orderId: &#39;ord_123&#39;,
+  error: err.message,
+  stack: err.stack
+}, &#39;Payment processing failed&#39;);
+</code></pre>
+<hr>
+<h2 id="16-deployment--infrastructure">16. Deployment &amp; Infrastructure</h2>
+<h3 id="161-environment-strategy">16.1 Environment Strategy</h3>
+<p><strong>Environments:</strong></p>
+<ol>
+<li><strong>Development</strong> - Local developer machines</li>
+<li><strong>Staging</strong> - Pre-production (Vercel preview deployments)</li>
+<li><strong>Production</strong> - Live application</li>
+</ol>
+<h3 id="162-deployment-pipeline">16.2 Deployment Pipeline</h3>
+<pre><code class="language-yaml"># .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: &#39;20&#39;
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run linter
+        run: npm run lint
+        
+      - name: Run type check
+        run: npm run type-check
+        
+      - name: Run unit tests
+        run: npm run test:unit
+        
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          
+  deploy-staging:
+    needs: test
+    if: github.ref == &#39;refs/heads/staging&#39;
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: &#39;--env staging&#39;
+          
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          BASE_URL: ${{ steps.deploy.outputs.preview-url }}
+          
+  deploy-production:
+    needs: test
+    if: github.ref == &#39;refs/heads/main&#39;
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: &#39;--prod&#39;
+          
+      - name: Notify Slack
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H &#39;Content-Type: application/json&#39; \
+            -d &#39;{&quot;text&quot;:&quot;🚀 Production deployment successful: ${{ github.sha }}&quot;}&#39;
+</code></pre>
+<h3 id="163-database-migration-strategy">16.3 Database Migration Strategy</h3>
+<pre><code class="language-bash"># Development
+npx prisma migrate dev --name add_subscription_features
+
+# Staging
+npx prisma migrate deploy
+
+# Production (zero-downtime)
+# 1. Create migration file
+npx prisma migrate dev --create-only --name add_indexes
+
+# 2. Review migration file
+# 3. Test on staging
+# 4. Schedule maintenance window OR use online schema change tool
+# 5. Deploy during low-traffic period (3 AM IST)
+</code></pre>
+<h3 id="164-rollback-procedure">16.4 Rollback Procedure</h3>
+<pre><code class="language-bash"># Vercel rollback (instant)
+vercel rollback https://cafe-south-central-abc123.vercel.app
+
+# Database rollback (manual)
+# 1. Identify last good migration
+npx prisma migrate resolve --rolled-back 20260201120000_bad_migration
+
+# 2. Apply previous version
+npx prisma migrate deploy
+
+# 3. Verify application works
+curl https://app.cafesouthcentral.com/api/health
+</code></pre>
+<h3 id="165-backup-strategy">16.5 Backup Strategy</h3>
+<p><strong>Database Backups:</strong></p>
+<ul>
+<li><strong>Frequency:</strong> Daily at 2 AM IST</li>
+<li><strong>Retention:</strong> 30 days (daily), 12 months (monthly)</li>
+<li><strong>Storage:</strong> AWS S3 (encrypted)</li>
+<li><strong>Recovery Time Objective (RTO):</strong> &lt; 4 hours</li>
+<li><strong>Recovery Point Objective (RPO):</strong> 24 hours</li>
+</ul>
+<pre><code class="language-bash"># Automated backup script (runs via cron)
+#!/bin/bash
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE=&quot;cafe_db_backup_${DATE}.sql&quot;
+
+# Dump database
+pg_dump $DATABASE_URL &gt; $BACKUP_FILE
+
+# Compress
+gzip $BACKUP_FILE
+
+# Upload to S3
+aws s3 cp ${BACKUP_FILE}.gz s3://cafe-backups/database/
+
+# Cleanup local file
+rm ${BACKUP_FILE}.gz
+
+# Verify backup integrity
+aws s3 ls s3://cafe-backups/database/${BACKUP_FILE}.gz
+</code></pre>
+<h3 id="166-infrastructure-as-code">16.6 Infrastructure as Code</h3>
+<pre><code class="language-terraform"># infrastructure/main.tf
+
+terraform {
+  required_providers {
+    vercel = {
+      source  = &quot;vercel/vercel&quot;
+      version = &quot;~&gt; 0.15&quot;
+    }
+    supabase = {
+      source  = &quot;supabase/supabase&quot;
+      version = &quot;~&gt; 1.0&quot;
+    }
+  }
+}
+
+provider &quot;vercel&quot; {
+  token = var.vercel_token
+}
+
+resource &quot;vercel_project&quot; &quot;cafe_app&quot; {
+  name      = &quot;cafe-south-central&quot;
+  framework = &quot;nextjs&quot;
+  
+  environment = [
+    {
+      key    = &quot;DATABASE_URL&quot;
+      value  = var.database_url
+      target = [&quot;production&quot;]
+    },
+    {
+      key    = &quot;RAZORPAY_KEY_ID&quot;
+      value  = var.razorpay_key_id
+      target = [&quot;production&quot;]
+    }
+  ]
+}
+
+resource &quot;vercel_deployment&quot; &quot;production&quot; {
+  project_id = vercel_project.cafe_app.id
+  production = true
+}
+</code></pre>
+<hr>
+<h2 id="17-future-roadmap">17. Future Roadmap</h2>
+<h3 id="phase-1-mvp-months-1-2-✅">Phase 1: MVP (Months 1-2) ✅</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> Customer authentication (OTP)</li>
+<li><input checked="" disabled="" type="checkbox"> Menu browsing</li>
+<li><input checked="" disabled="" type="checkbox"> Order placement (Cash/UPI)</li>
+<li><input checked="" disabled="" type="checkbox"> Admin dashboard</li>
+<li><input checked="" disabled="" type="checkbox"> Inventory management</li>
+<li><input checked="" disabled="" type="checkbox"> Subscription plans</li>
+</ul>
+<h3 id="phase-2-enhancements-months-3-4">Phase 2: Enhancements (Months 3-4)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Push notifications (Web Push API)</li>
+<li><input disabled="" type="checkbox"> Email receipts (Resend integration)</li>
+<li><input disabled="" type="checkbox"> Advanced analytics dashboard</li>
+<li><input disabled="" type="checkbox"> Customer feedback system</li>
+<li><input disabled="" type="checkbox"> Referral program</li>
+<li><input disabled="" type="checkbox"> Promo codes &amp; discounts</li>
+</ul>
+<h3 id="phase-3-scale-months-5-6">Phase 3: Scale (Months 5-6)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Multi-location support</li>
+<li><input disabled="" type="checkbox"> Table reservations</li>
+<li><input disabled="" type="checkbox"> Dine-in menu (separate from takeaway)</li>
+<li><input disabled="" type="checkbox"> Kitchen display system (dedicated hardware)</li>
+<li><input disabled="" type="checkbox"> Staff scheduling module</li>
+<li><input disabled="" type="checkbox"> Supplier management</li>
+</ul>
+<h3 id="phase-4-ai--automation-months-7-9">Phase 4: AI &amp; Automation (Months 7-9)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> AI-powered menu recommendations</li>
+<li><input disabled="" type="checkbox"> Demand forecasting</li>
+<li><input disabled="" type="checkbox"> Automated inventory reordering</li>
+<li><input disabled="" type="checkbox"> Chatbot for customer support</li>
+<li><input disabled="" type="checkbox"> Voice ordering integration</li>
+<li><input disabled="" type="checkbox"> Dynamic pricing based on demand</li>
+</ul>
+<h3 id="phase-5-expansion-months-10-12">Phase 5: Expansion (Months 10-12)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Third-party delivery integration (Swiggy, Zomato)</li>
+<li><input disabled="" type="checkbox"> Franchise management portal</li>
+<li><input disabled="" type="checkbox"> White-label solution for other cafes</li>
+<li><input disabled="" type="checkbox"> Mobile app (React Native)</li>
+<li><input disabled="" type="checkbox"> Loyalty points program</li>
+<li><input disabled="" type="checkbox"> Gift cards</li>
+</ul>
+<hr>
+<h2 id="18-appendices">18. Appendices</h2>
+<h3 id="appendix-a-glossary">Appendix A: Glossary</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Artifact</strong></td>
+<td>Self-contained code output (HTML, React, SVG)</td>
+</tr>
+<tr>
+<td><strong>DPDP Act</strong></td>
+<td>Digital Personal Data Protection Act, 2023 (India)</td>
+</tr>
+<tr>
+<td><strong>Idempotency</strong></td>
+<td>Operation that produces same result regardless of repetition</td>
+</tr>
+<tr>
+<td><strong>Orphaned Payment</strong></td>
+<td>Payment captured but order not created</td>
+</tr>
+<tr>
+<td><strong>Pro-rata</strong></td>
+<td>Proportional billing for partial billing period</td>
+</tr>
+<tr>
+<td><strong>PWA</strong></td>
+<td>Progressive Web App (installable web app)</td>
+</tr>
+<tr>
+<td><strong>RBAC</strong></td>
+<td>Role-Based Access Control</td>
+</tr>
+<tr>
+<td><strong>SLA</strong></td>
+<td>Service Level Agreement (performance targets)</td>
+</tr>
+<tr>
+<td><strong>TOTP</strong></td>
+<td>Time-based One-Time Password (2FA)</td>
+</tr>
+</tbody></table>
+<h3 id="appendix-b-environment-variables">Appendix B: Environment Variables</h3>
+<pre><code class="language-bash"># .env.example
+
+# Database
+DATABASE_URL=&quot;postgresql://user:pass@host:5432/cafe_db?pgbouncer=true&quot;
+DIRECT_URL=&quot;postgresql://user:pass@host:5432/cafe_db&quot;
+
+# Redis
+REDIS_URL=&quot;redis://default:pass@host:6379&quot;
+
+# Razorpay
+RAZORPAY_KEY_ID=&quot;rzp_live_...&quot;
+RAZORPAY_KEY_SECRET=&quot;...&quot;
+RAZORPAY_WEBHOOK_SECRET=&quot;...&quot;
+
+# Twilio
+TWILIO_ACCOUNT_SID=&quot;AC...&quot;
+TWILIO_AUTH_TOKEN=&quot;...&quot;
+TWILIO_PHONE_NUMBER=&quot;+1234567890&quot;
+
+# AWS (S3, SNS fallback)
+AWS_ACCESS_KEY_ID=&quot;...&quot;
+AWS_SECRET_ACCESS_KEY=&quot;...&quot;
+AWS_REGION=&quot;ap-south-1&quot;
+AWS_S3_BUCKET=&quot;cafe-uploads&quot;
+
+# Encryption
+ENCRYPTION_KEY=&quot;32-byte-hex-string&quot;
+
+# Session
+SESSION_SECRET=&quot;32-byte-hex-string&quot;
+
+# Monitoring
+SENTRY_DSN=&quot;https://...@sentry.io/...&quot;
+NEXT_PUBLIC_DATADOG_APP_ID=&quot;...&quot;
+NEXT_PUBLIC_DATADOG_CLIENT_TOKEN=&quot;...&quot;
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS=&quot;true&quot;
+NEXT_PUBLIC_ENABLE_WEB_PUSH=&quot;false&quot;
+</code></pre>
+<h3 id="appendix-c-third-party-services">Appendix C: Third-Party Services</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+<th>Plan</th>
+<th>Monthly Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vercel</td>
+<td>Hosting</td>
+<td>Hobby → Pro</td>
+<td>$0 → $20</td>
+</tr>
+<tr>
+<td>Supabase</td>
+<td>Database</td>
+<td>Pro</td>
+<td>$25</td>
+</tr>
+<tr>
+<td>Upstash</td>
+<td>Redis</td>
+<td>Pay-as-you-go</td>
+<td>$5</td>
+</tr>
+<tr>
+<td>Razorpay</td>
+<td>Payments</td>
+<td>Pay-per-transaction</td>
+<td>2% of GMV</td>
+</tr>
+<tr>
+<td>Twilio</td>
+<td>SMS (Primary)</td>
+<td>Pay-as-you-go</td>
+<td>₹0.15/SMS</td>
+</tr>
+<tr>
+<td>AWS SNS</td>
+<td>SMS (Fallback)</td>
+<td>Pay-as-you-go</td>
+<td>₹0.10/SMS</td>
+</tr>
+<tr>
+<td>Sentry</td>
+<td>Error tracking</td>
+<td>Team</td>
+<td>$26</td>
+</tr>
+<tr>
+<td>Datadog</td>
+<td>APM &amp; Monitoring</td>
+<td>Pro</td>
+<td>$31</td>
+</tr>
+<tr>
+<td>Better Stack</td>
+<td>Logging</td>
+<td>Basic</td>
+<td>$15</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td></td>
+<td><strong>~$127/month</strong></td>
+</tr>
+</tbody></table>
+<h3 id="appendix-d-success-criteria">Appendix D: Success Criteria</h3>
+<p><strong>Launch Criteria (Must achieve before going live):</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> 100% uptime on staging for 7 consecutive days</li>
+<li><input disabled="" type="checkbox"> All P0 alerts tested and working</li>
+<li><input disabled="" type="checkbox"> Load test passes with 1000 concurrent users</li>
+<li><input disabled="" type="checkbox"> Security audit completed with no high-severity issues</li>
+<li><input disabled="" type="checkbox"> DPDP Act compliance verified by legal team</li>
+<li><input disabled="" type="checkbox"> Disaster recovery tested (backup restoration &lt; 4 hours)</li>
+<li><input disabled="" type="checkbox"> Payment reconciliation tested with real Razorpay account</li>
+<li><input disabled="" type="checkbox"> 10 beta users complete full order cycle successfully</li>
+</ul>
+<p><strong>Month 1 Success Metrics:</strong></p>
+<ul>
+<li>100+ active customers</li>
+<li>50+ orders per day</li>
+<li>10+ subscription signups</li>
+<li>&lt;1% order error rate</li>
+<li>99% uptime</li>
+<li>&lt;5 support tickets per day</li>
+</ul>
+<p><strong>Month 3 Success Metrics:</strong></p>
+<ul>
+<li>500+ active customers</li>
+<li>200+ orders per day</li>
+<li>50+ active subscriptions</li>
+<li>&lt;0.5% order error rate</li>
+<li>99.5% uptime</li>
+<li>30% repeat customer rate</li>
+</ul>
+<p><strong>Month 6 Success Metrics:</strong></p>
+<ul>
+<li>1,000+ active customers</li>
+<li>500+ orders per day</li>
+<li>100+ active subscriptions</li>
+<li>₹3,00,000 monthly revenue</li>
+<li>50% of orders via subscription</li>
+<li>4.5+ customer satisfaction score</li>
+</ul>
+<hr>
+<h2 id="document-sign-off">Document Sign-Off</h2>
+<p><strong>By signing below, stakeholders acknowledge they have reviewed this PRD and agree with the specifications, scope, and success criteria.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Role</th>
+<th>Signature</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>_____________</td>
+<td>Product Owner</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>_____________</td>
+<td>Tech Lead</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>_____________</td>
+<td>Security Lead</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>_____________</td>
+<td>QA Lead</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>_____________</td>
+<td>Legal/Compliance</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+<tr>
+<td>_____________</td>
+<td>Finance</td>
+<td>_________</td>
+<td>______</td>
+</tr>
+</tbody></table>
+<hr>
+<p><strong>End of Document</strong><br><strong>Version:</strong> 3.0 (Production-Ready)<br><strong>Total Pages:</strong> 85<br><strong>Last Updated:</strong> February 1, 2026<br><strong>Next Review:</strong> March 1, 2026</p>

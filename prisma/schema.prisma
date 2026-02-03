@@ -9,23 +9,74 @@ datasource db {
 }
 
 model User {
-  id             String             @id @default(uuid())
-  name           String?
-  phone          String             @unique
-  email          String?            @unique
-  role           UserRole           @default(CUSTOMER)
-  walletBalance  Float              @default(0.0)
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  fcmToken       String?
-  profilePicture String?
-  dailyUsages    DailyUsage[]
-  feedbacks      Feedback[]
-  orders         Order[]
-  subscriptions  UserSubscription[]
-  addresses      Address[]
-  paymentMethods PaymentMethod[]
-  loyaltyPoints  LoyaltyPoints?
+  id               String            @id @default(uuid())
+  name             String?
+  phone            String            @unique
+  email            String?           @unique
+  passwordHash     String?           // For Admin Argon2
+  totpSecret       String?           // For Admin 2FA (Encrypted)
+  totpEnabled      Boolean           @default(false)
+  role             UserRole          @default(CUSTOMER)
+  walletBalance    Float             @default(0.0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  fcmToken         String?
+  profilePicture   String?
+  dailyUsages      DailyUsage[]
+  feedbacks        Feedback[]
+  orders           Order[]
+  subscriptions    UserSubscription[]
+  addresses        Address[]
+  paymentMethods   PaymentMethod[]
+  loyaltyPoints    LoyaltyPoints?
+  orphanedPayments OrphanedPayment[]
+  adminSessions    AdminSession[]    // Admin only
+  fraudAlerts      FraudAlert[]
+  consentRecords   ConsentRecord[]
+  subscriptionDevices SubscriptionDevice[]
+}
+
+model SubscriptionDevice {
+  id              String   @id @default(uuid())
+  userId          String
+  fingerprintHash String   @unique // One entry per unique device fingerprint
+  userAgent       String?
+  ipAddress       String?
+  lastSeenAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdminSession {
+  id           String   @id @default(uuid())
+  adminId      String
+  sessionToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+  admin        User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model FraudAlert {
+  id        String   @id @default(uuid())
+  userId    String
+  reason    String
+  details   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ConsentRecord {
+  id          String    @id @default(uuid())
+  userId      String
+  purpose     String    // e.g., "ORDER_PROCESSING"
+  grantedAt   DateTime  @default(now())
+  withdrawnAt DateTime?
+  ipAddress   String?
+  userAgent   String?
+  user        User      @relation(fields: [userId], references: [id])
 }
 
 model Feedback {
@@ -40,35 +91,39 @@ model Feedback {
 }
 
 model MenuItem {
-  id              String       @id @default(uuid())
-  name            String
-  description     String?
-  price           Float
-  type            MenuItemType
-  category        String
-  imageUrl        String?
-  inventoryCount  Int          @default(0)
-  isDoubleAllowed Boolean      @default(false)
-  isAvailable     Boolean      @default(true)
-  isVeg           Boolean      @default(true)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  orderItems      OrderItem[]
+  id                     String       @id @default(uuid())
+  name                   String
+  description            String?
+  price                  Float
+  type                   MenuItemType @default(NORMAL)
+  category               String
+  imageUrl               String?
+  stock                  Int          @default(0) // Renamed from inventoryCount
+  reservedStock          Int          @default(0) // Added for concurrency Layer 1
+  isSubscriptionEligible Boolean      @default(false)
+  isAvailable            Boolean      @default(true)
+  isVeg                  Boolean      @default(true)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  orderItems             OrderItem[]
 }
 
 model UserSubscription {
-  id                     String   @id @default(uuid())
-  userId                 String
-  planType               PlanType
-  monthlyQuota           Int
-  mealsConsumedThisMonth Int      @default(0)
-  startDate              DateTime
-  endDate                DateTime
-  isActive               Boolean  @default(true)
-  isCancelled            Boolean  @default(false)
-  cancelledAt            DateTime?
-  cancellationReason     String?
-  user                   User     @relation(fields: [userId], references: [id])
+  id                 String            @id @default(uuid())
+  userId             String            @unique // One subscription per user
+  planType           PlanType
+  creditsTotal       Int               // Renamed from monthlyQuota
+  creditsUsed        Int               @default(0)
+  dailyLimit         Int
+  dailyUsed          Int               @default(0)
+  startDate          DateTime
+  endDate            DateTime
+  status             SubscriptionState @default(ACTIVE)
+  isActive           Boolean           @default(true)
+  autoRenew          Boolean           @default(true)
+  cancelledAt        DateTime?
+  cancellationReason String?
+  user               User              @relation(fields: [userId], references: [id])
 }
 
 model DailyUsage {
@@ -81,22 +136,39 @@ model DailyUsage {
   @@unique([userId, date])
 }
 
+// ... Slot model kept if needed, assuming yes for now ...
+model Slot {
+  id           String   @id @default(uuid())
+  name         String? 
+  startTime    String 
+  endTime      String 
+  maxOrders    Int      @default(50)
+  bookedOrders Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Order {
-  id                       String      @id @default(uuid())
-  userId                   String
-  status                   OrderStatus @default(PENDING)
+  id                       String             @id @default(uuid())
+  userId                   String?            // Nullable for deleted users (Data Erasure)
+  status                   OrderStatus        @default(CREATED)
   mode                     OrderMode
-  totalAmount              Float       @default(0)
-  createdAt                DateTime    @default(now())
+  totalAmount              Float              @default(0)
+  createdAt                DateTime           @default(now())
   displayId                String?
-  feedbackNotificationSent Boolean     @default(false)
+  feedbackNotificationSent Boolean            @default(false)
   note                     String?
-  paymentDetails           String?
-  paymentMethod            String?
-  timeSlot                 String?
-  updatedAt                DateTime    @updatedAt
+  paymentDetails           String?            
+  paymentId                String?            
+  paymentMethod            PaymentMethodType?
+  scheduledFor             DateTime?          
+  timeSlot                 String?            
+  updatedAt                DateTime           @updatedAt
+  refundId                 String?
+  refundStatus             String?
   feedback                 Feedback?
-  user                     User        @relation(fields: [userId], references: [id])
+  user                     User?              @relation(fields: [userId], references: [id])
   items                    OrderItem[]
 }
 
@@ -105,16 +177,30 @@ model OrderItem {
   orderId    String
   menuItemId String
   name       String
-  price      Float
+  price      Float    // Snapshot price
   quantity   Int
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  order      Order    @relation(fields: [orderId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model OrphanedPayment {
+  id                String    @id @default(uuid())
+  razorpayPaymentId String    @unique
+  amount            Float
+  userId            String
+  errorMessage      String?
+  resolved          Boolean   @default(false)
+  refunded          Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  resolvedAt        DateTime?
+  user              User      @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {
   CUSTOMER
-  KITCHEN
-  ADMIN
+  SUPER_ADMIN
+  MANAGER
+  KITCHEN_STAFF
 }
 
 enum MenuItemType {
@@ -125,20 +211,32 @@ enum MenuItemType {
 }
 
 enum PlanType {
-  MONTHLY_MESS
   TRIAL
+  LIGHT_BITE
+  FEAST_FUEL
+  TOTAL_WELLNESS
+  ULTIMATE
 }
 
 enum OrderStatus {
-  PENDING
+  CREATED
+  PENDING_PAYMENT
+  PAYMENT_FAILED
   CONFIRMED
   PREPARING
   READY
   COMPLETED
   CANCELLED
-  RECEIVED
-  DONE
-  SOLD
+  CANCELLED_USER
+  CANCELLED_ADMIN
+  FAILED
+}
+
+enum SubscriptionState {
+  ACTIVE
+  PAUSED
+  EXPIRED
+  CANCELLED
 }
 
 enum OrderMode {
@@ -146,10 +244,17 @@ enum OrderMode {
   SUBSCRIPTION
 }
 
+enum PaymentMethodType {
+  CASH
+  UPI
+  SUBSCRIPTION
+  CARD
+}
+
 model Address {
   id        String   @id @default(uuid())
   userId    String
-  label     String   // "Home", "Work", "Other"
+  label     String   
   street    String
   city      String
   state     String
@@ -163,7 +268,7 @@ model Address {
 model PaymentMethod {
   id             String   @id @default(uuid())
   userId         String
-  cardType       String   // "Visa", "MasterCard", "Rupay", etc.
+  cardType       String   
   lastFourDigits String
   expiryMonth    Int
   expiryYear     Int
@@ -178,10 +283,9 @@ model LoyaltyPoints {
   id               String   @id @default(uuid())
   userId           String   @unique
   totalPoints      Int      @default(0)
-  tier             String   @default("Bronze") // "Bronze", "Silver", "Gold", "Platinum"
+  tier             String   @default("Bronze") 
   pointsToNextTier Int      @default(500)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-

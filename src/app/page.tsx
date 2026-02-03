@@ -21,6 +21,7 @@ import { useMenu } from '@/hooks/useMenu';
 import StickyCartSummary from '@/components/ordering/StickyCartSummary';
 // import MobileProfileMenu from '@/components/layout/MobileProfileMenu';
 import StaggeredMenu from '@/components/ui/StaggeredMenu';
+import DesktopHeader from '@/components/layout/DesktopHeader';
 import dynamic from 'next/dynamic';
 
 const LandingPage = dynamic(() => import('@/components/marketing/LandingPage'), { ssr: false });
@@ -306,7 +307,7 @@ function DashboardContent() {
                 return;
             }
 
-            const fullUser = { ...userData, id: data.id, role: data.role };
+            const fullUser = { ...userData, id: data.user.id, role: data.user.role };
 
             if (stayLoggedIn) {
                 localStorage.setItem('cafe_user', JSON.stringify(fullUser));
@@ -314,7 +315,7 @@ function DashboardContent() {
                 sessionStorage.setItem('cafe_user', JSON.stringify(fullUser));
             }
 
-            if (data.role === 'ADMIN') {
+            if (data.user.role === 'ADMIN') {
                 router.push('/admin/dashboard');
             } else {
                 setUser(fullUser);
@@ -441,7 +442,6 @@ function DashboardContent() {
 
                 {layoutStyles}
                 <LandingPage
-                    user={user}
                     onExplore={() => {
                         // Mark as explored in session
                         sessionStorage.setItem('cafe_has_explored', 'true');
@@ -457,6 +457,7 @@ function DashboardContent() {
                         setHasExplored(true);
                     }}
                     onLogin={() => setShowLoginModal(true)}
+                    user={user}
                 />
             </>
         );
@@ -508,7 +509,7 @@ function DashboardContent() {
                 borderBottom: '1px solid #e5e7eb',
                 position: 'sticky',
                 top: 0,
-                backgroundColor: '#FFF8F0',
+                backgroundColor: '#e2e9e0',
                 zIndex: 50,
                 gap: '2rem'
             }}>
@@ -523,7 +524,7 @@ function DashboardContent() {
                         style={{ cursor: 'pointer' }}
                     >
                         <Image
-                            src="/logo.png"
+                            src="/Final web logo.png"
                             alt="Cafe South Central"
                             width={200}
                             height={60}
@@ -639,43 +640,54 @@ function DashboardContent() {
 
                     {/* Profile Icon or Login */}
                     {user ? (
-                        <button
-                            onClick={() => router.push('/account')}
-                            style={{
-                                width: '36px',
-                                height: '36px',
-                                borderRadius: '50%',
-                                backgroundColor: '#5C3A1A',
-                                color: 'white',
-                                border: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1rem',
-                                fontWeight: 'bold'
-                            }}
-                            title={user.name || 'Profile'}
-                        >
-                            {user.name?.[0]?.toUpperCase() || '👤'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <button
+                                onClick={() => router.push('/account')}
+                                style={{
+                                    height: '36px',
+                                    padding: '0 1rem',
+                                    borderRadius: '999px',
+                                    backgroundColor: '#5C3A1A',
+                                    color: 'white',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 'bold'
+                                }}
+                                title="Profile"
+                            >
+                                {user.name || 'User'}
+                            </button>
+                        </div>
                     ) : (
                         <button
                             onClick={() => setShowLoginModal(true)}
                             style={{
-                                background: 'none',
+                                backgroundColor: '#3C2A21',
+                                color: '#FFF8F0',
                                 border: 'none',
-                                color: '#5C3A1A',
+                                padding: '0.6rem 2rem',
+                                borderRadius: '999px',
                                 fontSize: '1rem',
                                 fontWeight: '700',
                                 cursor: 'pointer',
-                                padding: '0.5rem 0',
-                                transition: 'color 0.2s'
+                                transition: 'all 0.2s',
+                                fontFamily: 'inherit',
+                                boxShadow: '0 2px 5px rgba(60, 42, 33, 0.2)'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(60, 42, 33, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'none';
+                                e.currentTarget.style.boxShadow = '0 2px 5px rgba(60, 42, 33, 0.2)';
+                            }}
                         >
-                            Login
+                            Login / Sign Up
                         </button>
                     )}
                 </div>

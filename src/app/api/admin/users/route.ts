@@ -8,7 +8,7 @@ export async function GET() {
         const users = await prisma.user.findMany({
             where: {
                 role: {
-                    not: 'ADMIN'
+                    not: 'SUPER_ADMIN'
                 }
             },
             select: {
@@ -18,10 +18,10 @@ export async function GET() {
                 role: true,
                 createdAt: true,
                 subscriptions: {
-                    where: { isActive: true },
+                    where: { status: 'ACTIVE' }, // Fixed from isActive: true
                     orderBy: { endDate: 'desc' },
                     take: 1,
-                    select: { endDate: true, planType: true }
+                    select: { endDate: true, planType: true, status: true } // Added status
                 },
                 _count: {
                     select: { orders: true }
@@ -38,7 +38,7 @@ export async function GET() {
             role: user.role,
             createdAt: user.createdAt,
             orderCount: user._count.orders,
-            isMember: user.subscriptions.length > 0,
+            isMember: user.subscriptions.length > 0, // Simplified check since we only fetch ACTIVE
             subscription: user.subscriptions[0] || null
         }));
 

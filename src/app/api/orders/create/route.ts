@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
         let result;
         if (mode === 'NORMAL') {
-            result = await createNormalOrder(userId, items, paymentMethod, upiId, note, timeSlot);
+            result = await createNormalOrder(userId, items, note, timeSlot);
         } else {
             // Default to Subscription or explicit 'SUBSCRIPTION'
             result = await createSubscriptionOrder(userId, items, note, timeSlot);

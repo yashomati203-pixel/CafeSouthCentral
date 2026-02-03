@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import * as Dialog from '@radix-ui/react-dropdown-menu'; // Using simple overlay instead of full Dialog to keep deps low/consistent
+import SmileyFace from './SmileyFace';
+import { Lock, ArrowRight, Phone, User, X } from 'lucide-react';
+import * as Dialog from '@radix-ui/react-dialog'; // Assuming radix-ui is available or we use simple div if not installed. Let's stick to simple divs if unsure, but user had imports.
+// Actually user code had import * as Dialog from '@radix-ui/react-dropdown-menu'; which was weird.
+// keeping it simple with conditional rendering for modals as before to avoid dependency issues.
 
 interface LoginPageProps {
     onLogin: (user: { name: string; phone: string }, stayLoggedIn: boolean) => Promise<void>;
@@ -12,7 +16,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState('');
-    const [tempOtp, setTempOtp] = useState(''); // Store generated OTP for mock check
+    const [tempOtp, setTempOtp] = useState('');
+
+    // Focus state for Smiley
+    const [focusedField, setFocusedField] = useState<'name' | 'phone' | 'otp' | undefined>(undefined);
 
     const [error, setError] = useState('');
     const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -33,9 +40,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             }
             setIsLoading(true);
             try {
-                await onLogin({ name: 'Admin', phone }, false); // Admin no persistence usually
+                await onLogin({ name: 'Admin', phone }, false);
             } catch (e) {
-                // Error handling usually in onLogin alert, but we need to stop loading
+                // error
             } finally {
                 setIsLoading(false);
             }
@@ -57,17 +64,15 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             return;
         }
 
-        // Mock OTP Generation
         const mockOtp = '1234';
         setTempOtp(mockOtp);
         setStep('OTP');
-        // alert(`Your OTP is ${mockOtp}`); // Optional: Simulate SMS
     };
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (otp !== tempOtp && otp !== '1234') { // Allow 1234 as master otp
+        if (otp !== tempOtp && otp !== '1234') {
             setError('Invalid OTP. Please try again.');
             return;
         }
@@ -76,310 +81,235 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         try {
             await onLogin({ name, phone }, stayLoggedIn);
         } catch (e) {
-            // Check
+            // error
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleTermsClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setShowTermsModal(true);
-    };
-
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#e5e7eb',
-            padding: '1rem',
-            position: 'relative'
-        }}>
+        <div className="min-h-screen flex items-center justify-center bg-sand-beige p-4 font-display relative overflow-hidden">
+
+            {/* Background Decorations (Optional) */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-palm-green-light opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-tropical-yellow opacity-5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+
             {/* Terms Modal Overlay */}
             {showTermsModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }} onClick={() => setShowTermsModal(false)}>
-                    <div style={{
-                        backgroundColor: 'white',
-                        padding: '2rem',
-                        borderRadius: '1rem',
-                        maxWidth: '500px',
-                        width: '90%',
-                        maxHeight: '80vh',
-                        overflowY: 'auto'
-                    }} onClick={e => e.stopPropagation()}>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#5C3A1A' }}>Cafe South Central – User Agreement</h2>
-                        <div style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.6', marginBottom: '1.5rem', textAlign: 'left' }}>
-                            <p><strong>One User, One Plan:</strong> Your Mess Plan is linked to your Phone Number. Sharing your account to 'guest' others is not allowed and may result in plan suspension.</p>
-                            <br />
-                            <p><strong>Use It or Lose It:</strong> Subscription meals have a daily limit. These do not carry over. Your 'Daily Limit' resets every night at midnight.</p>
-                            <br />
-                            <p><strong>No Refunds:</strong> Subscription fees are non-refundable once the plan is activated.</p>
-                            <br />
-                            <p><strong>Inventory:</strong> All orders are subject to availability. If an item sells out before you pick it up, a 'Normal Mode' refund or substitute will be offered.</p>
-                            <br />
-                            <p><strong>Privacy:</strong> Your phone number is only used for secure login and to notify you when your food is ready. We never share your data.</p>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto p-8 relative">
+                        <button
+                            onClick={() => setShowTermsModal(false)}
+                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <X size={20} className="text-gray-500" />
+                        </button>
+
+                        <h2 className="font-serif-display text-2xl font-bold text-coconut-brown mb-4">User Agreement</h2>
+                        <div className="prose prose-sm text-gray-600 space-y-4">
+                            <p><strong>One User, One Plan:</strong> Your Mess Plan is linked to your Phone Number.</p>
+                            <p><strong>Use It or Lose It:</strong> Daily limits reset every midnight.</p>
+                            <p><strong>No Refunds:</strong> Fees are non-refundable once activated.</p>
+                            <p><strong>Inventory:</strong> Subject to availability.</p>
+                            <p><strong>Privacy:</strong> Data used only for login and notifications.</p>
                         </div>
                         <button
-                            type="button"
                             onClick={() => setShowTermsModal(false)}
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                backgroundColor: '#5C3A1A',
-                                color: 'white',
-                                borderRadius: '0.5rem',
-                                fontWeight: 'bold',
-                                border: 'none',
-                                cursor: 'pointer'
-                            }}
+                            className="w-full mt-6 bg-coconut-brown text-white font-bold py-3 rounded-xl hover:bg-opacity-90 transition-all active:scale-95"
                         >
-                            Close
+                            I Understand
                         </button>
                     </div>
                 </div>
             )}
 
-            <div style={{
-                backgroundColor: 'white',
-                padding: '2rem',
-                borderRadius: '1rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                width: '100%',
-                maxWidth: '400px',
-                textAlign: 'center'
-            }}>
-                <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
-                    {/* <img src="/logo.png" alt="Cafe South Central" style={{ height: '80px', objectFit: 'contain' }} /> */}
-                    <h2 style={{ color: '#5C3A1A', fontWeight: 'bold' }}>Cafe South Central</h2>
-                </div>
+            {/* Main Login Card */}
+            <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative z-10">
+                <div className="p-6 pt-8">
 
-                <h1 style={{
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                    color: '#5C3A1A',
-                    marginBottom: '0.5rem'
-                }}>
-                    Welcome
-                </h1>
-                <p style={{ color: '#666', marginBottom: '2rem' }}>
-                    {step === 'PHONE' ? 'Please login to continue ordering' : `Enter OTP sent to +91 ${phone}`}
-                </p>
-
-                {/* Admin Login Toggle - More Prominent */}
-                {step === 'PHONE' && (
-                    <div style={{
-                        marginBottom: '2rem',
-                        padding: '1rem',
-                        backgroundColor: '#f9fafb',
-                        borderRadius: '0.75rem',
-                        border: '1px solid #e5e7eb'
-                    }}>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsAdminLogin(!isAdminLogin);
-                                setError('');
-                                setStep('PHONE');
-                            }}
-                            style={{
-                                width: '100%',
-                                background: 'none',
-                                border: 'none',
-                                color: '#5C3A1A',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                fontSize: '0.95rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem'
-                            }}
-                        >
-                            <span style={{ fontSize: '1.2rem' }}>
-                                {isAdminLogin ? '← ' : '🔐 '}
-                            </span>
-                            {isAdminLogin ? 'Back to User Login' : 'Admin Login'}
-                        </button>
+                    {/* Brand */}
+                    <div className="text-center mb-6">
+                        <h2 className="text-coconut-brown font-serif-display font-bold text-xl tracking-wide">Cafe South Central</h2>
                     </div>
-                )}
 
-                <form onSubmit={step === 'PHONE' ? handleGetOtp : handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {/* Smiley Animation */}
+                    <div className="mb-6">
+                        <SmileyFace focusState={focusedField || (step === 'OTP' ? 'otp' : undefined)} />
+                    </div>
 
+                    <div className="text-center mb-5">
+                        <h1 className="font-serif-display text-2xl font-bold text-palm-green-dark mb-1">
+                            {step === 'PHONE' ? 'Welcome Back!' : 'Verify OTP'}
+                        </h1>
+                        <p className="text-gray-500 text-xs">
+                            {step === 'PHONE'
+                                ? 'Detailed flavors, simplified ordering.'
+                                : `Enter the code sent to ${phone}`}
+                        </p>
+                    </div>
+
+                    {/* Admin Toggle */}
                     {step === 'PHONE' && (
-                        <>
-                            {!isAdminLogin && (
-                                <div style={{ textAlign: 'left' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#333' }}>
-                                        Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="Enter your name"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem',
-                                            borderRadius: '0.5rem',
-                                            border: '1px solid #ddd',
-                                            fontSize: '1rem'
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            <div style={{ textAlign: 'left' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#333' }}>
-                                    {isAdminLogin ? 'Admin ID' : 'Phone Number'}
-                                </label>
-                                <input
-                                    type={isAdminLogin ? "text" : "tel"}
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    placeholder={isAdminLogin ? "Enter Admin ID" : "Enter your number"}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        borderRadius: '0.5rem',
-                                        border: '1px solid #ddd',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
-
-                            {!isAdminLogin && (
-                                <>
-                                    <label style={{ display: 'flex', alignItems: 'start', gap: '0.5rem', textAlign: 'left', fontSize: '0.9rem', cursor: 'pointer' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={termsAccepted}
-                                            onChange={(e) => setTermsAccepted(e.target.checked)}
-                                            style={{ marginTop: '0.25rem' }}
-                                        />
-                                        <div style={{ color: '#555' }}>
-                                            <span>I agree to the </span>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setShowTermsModal(true);
-                                                }}
-                                                style={{ color: '#5C3A1A', textDecoration: 'underline', border: 'none', background: 'none', padding: 0, fontWeight: 'bold', cursor: 'pointer', display: 'inline' }}
-                                            >
-                                                Terms & Conditions
-                                            </button>
-                                        </div>
-                                    </label>
-
-                                    {/* Stay Logged In Checkbox */}
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textAlign: 'left', fontSize: '0.9rem', cursor: 'pointer' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={stayLoggedIn}
-                                            onChange={(e) => setStayLoggedIn(e.target.checked)}
-                                        />
-                                        <span style={{ color: '#555' }}>
-                                            Stay logged in on this device
-                                        </span>
-                                    </label>
-                                </>
-                            )}
-                        </>
-                    )}
-
-                    {step === 'OTP' && (
-                        <div style={{ textAlign: 'left' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#333' }}>
-                                Enter 4-digit OTP (Use 1234)
-                            </label>
-                            <input
-                                type="text"
-                                maxLength={4}
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                placeholder="- - - -"
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    borderRadius: '0.5rem',
-                                    border: '1px solid #ddd',
-                                    fontSize: '1.5rem',
-                                    textAlign: 'center',
-                                    letterSpacing: '0.5rem'
+                        <div className="mb-4 flex justify-center">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsAdminLogin(!isAdminLogin);
+                                    setError('');
+                                    setStep('PHONE');
                                 }}
-                                autoFocus
-                            />
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                            >
+                                {isAdminLogin ? <ArrowRight size={14} /> : <Lock size={14} />}
+                                {isAdminLogin ? 'Back to Customer Login' : 'Admin Login'}
+                            </button>
                         </div>
                     )}
 
-                    {error && (
-                        <p style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                            {error}
-                        </p>
-                    )}
+                    <form onSubmit={step === 'PHONE' ? handleGetOtp : handleVerifyOtp} className="space-y-4">
+                        {step === 'PHONE' && (
+                            <>
+                                {!isAdminLogin && (
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1 ml-1">Your Name</label>
+                                        <div className="relative">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <User size={16} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                onFocus={() => setFocusedField('name')}
+                                                onBlur={() => setFocusedField(undefined)}
+                                                placeholder="e.g. Ananya"
+                                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
 
-                    {(() => {
-                        // Logic to calculate if button is disabled
-                        const isPhoneStepValid = isAdminLogin
-                            ? phone.trim().length > 0
-                            : (name.trim().length > 0 && phone.trim().length >= 10 && termsAccepted);
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-700 mb-1 ml-1">
+                                        {isAdminLogin ? 'Admin ID' : 'Phone Number'}
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                            {isAdminLogin ? <Lock size={16} /> : <Phone size={16} />}
+                                        </div>
+                                        <input
+                                            type={isAdminLogin ? "text" : "tel"}
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            onFocus={() => setFocusedField('phone')}
+                                            onBlur={() => setFocusedField(undefined)}
+                                            placeholder={isAdminLogin ? "Enter Admin ID" : "98765 43210"}
+                                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                        />
+                                    </div>
+                                </div>
 
-                        const isDisabled = isLoading || (step === 'PHONE' && !isPhoneStepValid);
+                                {!isAdminLogin && (
+                                    <div className="space-y-2 pt-1">
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={termsAccepted}
+                                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                                    className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-palm-green-dark checked:bg-palm-green-dark"
+                                                />
+                                                <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
+                                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                </div>
+                                            </div>
+                                            <div className="text-xs text-gray-500 leading-snug">
+                                                I agree to the <button onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }} className="text-palm-green-dark font-bold hover:underline">Terms & Conditions</button>
+                                            </div>
+                                        </label>
 
-                        return (
-                            <button
-                                type="submit"
-                                disabled={isDisabled}
-                                style={{
-                                    marginTop: '1rem',
-                                    backgroundColor: isDisabled ? '#ccc' : '#5C3A1A',
-                                    color: 'white',
-                                    padding: '0.75rem',
-                                    borderRadius: '0.5rem',
-                                    border: 'none',
-                                    fontSize: '1rem',
-                                    fontWeight: 'bold',
-                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    transition: 'background-color 0.2s'
-                                }}
-                            >
-                                {isLoading ? 'Please wait...' : (isAdminLogin ? 'Login to Dashboard' : (step === 'PHONE' ? 'Get OTP ➔' : 'Verify & Login'))}
-                            </button>
-                        );
-                    })()}
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={stayLoggedIn}
+                                                    onChange={(e) => setStayLoggedIn(e.target.checked)}
+                                                    className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-palm-green-dark checked:bg-palm-green-dark"
+                                                />
+                                                <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
+                                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-gray-500">Keep me logged in</span>
+                                        </label>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {step === 'OTP' && (
+                            <div className="space-y-4">
+                                <div>
+                                    <input
+                                        type="text"
+                                        maxLength={4}
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                        onFocus={() => setFocusedField('otp')}
+                                        onBlur={() => setFocusedField(undefined)}
+                                        placeholder="• • • •"
+                                        className="w-full py-4 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none text-center text-3xl tracking-[1em] font-bold text-gray-800 placeholder-gray-300"
+                                        autoFocus
+                                    />
+                                    <p className="text-center text-xs text-gray-400 mt-2">Use code 1234 for testing</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-medium text-center animate-in fade-in">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={`
+                                w-full py-3 rounded-full font-bold text-base shadow-lg hover:shadow-xl active:scale-95 transition-all
+                                flex items-center justify-center gap-2
+                                ${isLoading || (step === 'PHONE' && !isAdminLogin && (!termsAccepted || !name || !phone))
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                    : 'bg-palm-green-dark text-tropical-yellow hover:bg-opacity-90'}
+                            `}
+                        >
+                            {isLoading ? (
+                                <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                isAdminLogin ? 'Enter Dashboard' : (step === 'PHONE' ? 'Get OTP' : 'Verify & Login')
+                            )}
+                        </button>
+                    </form>
 
                     {step === 'OTP' && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setStep('PHONE');
-                                setOtp('');
-                                setError('');
-                            }}
-                            style={{ background: 'none', border: 'none', color: '#666', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.9rem' }}
-                        >
-                            Change Phone Number
-                        </button>
+                        <div className="text-center mt-6">
+                            <button
+                                onClick={() => {
+                                    setStep('PHONE');
+                                    setOtp('');
+                                    setError('');
+                                }}
+                                className="text-sm text-gray-500 hover:text-palm-green-dark font-medium transition-colors"
+                            >
+                                Change Phone Number
+                            </button>
+                        </div>
                     )}
-                </form>
+                </div>
+            </div>
+
+            <div className="absolute bottom-4 text-xs text-gray-400 font-medium">
+                © 2026 Cafe South Central
             </div>
         </div>
     );

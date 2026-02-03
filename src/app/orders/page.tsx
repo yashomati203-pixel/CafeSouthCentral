@@ -56,7 +56,10 @@ export default function OrderHistoryPage() {
                         }
                         setLoading(false);
                     })
-                    .catch(e => console.error(e));
+                    .catch(e => {
+                        console.error(e);
+                        setLoading(false);
+                    });
             };
 
             poll();
@@ -151,10 +154,10 @@ export default function OrderHistoryPage() {
         return matchesStatus && matchesDate;
     });
 
-    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading history...</div>;
+    if (loading) return <div style={{ padding: '2rem', textAlign: 'center', minHeight: '100vh', backgroundColor: '#e2e9e0' }}>Loading history...</div>;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F0' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: '#e2e9e0' }}>
             <DesktopHeader
                 user={user}
                 onLoginClick={() => router.push('/?login=true')}

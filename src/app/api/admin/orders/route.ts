@@ -21,8 +21,8 @@ export async function GET() {
                         name: true,
                         phone: true,
                         subscriptions: {
-                            where: { isActive: true },
-                            select: { id: true }, // Sufficient to check length > 0
+                            where: { status: 'ACTIVE' },
+                            select: { id: true },
                             take: 1
                         }
                     }

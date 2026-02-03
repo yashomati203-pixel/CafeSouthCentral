@@ -43,7 +43,7 @@ export default function SubscriptionPage() {
         : 0;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F0', fontFamily: 'sans-serif' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: '#e2e9e0', fontFamily: 'sans-serif' }}>
             <DesktopHeader
                 user={user}
                 onLoginClick={() => router.push('/?login=true')}

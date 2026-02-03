@@ -313,7 +313,7 @@ function MenuItemCard({
     isPopular?: boolean;
 }) {
     return (
-        <div className={`flex flex-col h-full ${item.inventoryCount === 0 ? 'opacity-60' : ''}`}>
+        <div className={`flex flex-col h-full ${item.stock === 0 ? 'opacity-60' : ''}`}>
             {/* Image */}
             <div className="relative w-full overflow-hidden bg-slate-100 dark:bg-slate-700" style={{ aspectRatio: '4/3' }}>
                 {!isBestseller && isPopular && (
@@ -335,17 +335,14 @@ function MenuItemCard({
                         {item.name}
                     </h3>
                     <div className="flex flex-col items-end gap-1 ml-2">
-                        <span className={`text-xs px-2 py-0.5 rounded border ${item.isVeg
-                            ? 'border-green-500 text-green-600 dark:text-green-400'
-                            : 'border-red-500 text-red-600 dark:text-red-400'
-                            }`}>
-                            {item.isVeg ? 'VEG' : 'NON-VEG'}
+                        <span className="text-xs px-2 py-0.5 rounded border border-green-500 text-green-600 dark:text-green-400">
+                            PURE VEG
                         </span>
-                        {item.inventoryCount === 0 ? (
+                        {item.stock === 0 ? (
                             <span className="text-xs font-bold text-red-600 border border-red-600 px-2 py-0.5 rounded">
                                 SOLD OUT
                             </span>
-                        ) : item.inventoryCount <= 5 ? (
+                        ) : item.stock <= 5 ? (
                             <span className="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">
                                 Running Out!
                             </span>
@@ -381,11 +378,11 @@ function MenuItemCard({
                     ) : (
                         <button
                             onClick={() => onAddToCart(item)}
-                            disabled={item.inventoryCount === 0}
+                            disabled={item.stock === 0}
                             className="w-full flex items-center justify-center gap-2 py-3 bg-stone-100 hover:bg-[#5C3A1A] text-[#5C3A1A] hover:text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                         >
                             <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-                            {item.inventoryCount === 0 ? 'Sold Out' : 'Add to Cart'}
+                            {item.stock === 0 ? 'Sold Out' : 'Add to Cart'}
                         </button>
                     )}
                 </div>

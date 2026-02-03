@@ -4,14 +4,14 @@ import { prisma } from '@/lib/prisma';
 export async function PATCH(request: Request) {
     try {
         const body = await request.json();
-        const { id, inventoryCount, isAvailable } = body;
+        const { id, stock, isAvailable } = body;
 
         if (!id) {
             return NextResponse.json({ error: 'ID required' }, { status: 400 });
         }
 
         const data: any = {};
-        if (typeof inventoryCount === 'number') data.inventoryCount = inventoryCount;
+        if (typeof stock === 'number') data.stock = stock;
         if (typeof isAvailable === 'boolean') {
             data.isAvailable = isAvailable;
             // If explicit "Availability" toggle is off, maybe set count to 0? 

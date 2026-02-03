@@ -99,7 +99,13 @@ const PLANS = [
     }
 ];
 
-export default function CheckoutPage() {
+// Force dynamic rendering because this page relies on SearchParams
+// which breaks static generation if not wrapped in Suspense (or marked dynamic)
+export const dynamic = 'force-dynamic';
+
+import { Suspense } from 'react';
+
+function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const planId = searchParams?.get('plan');
@@ -441,5 +447,13 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CheckoutContent />
+        </Suspense>
     );
 }

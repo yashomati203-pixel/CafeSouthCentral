@@ -36,11 +36,7 @@ interface PaymentMethod {
     isPrimary: boolean;
 }
 
-interface LoyaltyPoints {
-    totalPoints: number;
-    tier: string;
-    pointsToNextTier: number;
-}
+// LoyaltyPoints interface removed
 
 export default function AccountPage() {
     const router = useRouter();
@@ -81,9 +77,6 @@ export default function AccountPage() {
         expiryYear: new Date().getFullYear(),
         cardholderName: ''
     });
-
-    // Loyalty State
-    const [loyaltyPoints, setLoyaltyPoints] = useState<LoyaltyPoints | null>(null);
 
     // Subscription State
     const [subscription, setSubscription] = useState<any>(null);
@@ -127,12 +120,6 @@ export default function AccountPage() {
             const pmRes = await fetch(`/api/user/payment-methods?userId=${userId}`);
             if (pmRes.ok) setPaymentMethods(await pmRes.json());
         } catch (e) { console.log('Payment methods not available yet'); }
-
-        // Load loyalty points
-        try {
-            const loyaltyRes = await fetch(`/api/user/loyalty?userId=${userId}`);
-            if (loyaltyRes.ok) setLoyaltyPoints(await loyaltyRes.json());
-        } catch (e) { console.log('Loyalty not available yet'); }
 
         // Load subscription
         try {
@@ -278,14 +265,7 @@ export default function AccountPage() {
         }
     };
 
-    const getTierColor = (tier: string) => {
-        switch (tier) {
-            case 'Platinum': return { bg: '#e0e7ff', color: '#4338ca' };
-            case 'Gold': return { bg: '#fef3c7', color: '#92400e' };
-            case 'Silver': return { bg: '#f3f4f6', color: '#374151' };
-            default: return { bg: '#fed7aa', color: '#92400e' };
-        }
-    };
+    // Loyalty Helper Removed
 
     if (loading && !user) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Account...</div>;
 
@@ -816,56 +796,7 @@ export default function AccountPage() {
 
                     {/* Right Column - Loyalty & Rewards */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {/* Loyalty & Rewards Card */}
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                            textAlign: 'center'
-                        }}>
-                            <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.5rem' }}>Loyalty & Rewards</h3>
-                            <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#5C3A1A', marginBottom: '0.5rem' }}>
-                                {loyaltyPoints?.totalPoints || 0}
-                            </div>
-                            <p style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '1rem' }}>Points</p>
-
-                            <div style={{
-                                display: 'inline-block',
-                                padding: '0.5rem 1.25rem',
-                                backgroundColor: getTierColor(loyaltyPoints?.tier || 'Bronze').bg,
-                                color: getTierColor(loyaltyPoints?.tier || 'Bronze').color,
-                                borderRadius: '1.5rem',
-                                fontSize: '0.875rem',
-                                fontWeight: 'bold',
-                                marginBottom: '1.5rem'
-                            }}>
-                                {loyaltyPoints?.tier || 'Bronze'} Member
-                            </div>
-
-                            {loyaltyPoints && loyaltyPoints.pointsToNextTier > 0 && (
-                                <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>
-                                    You're just {loyaltyPoints.pointsToNextTier} points away from a free pastry!
-                                </p>
-                            )}
-
-                            <button
-                                onClick={() => router.push('/subscription')}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    backgroundColor: '#5C3A1A',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '0.5rem',
-                                    fontSize: '0.875rem',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                View Rewards Program
-                            </button>
-                        </div>
+                        {/* Loyalty Card Removed */}
 
                         {/* Current Plan Card (if subscription exists) */}
                         {subscription && (
