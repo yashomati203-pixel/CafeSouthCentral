@@ -78,7 +78,7 @@
 
 | Metric | Current (Manual) | Target (With App) | Measurement |
 |--------|------------------|-------------------|-------------|
-| Average Order Time | 8 minutes | 2 minutes | Time from order to kitchen |
+| Average Order Time |10 minutes | 2 minutes | Time from order to kitchen |
 | Queue Wait Time | 15 minutes | 4 minutes | Customer time in queue |
 | Order Error Rate | 12% | <1% | Incorrect orders / total |
 | Subscription Retention | N/A | 85% | Active after 3 months |
@@ -280,8 +280,7 @@ font-family: 'JetBrains Mono', 'Fira Code', monospace;
 |------|-------------|--------------|
 | Guest | Browse menu, view prices | Public |
 | Customer | Place orders, manage subscriptions, view history | Authenticated |
-| Kitchen Staff | View order queue, update order status | Admin Portal (Read/Write Orders) |
-| Manager | All kitchen + inventory + analytics | Admin Portal (Full Operations) |
+| Manager / Staff | View order queue, update status, inventory & analytics | Admin Portal (Full Operations) |
 | Super Admin | All manager + user management + financial reports | Admin Portal (Full System) |
 
 ### 3.2 Core User Journeys
@@ -337,8 +336,8 @@ font-family: 'JetBrains Mono', 'Fira Code', monospace;
 
 **Requirements:**
 - Display all available items with photos, names, prices
-- Categories: South Indian, Chinese, Snacks, Beverages, Desserts
-- Filters: Vegetarian/Non-Vegetarian, Spice Level, Price Range
+- Categories: South Indian, Snacks, Beverages, Desserts
+- Filters: Vegetarian, Spice Level, Price Range
 - Search: Fuzzy matching on item names (e.g., "dosa" matches "Masala Dosa")
 - Sort: Price (Low/High), Popularity, Alphabetical
 - Stock indicators:
@@ -347,14 +346,14 @@ font-family: 'JetBrains Mono', 'Fira Code', monospace;
   - "Sold Out" (red badge, disabled, grayed out)
 
 **UI Components:**
-- Grid view (desktop 3 columns, tablet 2, mobile 1)
+- Grid view (desktop 4columns, tablet 3, mobile 2)
 - Card per item showing:
   - High-quality food photo (16:9 aspect ratio)
   - Item name (Californian FB font)
   - Description (1-2 lines, truncated)
   - Price (₹ symbol, monospace font)
   - Add to cart button
-  - Veg/Non-Veg icon (green dot / red triangle)
+  - Veg/(green dot)
 
 **Performance:**
 - Initial load: <150ms (cached menu data)
@@ -470,6 +469,13 @@ interface OrderQRPayload {
 // QR code contains:
 // {"oid":"abc123","uid":"xyz789","ts":1738395600,"sig":"abc..."}
 ```
+
+#### 3.3.5 Subscription Dashboard
+
+**Subscription Quota Display:**
+- Visual "Meal Tokens" that grey out as they are used
+- Provide clear, at-a-glance usage tracking.
+
 
 ---
 
@@ -1227,11 +1233,11 @@ async function handlePaymentCaptured(payment) {
       });
     }
     
-    // 3. Send confirmation SMS
-    await sendOrderConfirmationSMS(order);
+    // 3. Send confirmation WhatsApp
+    await sendOrderConfirmationWhatsApp(order);
     
-    // 4. Send email receipt
-    await sendOrderConfirmationEmail(order);
+    // 4. (Optional) Email receipt can still be sent for record
+    // await sendOrderConfirmationEmail(order);
   });
 }
 
@@ -2147,20 +2153,16 @@ async function checkLowStockItems() {
     }
   });
   
-  if (lowStockItems.length > 0) {
-    // Send alert to manager
-    await sendSlackNotification(
-      `⚠️ Low Stock Alert: ${lowStockItems.map(i => `${i.name} (${i.stock} left)`).join(', ')}`
-    );
-  }
-}
-```
+### 9.1 Authentication & Authorization
+- **Implementation**:
+  - **Hashing**: Argon2 (replacing bcrypt) for robust password security.
+  - **Sessions**: Secure HTTP-only cookies with JWT (JOSE library).
+  - **Rate Limiting**: Upstash Redis-based limiter (`middleware.ts`).
+  - **CSP**: Content-Security-Policy headers in `next.config.js`.
 
----
-
-## 9. Security & Compliance
-
-### 9.1 Data Protection & DPDP Act 2023 Compliance
+### 9.2 Data Protection
+- **Audit Logs**: `AuditLog` table tracks critical actions (Login, Refund, Inventory Update).
+- **Encryption**: Sensitive fields (like TotpSecret) are encrypted at rest.
 
 **Legal Framework:** Digital Personal Data Protection Act, 2023 (India)
 
@@ -2457,9 +2459,9 @@ export async function handleDataBreach(incident: {
 #### 9.1.4 Data Localization
 
 **Server Locations:**
-- **Database:** Supabase (Asia South - Mumbai region)
-- **Application:** Vercel (BOM1 - Mumbai deployment)
-- **Cache:** Upstash Redis (Mumbai region)
+- **Infrastructure**: Vercel (Frontend/API), Supabase (Database), Upstash Redis (Rate Limiting/Auth), Pusher (Real-time).
+- **Notifications**: WhatsApp-first (Direct Meta API), replacing SMS for cost-efficiency.
+- **Security**: CSP, Rate Limiting, Argon2 Hashing, Audit Logs.
 - **File Storage:** AWS S3 (ap-south-1 - Mumbai)
 
 **Compliance Notes:**
@@ -2923,30 +2925,16 @@ export class AppError extends Error {
     public statusCode: number = 400,
     public details?: any
   ) {
-    super(message);
-    this.name = 'AppError';
-  }
-}
+   ## 10. Error Handling & Resilience
 
-// Global error handler
-export function handleError(error: Error, requestId: string): Response {
-  // Log to Sentry
-  Sentry.captureException(error, {
-    tags: { requestId }
-  });
-  
-  if (error instanceof AppError) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          timestamp: new Date().toISOString(),
-          requestId
-        }
-      } as APIError),
+### 10.1 Implementation
+- **Centralized Handler**: `src/lib/error.ts` standardizes API responses.
+- **Logging**: `prisma.ErrorLog` captures backend exceptions with stack traces.
+- **Structured Logs**: Application uses `pino` (via `src/lib/logger.ts`) for JSON-structured logging.
+
+### 10.2 Resilience
+- **Webhooks**: Razorpay webhooks (`src/app/api/webhooks/razorpay`) handle async payment confirmation.
+- **Database**: Connection pooling enabled for Supabase to handle 1000+ users.
       {
         status: error.statusCode,
         headers: { 'Content-Type': 'application/json' }
@@ -4664,7 +4652,7 @@ resource "vercel_deployment" "production" {
 - [ ] Dynamic pricing based on demand
 
 ### Phase 5: Expansion (Months 10-12)
-- [ ] Third-party delivery integration (Swiggy, Zomato)
+
 - [ ] Franchise management portal
 - [ ] White-label solution for other cafes
 - [ ] Mobile app (React Native)

@@ -9,7 +9,7 @@ This application is a specialized food ordering system designed for high-traffic
 ## 2. Functionality & Features
 
 ### For Customers
-*   **Authentication**: Simple login using Name and Phone Number. (Admin login via ID).
+*   **Authentication**: Login via **WhatsApp OTP** (Direct Meta API). Admin login via ID/Password.
 *   **Menu Browsing**:
     *   View items categorized (South Indian, Chinese, etc.).
     *   Veg/Non-Veg indicators.
@@ -54,6 +54,10 @@ This application is a specialized food ordering system designed for high-traffic
 *   **Kitchen Scanner** (`/api/admin/scan`):
     *   Validates Order QR Tokens.
     *   Prevents race conditions on pickup.
+*   **Notification Service** (`src/services/notificationService.ts`):
+    *   Unified interface for sending alerts.
+    *   **WhatsApp-First**: Uses Direct Meta Graph API (No middleman fees).
+    *   Handles OTPs and Order Status updates.
 
 ### Key Technical Components
 
@@ -71,8 +75,10 @@ Located in `src/services/orderService.ts`, the application uses Prisma **Interac
 *   **Normal Order**: Atomically Checks Inventory -> Decrements Inventory -> Creates Order.
 
 #### Authentication
-*   Currently uses a **passwordless local strategy** for ease of access (Name + Phone).
-*   Session is client-side persisted via LocalStorage.
+#### Authentication
+*   **Strategy**: Mobile-first WhatsApp OTP.
+*   **Flow**: User enters phone -> Random OTP generated -> Hashed (Argon2) & Stored in Redis (5 min TTL) -> Sent via WhatsApp -> User verifies.
+*   **Session**: JWT (Signed with JOSE) in HTTP-only cookies.
 
 ## 4. Deployment Tools & Free Strategy
 
@@ -81,8 +87,9 @@ To deploy this application successfully, you will need the following tools/servi
 
 1.  **Source Code Management**: **GitHub** (Required for Vercel/Netlify integration).
 2.  **Hosting Platform**: **Vercel** (Recommended for Next.js) or Netlify.
-3.  **Database Provider**: **Supabase** or **Neon** (Managed PostgreSQL).
-4.  **Package Manager**: **npm** or **yarn** (Local development).
+3.  **Database Provider**: **Supabase** (PostgreSQL).
+4.  **Cache/KV Store**: **Upstash Redis** (Required for OTPs & Rate Limiting).
+5.  **Package Manager**: **npm** or **yarn** (Local development).
 
 ### Free Deployment Strategy (1000+ Users Support)
 You can deploy this application completely for **FREE** while still supporting 1000+ concurrent users by leveraging the generous free tiers of the following services:

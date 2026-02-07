@@ -34,6 +34,7 @@ model User {
   fraudAlerts      FraudAlert[]
   consentRecords   ConsentRecord[]
   subscriptionDevices SubscriptionDevice[]
+  auditLogs           AuditLog[]
 }
 
 model SubscriptionDevice {
@@ -288,4 +289,27 @@ model LoyaltyPoints {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String   // e.g., "LOGIN_ATTEMPT", "ORDER_CANCELLED", "INVENTORY_UPDATE"
+  resource  String?  // e.g., "Order:123", "MenuItem:456"
+  details   String?  // JSON string or description
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model ErrorLog {
+  id        String   @id @default(uuid())
+  code      String?  // e.g., "PAYMENT_FAILED", "DB_CONNECTION_ERROR"
+  message   String
+  stack     String?
+  context   String?  // JSON string of request body / user context
+  path      String?
+  method    String?
+  createdAt DateTime @default(now())
 }

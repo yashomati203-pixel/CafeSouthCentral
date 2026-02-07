@@ -10,7 +10,7 @@
 The initial launch strategy prioritizes a **Low-Burn Model** by leveraging generous "Free Tiers" from top-tier infrastructure providers. The primary costs during the launch phase will be **variable** (pay-as-you-grow) rather than fixed monthly fees.
 
 **Estimated Monthly Fixed Cost (Launch):** ₹0
-**Estimated One-Time Cost:** ₹6,900 (approx)
+**Estimated One-Time Cost:** ₹1,000 (Domain only)
 
 ---
 
@@ -36,13 +36,13 @@ These costs occur *only when you make money* (receive orders) or when users log 
 
 | Service | Provider | Unit Cost | Estimated Monthly (for 100 orders/day) |
 | :--- | :--- | :--- | :--- |
-| **SMS (OTP)** | Msg91 / 2Factor | ~₹0.20 - ₹0.25 per SMS | **₹600 - ₹750** *(Assuming 1 login = 1 order. Bulk packs reduce cost)* |
+| **Notifications** | WhatsApp (Meta) | ~₹0.35 / convection | **Variable** (First 1000/mo Free) |
 | **Payments** | Razorpay | 2% per transaction | **Variable** *(e.g., ₹20 on a ₹1000 order)* |
 | **Email** | Resend | Free (up to 3,000 / mo) | **₹0** *(Sufficient for 100 orders/day)* |
 
-**Note on SMS:**
-*   **Twilio (REJECTED):** ~₹7.00/SMS (Too expensive for India model).
-*   **Recommendation:** Buy a prepaid credit pack of ₹1,000 - ₹2,000 from Msg91/2Factor to start.
+**Note on WhatsApp:**
+*   **Direct API (Meta):** No platform fees. You pay only for conversations.
+*   **Free Tier:** First 1,000 Service conversations per month are FREE. This covers most initial traffic.
 
 ---
 
@@ -53,11 +53,11 @@ Mandatory fees to legally operate digital communications and branding in India.
 | Item | Necessity | Cost (Approx) | Frequency |
 | :--- | :--- | :--- | :--- |
 | **Domain Name** | Brand Identity | ₹800 - ₹1,000 | Yearly |
-| **DLT Registration** | TRAI Compliance (Mandatory for SMS) | ₹5,900 | **One-Time (Lifetime)** |
+| **DLT Registration** | **NOT REQUIRED (WhatsApp)** | **₹0** | - |
 | **Business Registration** | Legal Identity | Varies | One-Time |
 
-**What is DLT?**
-Distributed Ledger Technology registration is required by TRAI for any business sending SMS to Indian numbers. You must register your entity (Cafe South Central) and your Headers (e.g., "CAFESC") with a telecom operator like Jio, Airtel, or Vodafone-Idea.
+**Why No DLT?**
+We switched to **WhatsApp Direct Cloud API**, which does not require the expensive TRAI DLT registration that SMS does. This saves ~₹5,900 upfront.
 
 ---
 
@@ -65,9 +65,9 @@ Distributed Ledger Technology registration is required by TRAI for any business 
 
 ### **One-Time Setup**
 *   **Domain:** ₹1,000
-*   **DLT Registration:** ₹5,900
-*   **Initial SMS Credits:** ₹1,000
-*   **Total:** **~₹7,900**
+*   **DLT Registration:** ₹0 (Saved!)
+*   **Initial SMS Credits:** ₹0
+*   **Total:** **~₹1,000**
 
 ### **Monthly Running Cost (at Launch)**
 *   **Fixed:** ₹0

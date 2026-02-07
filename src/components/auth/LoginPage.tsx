@@ -8,18 +8,19 @@ import * as Dialog from '@radix-ui/react-dialog'; // Assuming radix-ui is availa
 // keeping it simple with conditional rendering for modals as before to avoid dependency issues.
 
 interface LoginPageProps {
-    onLogin: (user: { name: string; phone: string }, stayLoggedIn: boolean) => Promise<void>;
+    onLogin: (user: { name: string; phone: string; password?: string; otp?: string }, stayLoggedIn: boolean) => Promise<void>;
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
     const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [tempOtp, setTempOtp] = useState('');
 
     // Focus state for Smiley
-    const [focusedField, setFocusedField] = useState<'name' | 'phone' | 'otp' | undefined>(undefined);
+    const [focusedField, setFocusedField] = useState<'name' | 'phone' | 'password' | 'otp' | undefined>(undefined);
 
     const [error, setError] = useState('');
     const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -38,9 +39,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 setError('Please enter Admin ID');
                 return;
             }
+            if (!password.trim()) {
+                setError('Please enter Password');
+                return;
+            }
             setIsLoading(true);
             try {
-                await onLogin({ name: 'Admin', phone }, false);
+                await onLogin({ name: 'Admin', phone, password }, false);
             } catch (e) {
                 // error
             } finally {
@@ -64,22 +69,45 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             return;
         }
 
-        const mockOtp = '1234';
-        setTempOtp(mockOtp);
-        setStep('OTP');
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || 'Failed to send OTP');
+            } else {
+                setStep('OTP');
+
+                // Auto-fill for dev convenience
+                if (data.params?.devOtp) {
+                    setOtp(data.params.devOtp);
+                    alert(`[DEV] OTP is: ${data.params.devOtp}`);
+                }
+            }
+        } catch (e) {
+            setError('Network error. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (otp !== tempOtp && otp !== '1234') {
-            setError('Invalid OTP. Please try again.');
+        if (otp.length !== 4 && otp.length !== 6) {
+            setError('Please enter a valid OTP');
             return;
         }
 
         setIsLoading(true);
         try {
-            await onLogin({ name, phone }, stayLoggedIn);
+            await onLogin({ name, phone, otp }, stayLoggedIn);
         } catch (e) {
             // error
         } finally {
@@ -207,7 +235,28 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
                                         />
                                     </div>
+
                                 </div>
+
+                                {isAdminLogin && (
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-1 ml-1">Password</label>
+                                        <div className="relative">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <Lock size={16} />
+                                            </div>
+                                            <input
+                                                type="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                onFocus={() => setFocusedField('password')}
+                                                onBlur={() => setFocusedField(undefined)}
+                                                placeholder="••••••••"
+                                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
 
                                 {!isAdminLogin && (
                                     <div className="space-y-2 pt-1">
@@ -252,7 +301,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                 <div>
                                     <input
                                         type="text"
-                                        maxLength={4}
+                                        maxLength={6}
                                         value={otp}
                                         onChange={(e) => setOtp(e.target.value)}
                                         onFocus={() => setFocusedField('otp')}
@@ -311,6 +360,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <div className="absolute bottom-4 text-xs text-gray-400 font-medium">
                 © 2026 Cafe South Central
             </div>
-        </div>
+        </div >
     );
 }

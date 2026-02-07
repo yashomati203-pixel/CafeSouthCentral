@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import StockItem from '@/components/admin/StockItem';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
-import { printKOT } from '@/lib/printer';
+import { printKOT, printBill } from '@/lib/printer';
 import {
     LayoutDashboard,
     ShoppingBag,
@@ -53,6 +53,8 @@ interface Order {
     timeSlot?: string;
     mode?: string;
     note?: string;
+    header?: string;
+    paymentMethod?: string;
 }
 
 export default function AdminDashboard() {
@@ -119,7 +121,7 @@ export default function AdminDashboard() {
         }
         try {
             const parsed = JSON.parse(storedUser);
-            if (parsed.role !== 'ADMIN') {
+            if (!['SUPER_ADMIN', 'MANAGER', 'KITCHEN_STAFF'].includes(parsed.role)) {
                 window.location.href = '/';
                 return;
             }
@@ -152,6 +154,7 @@ export default function AdminDashboard() {
             }
             const data = await res.json();
             if (Array.isArray(data)) {
+                console.log("Admin Fetched Orders:", data.length, data[0]); // Debug Log
                 setOrders(data);
 
                 // Sound Alert Logic
@@ -345,13 +348,21 @@ export default function AdminDashboard() {
                     displayId: data.displayId,
                     user: { name: posName || 'Walk-in', phone: posPhone },
                     createdAt: new Date().toISOString(),
-                    items: posCart.map(i => ({ quantity: i.qty, name: i.item.name })),
-                    // totalAmount not returned by createNormalOrder unless we update it? 
-                    // createNormalOrder returns { orderId, displayId, totalAmount, status }
-                    // So data.totalAmount should be there.
+                    items: posCart.map(i => ({ quantity: i.qty, name: i.item.name, price: i.item.price })), // Include price for Bill
+                    totalAmount: data.totalAmount || posCart.reduce((acc, i) => acc + (i.item.price * i.qty), 0),
+                    paymentMethod: 'CASH'
                 };
-                printKOT(printableOrder);
-                alert('Order Placed & Print Sent!');
+
+                // Auto Print Options
+                // We'll show an alert or just rely on the new UI buttons if they navigate to Live list.
+                // But for POS "Checkout", usually we print bill immediately.
+                if (confirm("Order Placed! Print Bill and KOT now?")) {
+                    printBill(printableOrder);
+                    // Small delay to ensure first print dialog opens/closes or just allow browser to handle multiple popups
+                    setTimeout(() => printKOT(printableOrder), 500);
+                }
+
+                alert('Order Placed Successfully!');
                 setActiveTab('active');
             } else {
                 alert('Failed: ' + (data.error || 'Unknown error'));
@@ -510,21 +521,44 @@ export default function AdminDashboard() {
                                             <div>
                                                 <div style={{ fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     #{order.displayId || order.id.slice(0, 5)}
-                                                    <button
-                                                        onClick={() => printKOT(order)}
-                                                        title="Print Kitchen Ticket"
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}
-                                                    >
-                                                        🖨️
-                                                    </button>
-                                                    <a href={`/receipt/${order.id}`} target="_blank" title="View Receipt" style={{ textDecoration: 'none', fontSize: '1rem', cursor: 'pointer' }}>📄</a>
+                                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                                        <button
+                                                            onClick={() => printKOT(order)}
+                                                            title="Print Kitchen Ticket"
+                                                            style={{
+                                                                background: '#f3f4f6', border: '1px solid #d1d5db',
+                                                                cursor: 'pointer', fontSize: '0.9rem', padding: '2px 6px',
+                                                                borderRadius: '4px'
+                                                            }}
+                                                        >
+                                                            🧑‍🍳 KOT
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                // Need to cast to compatible type or ensure fetching includes necessary data
+                                                                // Since fetching is just "orders", fields might be missing types but present in JSON
+                                                                // We use "as any" safely here because we know the structure
+                                                                printBill(order as any);
+                                                            }}
+                                                            title="Print Bill"
+                                                            style={{
+                                                                background: '#ecfccb', border: '1px solid #bef264', color: '#3f6212',
+                                                                cursor: 'pointer', fontSize: '0.9rem', padding: '2px 6px',
+                                                                borderRadius: '4px', fontWeight: 'bold'
+                                                            }}
+                                                        >
+                                                            🧾 BILL
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <div style={{ fontSize: '0.9rem', color: '#666' }}>{order.user?.name}</div>
+                                                {order.header === 'POS/Counter' && (
+                                                    <div style={{ fontSize: '0.7rem', backgroundColor: '#e0e7ff', color: '#3730a3', padding: '1px 4px', borderRadius: '4px', display: 'inline-block', marginTop: '2px' }}>POS</div>
+                                                )}
                                             </div>
                                             <div style={{ fontSize: '0.8rem', color: '#666', textAlign: 'right' }}>
                                                 {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 <div>{Math.floor((new Date().getTime() - new Date(order.createdAt).getTime()) / 60000)}m ago</div>
-
                                             </div>
                                         </div>
 
@@ -558,79 +592,50 @@ export default function AdminDashboard() {
                                             </div>
                                         )}
 
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                                             <div style={{ fontWeight: 'bold' }}>₹{order.totalAmount}</div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', minWidth: '140px' }}>
-                                                {STATUS_OPTIONS.map((status, idx) => {
-                                                    const statusIndex = STATUS_OPTIONS.indexOf(order.status);
-                                                    const currentIndex = idx;
-                                                    const isCompleted = currentIndex <= statusIndex;
-                                                    const isClickable = currentIndex >= statusIndex;
-
-                                                    return (
-                                                        <div
-                                                            key={status}
-                                                            onClick={() => isClickable && updateStatus(order.id, status)}
-                                                            style={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: '0.5rem',
-                                                                cursor: isClickable ? 'pointer' : 'not-allowed',
-                                                                opacity: isClickable ? 1 : 0.5,
-                                                                padding: '0.3rem 0.5rem',
-                                                                borderRadius: '0.25rem',
-                                                                transition: 'background-color 0.2s',
-                                                                backgroundColor: isCompleted ? '#f0fdf4' : 'transparent'
-                                                            }}
-                                                            onMouseEnter={(e) => {
-                                                                if (isClickable) e.currentTarget.style.backgroundColor = '#f3f4f6';
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                if (isClickable) e.currentTarget.style.backgroundColor = isCompleted ? '#f0fdf4' : 'transparent';
-                                                            }}
-                                                        >
-                                                            <div style={{
-                                                                width: '18px',
-                                                                height: '18px',
-                                                                borderRadius: '50%',
-                                                                border: isCompleted ? '2px solid #10b981' : '2px solid #d1d5db',
-                                                                backgroundColor: isCompleted ? '#10b981' : 'white',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                flexShrink: 0
-                                                            }}>
-                                                                {isCompleted && (
-                                                                    <span style={{ color: 'white', fontSize: '12px', lineHeight: '1' }}>✓</span>
-                                                                )}
-                                                            </div>
-                                                            <span style={{
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: isCompleted ? '600' : '400',
-                                                                color: isCompleted ? '#059669' : '#6b7280',
-                                                                textDecoration: isCompleted ? 'line-through' : 'none'
-                                                            }}>
-                                                                {status}
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                })}
+                                            <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                                                {order.status}
                                             </div>
                                         </div>
 
-                                        {order.status !== 'READY' && order.status !== 'COMPLETED' && (
-                                            <button
-                                                onClick={() => markAsReady(order.id)}
-                                                style={{
-                                                    width: '100%', padding: '0.75rem',
-                                                    backgroundColor: '#10b981', color: 'white',
-                                                    border: 'none', borderRadius: '0.5rem',
-                                                    fontWeight: 'bold', cursor: 'pointer'
-                                                }}
-                                            >
-                                                ✅ Mark as Ready
-                                            </button>
-                                        )}
+                                        {/* 2x2 STATUS GRID */}
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '1fr 1fr',
+                                            gap: '0.5rem'
+                                        }}>
+                                            {STATUS_OPTIONS.map((status) => {
+                                                const isActive = order.status === status;
+                                                // Colors per status
+                                                let activeColor = '#3b82f6'; // Default Blue
+                                                if (status === 'CONFIRMED') activeColor = '#f59e0b'; // Amber
+                                                if (status === 'PREPARING') activeColor = '#d97706'; // Orange
+                                                if (status === 'READY') activeColor = '#10b981'; // Green
+                                                if (status === 'COMPLETED') activeColor = '#6b7280'; // Gray
+
+                                                return (
+                                                    <button
+                                                        key={status}
+                                                        onClick={() => updateStatus(order.id, status)}
+                                                        style={{
+                                                            padding: '0.5rem',
+                                                            borderRadius: '0.375rem',
+                                                            fontSize: '0.85rem',
+                                                            fontWeight: isActive ? 'bold' : 'normal',
+                                                            border: isActive ? `2px solid ${activeColor}` : '1px solid #d1d5db',
+                                                            backgroundColor: isActive ? activeColor : 'white',
+                                                            color: isActive ? 'white' : '#4b5563',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s',
+                                                            textAlign: 'center'
+                                                        }}
+                                                    >
+                                                        {status}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
                                     </div>
                                 ))
                             )}

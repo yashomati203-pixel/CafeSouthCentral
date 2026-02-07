@@ -2,104 +2,80 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { OrderStatus } from '@prisma/client';
-import { releaseStock } from '@/services/inventoryService';
+import { pusherServer } from '@/lib/pusher';
 
 export async function POST(req: NextRequest) {
     try {
         const bodyText = await req.text();
         const signature = req.headers.get('x-razorpay-signature');
+        const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
-        if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
-            console.error("WEBHOOK_SECRET missing");
-            return NextResponse.json({ error: 'Config Error' }, { status: 500 });
+        // 1. Security Check
+        if (!secret || !signature) {
+            console.error('[Razorpay Webhook] Missing secret or signature');
+            return NextResponse.json({ error: 'Config missing' }, { status: 500 });
         }
 
-        if (!signature) {
-            return NextResponse.json({ error: 'No Signature' }, { status: 400 });
-        }
-
-        // Verify Signature
         const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+            .createHmac('sha256', secret)
             .update(bodyText)
             .digest('hex');
 
         if (expectedSignature !== signature) {
-            console.error("Invalid Webhook Signature");
-            return NextResponse.json({ error: 'Invalid Signature' }, { status: 400 });
+            console.error('[Razorpay Webhook] Invalid Signature');
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
         }
 
+        // 2. Parse Event
         const event = JSON.parse(bodyText);
-        const { payload } = event;
+        const { event: eventName, payload } = event;
 
-        if (event.event === 'payment.captured' || event.event === 'order.paid') {
-            const razorpayOrderId = payload.payment.entity.order_id;
-            const paymentId = payload.payment.entity.id;
+        // 3. Handle Events
+        if (eventName === 'order.paid') {
+            const razorpayOrderId = payload.order.entity.id;
+            const razorpayPaymentId = payload.payment.entity.id; // The actual payment transaction ID
 
-            // Saga Step: Complete Order
-            const order = await prisma.order.findFirst({
-                where: { paymentId: razorpayOrderId } // We search by RP Order ID (stored in paymentId field temporarily or create new field?)
-                // NOTE: In createOrder, we stored RP Order ID in 'paymentId'. 
-                // That's acceptable for mapping.
-            });
+            // Find our order
+            // Note: We stored access to our DB Order via the Razorpay Order ID in the 'paymentId' field?
+            // Wait, createNormalOrder stores: data: { paymentId: razorpayOrder.id }
+            // So yes, Order.paymentId = "order_..."
 
-            if (order && order.status === OrderStatus.PENDING_PAYMENT) {
-                await prisma.order.update({
-                    where: { id: order.id },
-                    data: {
-                        status: OrderStatus.CONFIRMED,
-                        paymentId: paymentId // Update with actual Payment ID? Or keep Order ID?
-                        // Let's store "RP_ORDER_ID|RP_PAYMENT_ID" or just keep the successful Payment ID
-                    }
-                });
-
-                // Trigger Real-time update
-                import('@/lib/pusher').then(({ pusherServer }) => {
-                    pusherServer.trigger('orders', 'order-update', {
-                        id: order.id, status: OrderStatus.CONFIRMED
-                    });
-                });
-
-                // Trigger WhatsApp Notification
-                import('@/services/whatsappService').then(({ whatsappNotifications }) => {
-                    prisma.user.findUnique({ where: { id: order.userId } }).then(u => {
-                        if (u) {
-                            whatsappNotifications.sendOrderConfirmation(
-                                u.phone,
-                                u.name || 'Valued Guest',
-                                order.displayId || order.id,
-                                order.totalAmount
-                            ).catch(e => console.error('WA Error:', e));
-                        }
-                    });
-                });
-            }
-        } else if (event.event === 'payment.failed') {
-            const razorpayOrderId = payload.payment.entity.order_id;
-
-            // Saga Compensation: Release Stock
             const order = await prisma.order.findFirst({
                 where: { paymentId: razorpayOrderId }
             });
 
-            if (order && order.status === OrderStatus.PENDING_PAYMENT) {
-                // 1. Release Inventory
-                const items = await prisma.orderItem.findMany({ where: { orderId: order.id } });
-                for (const item of items) {
-                    await releaseStock(item.menuItemId, item.quantity);
-                }
+            if (order) {
+                // Idempotency check
+                if (order.status === OrderStatus.PENDING_PAYMENT) {
+                    await prisma.order.update({
+                        where: { id: order.id },
+                        data: {
+                            // Auto-advance to PREPARING as it means "Paid and ready for kitchen".
+                            status: OrderStatus.PREPARING
+                        }
+                    });
 
-                // 2. Mark Payment Failed
-                await prisma.order.update({
-                    where: { id: order.id },
-                    data: { status: 'PAYMENT_FAILED' as OrderStatus } // Ensure Schema has this
-                });
+                    // Trigger Real-time Event for Kitchen
+                    await pusherServer.trigger('orders', 'status-update', {
+                        id: order.id,
+                        displayId: order.displayId,
+                        status: OrderStatus.PREPARING
+                    });
+                }
+            } else {
+                console.warn(`[Razorpay Webhook] Order not found for Razorpay Order ID: ${razorpayOrderId}`);
             }
+        } else if (eventName === 'payment.failed') {
+            // Handle payment failure logic if needed (e.g., notify user)
+            // Usually handled by frontend catching the error, but this is a backup.
+            const razorpayOrderId = payload.payment.entity.order_id;
+            // Might want to log this.
         }
 
-        return NextResponse.json({ received: true });
-    } catch (e) {
-        console.error("Webhook Error", e);
-        return NextResponse.json({ error: 'Webhook Handler Failed' }, { status: 500 });
+        return NextResponse.json({ status: 'ok' });
+
+    } catch (error) {
+        console.error('[Razorpay Webhook] Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -42,8 +42,8 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                     <Image
                         src="/Final web logo.png"
                         alt="Cafe South Central"
-                        width={550}
-                        height={260}
+                        width={400}
+                        height={120}
                         style={{ objectFit: 'contain' }}
                         priority
                     />
@@ -67,20 +67,20 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                             style={{
                                 background: 'none',
                                 border: 'none',
-                                fontFamily: 'var(--font-manrope)',
+                                fontFamily: 'var(--font-playfair)',
                                 fontWeight: 800,
                                 color: '#4a3b32',
                                 cursor: 'pointer',
-                                fontSize: '1rem' // Explicit font size to match
+                                fontSize: '1.2rem' // Explicit font size to match
                             }}>
                             Menu
                         </button>
                         <Link href="/subscription" style={{
-                            fontFamily: 'var(--font-manrope)',
+                            fontFamily: 'var(--font-playfair)',
                             fontWeight: 800,
                             color: '#4a3b32',
                             textDecoration: 'none',
-                            fontSize: '1rem'
+                            fontSize: '1.2rem'
                         }}>
                             Subscriptions
                         </Link>
@@ -93,9 +93,9 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                                         padding: '0.8rem 1.5rem',
                                         borderRadius: '999px',
                                         border: 'none',
-                                        fontFamily: 'var(--font-manrope)',
+                                        fontFamily: 'var(--font-playfair)',
                                         fontWeight: 800,
-                                        fontSize: '0.95rem',
+                                        fontSize: '1.2rem',
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -110,12 +110,12 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                                 style={{
                                     backgroundColor: '#005001',
                                     color: '#f7e231',
-                                    padding: '1.5rem 2.5rem',
+                                    padding: '1rem 2rem',
                                     borderRadius: '999px',
                                     border: 'none',
-                                    fontFamily: 'var(--font-manrope)',
+                                    fontFamily: 'var(--font-playfair)',
                                     fontWeight: 800,
-                                    fontSize: '0.95rem',
+                                    fontSize: '1.2rem',
                                     cursor: 'pointer'
                                 }}>
                                 Login / Sign Up

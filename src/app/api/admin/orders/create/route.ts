@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
             user.id,
             items,
             note, // note passed directly
-            undefined // timeSlot
+            undefined, // timeSlot
+            paymentMethod || 'CASH' // Force CASH if not specified, though POS normally sends it
         );
 
         return NextResponse.json(result, { status: 201 });

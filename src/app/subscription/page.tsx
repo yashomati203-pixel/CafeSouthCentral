@@ -62,74 +62,107 @@ export default function SubscriptionPage() {
                     );
 
                     return (
-                        <div style={{
+                        <div key="status-banner" style={{
                             marginBottom: '2rem',
                             backgroundColor: 'white',
                             borderRadius: '1rem',
                             padding: '1.25rem 1.5rem',
                             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
                             border: `2px solid ${status.borderColor}`
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    backgroundColor: status.bgColor,
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '1.25rem'
-                                }}>
-                                    {status.icon}
-                                </div>
-                                <div>
-                                    <h3 style={{
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold',
-                                        color: '#1f2937',
-                                        margin: 0,
-                                        marginBottom: '0.25rem'
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: status.bgColor,
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.25rem'
                                     }}>
-                                        {status.title}
-                                    </h3>
-                                    <p style={{
+                                        {status.icon}
+                                    </div>
+                                    <div>
+                                        <h3 style={{
+                                            fontSize: '1rem',
+                                            fontWeight: 'bold',
+                                            color: '#1f2937',
+                                            margin: 0,
+                                            marginBottom: '0.25rem'
+                                        }}>
+                                            {status.title}
+                                        </h3>
+                                        <p style={{
+                                            fontSize: '0.875rem',
+                                            color: '#6b7280',
+                                            margin: 0
+                                        }}>
+                                            {status.message}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => router.push('/manage-subscription')}
+                                    style={{
+                                        padding: '0.5rem 1.5rem',
+                                        backgroundColor: 'white',
+                                        color: '#5C3A1A',
+                                        border: '2px solid #5C3A1A',
+                                        borderRadius: '0.5rem',
+                                        fontWeight: 600,
                                         fontSize: '0.875rem',
-                                        color: '#6b7280',
-                                        margin: 0
-                                    }}>
-                                        {status.message}
-                                    </p>
-                                </div>
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#5C3A1A';
+                                        e.currentTarget.style.color = 'white';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.color = '#5C3A1A';
+                                    }}
+                                >
+                                    Manage Membership →
+                                </button>
                             </div>
-                            <button
-                                onClick={() => router.push('/manage-subscription')}
-                                style={{
-                                    padding: '0.5rem 1.5rem',
-                                    backgroundColor: 'white',
-                                    color: '#5C3A1A',
-                                    border: '2px solid #5C3A1A',
-                                    borderRadius: '0.5rem',
-                                    fontWeight: 600,
-                                    fontSize: '0.875rem',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    whiteSpace: 'nowrap'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#5C3A1A';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = '#5C3A1A';
-                                }}
-                            >
-                                Manage Membership →
-                            </button>
+
+                            {/* Meal Token Visualization */}
+                            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 600 }}>
+                                    <span style={{ color: '#374151' }}>Consumption Tracker</span>
+                                    <span style={{ color: '#5C3A1A' }}>{currentSub.creditsUsed} / {currentSub.creditsTotal} Meals Used</span>
+                                </div>
+
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '6px',
+                                    maxHeight: '120px',
+                                    overflowY: 'auto'
+                                }}>
+                                    {Array.from({ length: currentSub.creditsTotal }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            title={i < currentSub.creditsUsed ? "Meal Used" : "Meal Available"}
+                                            style={{
+                                                width: '12px',
+                                                height: '12px',
+                                                borderRadius: '50%',
+                                                backgroundColor: i < currentSub.creditsUsed ? '#d1d5db' : '#10b981', // Grey if used, Green if available
+                                                border: i < currentSub.creditsUsed ? '1px solid #9ca3af' : '1px solid #059669',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                                <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                                    Each circle represents 1 meal credit. Green circles are available for use.
+                                </p>
+                            </div>
                         </div>
                     );
                 })()}

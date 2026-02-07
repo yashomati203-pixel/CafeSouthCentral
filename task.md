@@ -9,3 +9,10 @@
 - [x] Refactor Admin Dashboard to use Vertical Sidebar Layout <!-- id: 6 -->
 - [x] Add "Cafe South Central" branding to Sidebar <!-- id: 7 -->
 - [x] verify sidebar navigation works correctly <!-- id: 8 -->
+
+# Configuration & Connectivity
+
+- [ ] Update `.env` with correct credentials <!-- id: 9 -->
+- [ ] Verify database connection (`prisma db push`) <!-- id: 10 -->
+- [ ] Verify application build and start (`npm run dev`) <!-- id: 11 -->
+

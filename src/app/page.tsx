@@ -149,7 +149,7 @@ function DashboardContent() {
 
                 if (storedUser) {
                     const parsedUser = JSON.parse(storedUser);
-                    if (parsedUser.role === 'ADMIN') {
+                    if (['SUPER_ADMIN', 'MANAGER', 'KITCHEN_STAFF'].includes(parsedUser.role)) {
                         router.push('/admin/dashboard');
                         return;
                     }
@@ -292,12 +292,22 @@ function DashboardContent() {
         return () => window.removeEventListener('online', syncOfflineOrders);
     }, [user, mode]); // Add dependencies needed for fetch hooks if called
 
-    const handleLogin = async (userData: { name: string; phone: string }, stayLoggedIn: boolean) => {
+    const handleLogin = async (userData: { name: string; phone: string; password?: string; otp?: string }, stayLoggedIn: boolean) => {
         try {
-            const res = await fetch('/api/auth/login', {
+            // Default to OTP Verification for customers
+            let url = '/api/auth/verify-otp';
+            let body = { ...userData };
+
+            if (userData.password) {
+                url = '/api/auth/admin/login';
+                // Admin API expects 'identifier' instead of 'phone'
+                body = { identifier: userData.phone, password: userData.password } as any;
+            }
+
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
+                body: JSON.stringify(body)
             });
 
             const data = await res.json();
@@ -307,6 +317,29 @@ function DashboardContent() {
                 return;
             }
 
+            // Handle Admin Login (requires 2FA)
+            if (userData.password && data.require2FA) {
+                // For now, we'll skip 2FA and directly log in
+                // TODO: Implement proper 2FA flow
+                const fullUser = {
+                    name: userData.name,
+                    phone: userData.phone,
+                    id: data.userId,
+                    role: data.role
+                };
+
+                if (stayLoggedIn) {
+                    localStorage.setItem('cafe_user', JSON.stringify(fullUser));
+                } else {
+                    sessionStorage.setItem('cafe_user', JSON.stringify(fullUser));
+                }
+
+                // Redirect to admin dashboard
+                router.push('/admin/dashboard');
+                return;
+            }
+
+            // Handle Regular Customer Login
             const fullUser = { ...userData, id: data.user.id, role: data.user.role };
 
             if (stayLoggedIn) {
@@ -315,7 +348,7 @@ function DashboardContent() {
                 sessionStorage.setItem('cafe_user', JSON.stringify(fullUser));
             }
 
-            if (data.user.role === 'ADMIN') {
+            if (['SUPER_ADMIN', 'MANAGER', 'KITCHEN_STAFF'].includes(data.user.role)) {
                 router.push('/admin/dashboard');
             } else {
                 setUser(fullUser);

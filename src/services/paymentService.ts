@@ -6,7 +6,10 @@ import { prisma } from '@/lib/prisma';
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-const razorpay = (keyId && keySecret)
+// Check if keys are placeholders or missing
+const isMockMode = !keyId || !keySecret || keyId === 'your_razorpay_key_id';
+
+const razorpay = (!isMockMode && keyId && keySecret)
     ? new Razorpay({ key_id: keyId, key_secret: keySecret })
     : null;
 

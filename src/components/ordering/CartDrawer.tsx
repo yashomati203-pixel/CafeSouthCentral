@@ -113,7 +113,14 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
         clearCart();
         setNote('');
         onClose();
-        if (onOrderSuccess) onOrderSuccess();
+        if (onOrderSuccess) {
+            try {
+                console.log("Calling onOrderSuccess...");
+                onOrderSuccess();
+            } catch (e) {
+                console.error("Error in onOrderSuccess:", e);
+            }
+        }
     };
 
     const saveOfflineOrder = (payload: any, mode: 'SUBSCRIPTION' | 'NORMAL') => {

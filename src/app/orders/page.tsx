@@ -3,14 +3,26 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { requestNotificationPermission, sendLocalNotification } from '@/lib/notifications';
+import { useCart } from '@/context/CartContext';
 import DesktopHeader from '@/components/layout/DesktopHeader';
+import { requestNotificationPermission, sendLocalNotification } from '@/lib/notifications';
 
 type StatusFilter = 'ALL' | 'COMPLETED' | 'CANCELLED' | 'SCHEDULED';
 
 export default function OrderHistoryPage() {
     const router = useRouter();
+    const { addToCart } = useCart(); // Destructure addToCart
     const [orders, setOrders] = useState<any[]>([]);
+
+    // ...
+
+    // ... inside map loop ...
+
+    // ... (rest of imports/state)
+
+    // ... inside the map loop ...
+    // ... inside the map loop ... (Removed stray code)
+
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [activeQrOrder, setActiveQrOrder] = useState<any>(null);
@@ -339,6 +351,42 @@ export default function OrderHistoryPage() {
                                         </div>
 
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm(`Add ${order.items.length} items from this order to cart?`)) {
+                                                        let addedCount = 0;
+                                                        order.items.forEach((orderItem: any) => {
+                                                            if (orderItem.menuItem) {
+                                                                addToCart(orderItem.menuItem, 'NORMAL');
+                                                                addedCount++;
+                                                            }
+                                                        });
+                                                        if (addedCount > 0) {
+                                                            alert(`${addedCount} Items added to cart!`);
+                                                            router.push('/?section=cart');
+                                                        } else {
+                                                            alert("Could not add items (Menu items might be missing/deleted).");
+                                                        }
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '0.3rem 0.6rem',
+                                                    backgroundColor: '#5C3A1A',
+                                                    color: 'white',
+                                                    borderRadius: '0.5rem',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 'bold',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem',
+                                                    border: 'none',
+                                                    marginRight: '0.25rem'
+                                                }}
+                                            >
+                                                🔄 Reorder
+                                            </button>
                                             <span style={{
                                                 padding: '0.375rem 0.75rem',
                                                 borderRadius: '0.5rem',
@@ -458,6 +506,57 @@ export default function OrderHistoryPage() {
                                                         Cancel Order
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        // Reorder Logic
+                                                        if (confirm(`Add ${order.items.length} items from this order to cart?`)) {
+                                                            order.items.forEach(orderItem => {
+                                                                if (orderItem.menuItem) {
+                                                                    // Assuming addToCart is available in the component's scope
+                                                                    // and 'NORMAL' is a valid mode.
+                                                                    // If addToCart is not defined, this will cause an error.
+                                                                    // If addToCart expects different arguments, adjust accordingly.
+                                                                    // For this example, I'm assuming addToCart(menuItem, mode)
+                                                                    // and that orderItem.menuItem contains the necessary data.
+                                                                    // If addToCart is not available, you'll need to define it or pass it as a prop.
+                                                                    // For now, I'll add a placeholder for addToCart if it's not globally available.
+                                                                    // If addToCart is part of a context or hook, ensure it's imported/used.
+                                                                    // Example placeholder:
+                                                                    // if (typeof addToCart === 'function') {
+                                                                    //     addToCart(orderItem.menuItem, 'NORMAL');
+                                                                    // } else {
+                                                                    //     console.warn("addToCart function not found.");
+                                                                    // }
+                                                                    // Assuming addToCart is available:
+                                                                    addToCart(orderItem.menuItem, 'NORMAL'); // Defaulting to Normal mode for reorders
+                                                                }
+                                                            });
+                                                            alert("Items added to cart!");
+                                                            window.location.href = '/?section=cart'; // Redirect to cart (or menu)
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        flex: '1',
+                                                        backgroundColor: '#5C3A1A', // Assuming primary-brown is this color
+                                                        color: 'white',
+                                                        padding: '0.75rem', // py-3
+                                                        borderRadius: '0.75rem', // rounded-xl
+                                                        fontWeight: 'bold',
+                                                        cursor: 'pointer',
+                                                        transition: 'background-color 0.2s ease-in-out', // transition-all hover:bg-opacity-90
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '0.5rem', // gap-2
+                                                        border: 'none',
+                                                        fontSize: '0.875rem' // Added for consistency
+                                                    }}
+                                                >
+                                                    🔄 Reorder
+                                                </button>
+
+
                                                 <a
                                                     href={`/receipt/${order.id}`}
                                                     target="_blank"

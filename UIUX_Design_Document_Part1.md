@@ -74,7 +74,7 @@ Create a digital experience that feels like walking into a modern South Indian c
 1. **The "Fresh Heritage" Color Story**
    - Deep forest green (tradition, nature, trust)
    - Golden yellow (sunshine, warmth, energy)
-   - Cream backgrounds (fresh, clean, appetizing)
+   - Off-white backgrounds (#f8fbf7) (fresh, clean, appetizing)
    - **Why it works:** Evokes both heritage and health-consciousness
 
 80. **Serif + Sans Fusion**
@@ -798,7 +798,7 @@ Subtext: "INDIA"
 --golden-yellow-900: #5C4503;
 
 /* NEUTRAL - CREAM & BROWNS */
---cream-white: #F9F7F4;
+--cream-white: #f8fbf7;
 --soft-beige: #F3EFE9;
 --warm-tan: #EAE3D9;
 --rich-brown: #5C3A1A;     /* Coconut Brown */

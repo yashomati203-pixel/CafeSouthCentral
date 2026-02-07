@@ -1419,7 +1419,7 @@ function OrdersPage() {
 
 **Verified Ratios:**
 ```
-Forest Green (#1E3A1F) on Cream White (#F9F7F4): 10.2:1 ✅ AAA
+Forest Green (#1E3A1F) on Off-White (#f8fbf7): 10.2:1 ✅ AAA
 Rich Brown (#6B4423) on Cream White: 7.8:1 ✅ AAA
 Gray 600 (#57534E) on White: 7.1:1 ✅ AAA
 Golden Yellow (#F4D03F) on Forest Green: 4.9:1 ✅ AA Large

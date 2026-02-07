@@ -30,7 +30,8 @@ export async function GET(request: Request) {
                     select: {
                         name: true,
                         quantity: true,
-                        price: true // Might be useful, though totalAmount covers it
+                        price: true,
+                        menuItem: true // Fetch full menu item data for Reorder logic
                     }
                 }
             },

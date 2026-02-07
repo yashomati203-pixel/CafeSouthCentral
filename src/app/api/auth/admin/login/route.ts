@@ -4,6 +4,7 @@ import { AdminAuthService } from '@/services/adminAuthService';
 export async function POST(req: NextRequest) {
     try {
         const { identifier, password } = await req.json();
+        console.log('[API] Admin Login Request:', { identifier, hasPassword: !!password });
 
         if (!identifier || !password) {
             return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });

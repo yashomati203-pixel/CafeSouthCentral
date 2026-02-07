@@ -56,17 +56,32 @@ export default function LoginPage() {
         };
     }, []);
 
-    const handleGetOtp = (e: React.FormEvent) => {
+    const handleGetOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         if (isAdminLogin) {
             handleAdminLoginStep1();
             return;
         }
 
-        console.log('Sending OTP to:', phone);
-        setStep('OTP');
+        try {
+            const res = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+
+            setStep('OTP');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAdminLoginStep1 = async () => {
@@ -116,9 +131,29 @@ export default function LoginPage() {
         }
     };
 
-    const handleVerifyOtp = (e: React.FormEvent) => {
+    const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Verifying OTP:', otp);
+        setError('');
+        setLoading(true);
+
+        try {
+            const res = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, otp, name })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+
+            // Success - Redirect based on role or to menu
+            router.push('/menu');
+            router.refresh(); // Refresh to update server components with new session
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

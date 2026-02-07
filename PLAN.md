@@ -36,11 +36,11 @@ This document outlines the current status of the **Cafe South Central** project 
 - **Concept**: User app generates a QR code containing the full order payload. Kitchen scanner parses this payload and uploads it to the server via the Admin's connection.
 
 ### 2. Push Notifications
-- [x] **Implemented**: Local notifications and Firebase Cloud Messaging (FCM) integration for "Order Ready" alerts and Cron-based reminders.
+- [x] **Implemented**: WhatsApp Direct API integration for "OTP" and "Order Status" alerts.
 
 ### 3. Payment Gateway
-- **Goal**: Replace "Simulated" UPI/Cash with real Razorpay/Stripe integration.
-- **Current**: Mock delays and success states for testing.
+- [x] **Implemented**: Razorpay integration with Webhooks for real-time payment confirmation.
+- [x] **Refunds**: Automated refund logic for cancellations.
 
 ---
 

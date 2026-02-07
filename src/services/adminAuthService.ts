@@ -93,6 +93,8 @@ export class AdminAuthService {
      * Returns: '2FA_REQUIRED' and temporary session ID, or throws invalid credentials
      */
     static async loginStep1(phoneOrEmail: string, password: string) {
+        console.log('[AuthService] loginStep1:', { phoneOrEmail });
+
         const admin = await prisma.user.findFirst({
             where: {
                 OR: [{ phone: phoneOrEmail }, { email: phoneOrEmail }],
@@ -100,12 +102,18 @@ export class AdminAuthService {
             }
         });
 
+        console.log('[AuthService] User Found:', admin ? { id: admin.id, role: admin.role, hasHash: !!admin.passwordHash } : 'NOT FOUND');
+
         if (!admin || !admin.passwordHash) {
+            console.log('[AuthService] User not found or no hash');
             throw new Error('Invalid credentials');
         }
 
         const validPassword = await argon2.verify(admin.passwordHash, password);
+        console.log('[AuthService] Password Verify:', validPassword);
+
         if (!validPassword) {
+            console.log('[AuthService] Password invalid');
             throw new Error('Invalid credentials');
         }
 

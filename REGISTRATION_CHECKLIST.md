@@ -5,19 +5,13 @@ Use this checklist to track all the accounts and approvals you need to obtain be
 ## 🔴 Critical Path (Do These First)
 *These block the technical integration and can take time to approve.*
 
-### 1. DLT Registration (Mandatory for SMS)
-- [ ] **Register with Operator:** Create account on [Jio DLT](https://trueconnect.jio.com) or [SmartPing (Videocon)](https://smartping.live/entity/login).
-    - **Cost:** ~₹5,900 (Lifetime)
-    - **Documents Needed:** Business PAN, GST Certificate, Authorized Signatory Letter, Proof of Address.
-    - **Wait Time:** 3-7 Days.
-- [ ] **Register Header (Sender ID):** E.g., `CAFESC` (6 chars).
-- [ ] **Register Content Templates:** "Your OTP is {#var#}..."
-
-### 2. SMS Provider Account
-- [ ] **Sign up:** [Msg91](https://msg91.com/) or [2Factor](https://2factor.in/).
-- [ ] **Verify KYC:** Upload business documents.
-- [ ] **Link DLT:** Connect your approved DLT Principal Entity ID (PEID) to the SMS panel.
-- [ ] **Buy Credits:** Purchase initial transactional credit pack (approx ₹1,000).
+### 1. WhatsApp Business API (Meta)
+- [ ] **Create Meta Business Account:** Go to [business.facebook.com](https://business.facebook.com/).
+- [ ] **Create App:** Create a "Business" app in [Meta Developers](https://developers.facebook.com/).
+- [ ] **Add WhatsApp Product:** Add "WhatsApp" to your app.
+- [ ] **Add Phone Number:** Add a phone number that is NOT currently registered on WhatsApp personal/business apps.
+- [ ] **Get Credentials:** Get `Phone Number ID` and `Access Token` (Permanent token recommended for prod).
+- [ ] **Payment Method:** Add payment method in Meta Business settings (first 1000 convos/month are free).
 
 ### 3. Payment Gateway (Razorpay)
 - [ ] **Sign up:** [Razorpay](https://razorpay.com/).

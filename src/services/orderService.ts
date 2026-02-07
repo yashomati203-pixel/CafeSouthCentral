@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { MenuItemType, OrderMode, OrderStatus, SubscriptionState } from '@prisma/client';
+import { MenuItemType, OrderMode, OrderStatus, SubscriptionState, PaymentMethodType } from '@prisma/client';
 import { validateAndBookSlot } from './slotService';
 import { createRazorpayOrder } from './paymentService';
 import { reserveStock, releaseStock } from './inventoryService';
@@ -46,7 +46,8 @@ export async function createNormalOrder(
     userId: string,
     items: CartItem[],
     note?: string,
-    timeSlotId?: string
+    timeSlotId?: string,
+    paymentMethod: string = 'ONLINE'
 ) {
     // 1. Optimistic Stock Check & Price Calculation
     // We do this BEFORE any DB transaction to fail fast.
@@ -76,13 +77,21 @@ export async function createNormalOrder(
     return prisma.$transaction(async (tx) => {
         const displayId = await generateOrderDisplayId(tx);
 
+        // Determine initial status based on Payment Method
+        // Cash orders are Auto-Confirmed
+        const initialStatus = (totalAmount === 0 || paymentMethod === 'CASH')
+            ? OrderStatus.CONFIRMED
+            : OrderStatus.PENDING_PAYMENT;
+
         const newOrder = await tx.order.create({
             data: {
                 userId,
                 displayId,
-                status: OrderStatus.PENDING_PAYMENT, // Initial State
+                status: initialStatus,
                 mode: OrderMode.NORMAL,
                 totalAmount,
+                // header: ... (Removed: field does not exist in schema)
+                paymentMethod: paymentMethod === 'CASH' ? PaymentMethodType.CASH : undefined,
                 note,
                 timeSlot: timeSlotId,
                 items: {
@@ -120,9 +129,9 @@ export async function createNormalOrder(
             }
         }
 
-        // 4. Initiate Payment
+        // 4. Initiate Payment (ONLY IF ONLINE & > 0)
         let razorpayOrder = null;
-        if (totalAmount > 0) {
+        if (totalAmount > 0 && paymentMethod !== 'CASH') {
             try {
                 razorpayOrder = await createRazorpayOrder(totalAmount, newOrder.displayId || newOrder.id);
 
@@ -136,19 +145,16 @@ export async function createNormalOrder(
                 for (const i of items) await releaseStock(i.menuItemId, i.qty);
                 throw new Error("Payment Gateway Initialization Failed");
             }
-        } else {
-            // Free Order (0 amount) -> Auto Confirm
-            await tx.order.update({
-                where: { id: newOrder.id },
-                data: { status: OrderStatus.CONFIRMED }
-            });
         }
+
+        // For CASH orders, maybe trigger a notification or print job here if needed
+        // Assuming strictly API response for now.
 
         return {
             orderId: newOrder.id,
             displayId: newOrder.displayId,
             totalAmount,
-            status: totalAmount > 0 ? OrderStatus.PENDING_PAYMENT : OrderStatus.CONFIRMED,
+            status: newOrder.status,
             razorpayOrderId: razorpayOrder?.id,
             razorpayKeyId: process.env.RAZORPAY_KEY_ID
         };
