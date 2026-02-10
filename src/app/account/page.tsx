@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
     Pencil1Icon,
-    CheckIcon,
-    Cross2Icon,
-    ExitIcon,
-    ReaderIcon,
-    StarIcon,
     ChevronRightIcon,
-    ChatBubbleIcon,
-    PlusIcon,
-    TrashIcon
 } from '@radix-ui/react-icons';
-import DesktopHeader from '@/components/layout/DesktopHeader';
+import {
+    ChevronLeft,
+    Home as HomeIcon,
+    Briefcase as BackpackIcon,
+    Star as StarIcon,
+    Trash2 as TrashIcon,
+    Plus as PlusIcon,
+    Mail
+} from 'lucide-react';
+import ProfileSidebar from '@/components/profile/ProfileSidebar';
+
 
 interface Address {
     id: string;
@@ -166,6 +169,8 @@ export default function AccountPage() {
         if (!confirm('Are you sure you want to log out?')) return;
         localStorage.removeItem('cafe_user');
         sessionStorage.removeItem('cafe_user');
+        sessionStorage.removeItem('cafe_has_explored'); // Clear explored state
+        window.dispatchEvent(new Event('storage-update')); // Notify layout
         router.push('/');
     };
 
@@ -267,929 +272,451 @@ export default function AccountPage() {
 
     // Loyalty Helper Removed
 
-    if (loading && !user) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Account...</div>;
+    // Logic for "Save All Changes" bottom bar:
+    // It will save the profile info.
+
+    if (loading && !user) return <div className="min-h-screen flex items-center justify-center bg-[#f8fbf7] dark:bg-[#121212] pt-20">Loading Account...</div>;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FBFAF9' }}>
-            <DesktopHeader
-                user={user}
-                onLoginClick={() => router.push('/?login=true')}
-            />
+        <div className="min-h-screen bg-[#f8fbf7] dark:bg-[#121212] pb-32 md:pb-0">
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-                {/* Header with Logout */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>My Profile</h1>
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.625rem 1.25rem',
-                            backgroundColor: '#fee2e2',
-                            color: '#b91c1c',
-                            border: '1px solid #fecaca',
-                            borderRadius: '0.5rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <ExitIcon />
-                        Logout
-                    </button>
-                </div>
 
-                {/* Two Column Layout - Desktop only */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 350px',
-                    gap: '2rem'
-                }}>
-                    {/* Left Column */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {/* Profile Card */}
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flex: 1 }}>
-                                    {/* Avatar */}
-                                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
-                                        <img
-                                            src={isEditingProfile && editForm.profilePicture ? editForm.profilePicture : (user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}`)}
-                                            alt="Profile"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            <div className="flex max-w-[1400px] mx-auto md:px-6 md:py-8 gap-8">
+                {/* Desktop Sidebar */}
+                <ProfileSidebar user={user} onLogout={handleLogout} />
+
+                {/* Main Content */}
+                <main className="flex-1 w-full max-w-5xl mx-auto">
+
+                    {/* Mobile Sub-Header: Customer Settings */}
+                    <div className="md:hidden px-6 pt-4 pb-4 sticky top-0 bg-[#f8fbf7]/80 dark:bg-[#121212]/80 backdrop-blur-md z-30 flex items-center justify-between">
+                        <button
+                            onClick={() => router.back()}
+                            className="w-10 h-10 flex items-center justify-start text-[#0d1c11] dark:text-white"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <div className="flex-1">
+                            <h1 className="text-xl font-serif text-[#0d1c11] dark:text-white text-center">Customer Settings</h1>
+                        </div>
+                        <div className="w-10"></div>
+                    </div>
+
+                    {/* Desktop Title */}
+                    <div className="hidden md:flex flex-col gap-2 mb-8">
+                        <h1 className="text-3xl font-serif font-bold text-[#0d1c11] dark:text-white">Settings</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Manage your profile and preferences</p>
+                    </div>
+
+                    <div className="flex flex-col gap-8 px-6 md:px-0">
+                        {/* Profile Section */}
+                        <section>
+                            <div className="hidden md:flex items-center justify-between mb-4">
+                                <h3 className="text-xl font-serif text-[#0d1c11] dark:text-white">Personal Information</h3>
+                            </div>
+
+                            {/* Mobile Avatar Layout */}
+                            <div className="md:hidden flex flex-col items-center mb-6">
+                                <div className="relative group mt-2">
+                                    <div
+                                        className="w-28 h-28 rounded-full bg-center bg-no-repeat bg-cover border-4 border-white dark:border-gray-800 shadow-md"
+                                        style={{ backgroundImage: `url(${editForm.profilePicture || user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}`})` }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            const url = prompt("Enter new avatar URL:", editForm.profilePicture);
+                                            if (url) setEditForm({ ...editForm, profilePicture: url });
+                                        }}
+                                        className="absolute bottom-1 right-1 bg-[#0ac238] text-white p-2 rounded-full shadow-lg border-2 border-white dark:border-gray-800"
+                                    >
+                                        <Pencil1Icon className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <h2 className="mt-4 text-xl font-bold text-[#0d1c11] dark:text-white">{user?.name}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">{user?.email}</p>
+                            </div>
+
+                            {/* Desktop/Mobile Form Card */}
+                            <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-sm relative">
+                                {/* Desktop Avatar (in card) */}
+                                <div className="hidden md:flex items-center gap-10 mb-8">
+                                    <div className="relative group">
+                                        <div
+                                            className="w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover border-4 border-[#f8fbf7] dark:border-gray-800 shadow-sm"
+                                            style={{ backgroundImage: `url(${editForm.profilePicture || user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}`})` }}
                                         />
+                                        <button
+                                            onClick={() => {
+                                                const url = prompt("Enter new avatar URL:", editForm.profilePicture);
+                                                if (url) setEditForm({ ...editForm, profilePicture: url });
+                                            }}
+                                            className="absolute bottom-0 right-0 bg-[#0ac238] text-white p-1.5 rounded-full shadow-lg hover:scale-110 transition-transform"
+                                        >
+                                            <Pencil1Icon className="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
-
-                                    {/* Info */}
-                                    {!isEditingProfile ? (
+                                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Desktop Inputs */}
                                         <div>
-                                            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: '0 0 0.25rem 0' }}>{user?.name}</h2>
-                                            <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 0.25rem 0' }}>📞 {user?.phone}</p>
-                                            {user?.email && <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>✉️ {user?.email}</p>}
-                                        </div>
-                                    ) : (
-                                        <div style={{ flex: 1 }}>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Full Name</label>
                                             <input
+                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
                                                 type="text"
                                                 value={editForm.name}
                                                 onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                                                placeholder="Full Name"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.625rem',
-                                                    border: '1px solid #d1d5db',
-                                                    borderRadius: '0.5rem',
-                                                    fontSize: '0.875rem',
-                                                    marginBottom: '0.5rem'
-                                                }}
-                                            />
-                                            <input
-                                                type="tel"
-                                                value={editForm.phone}
-                                                onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
-                                                placeholder="Phone Number"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.625rem',
-                                                    border: '1px solid #d1d5db',
-                                                    borderRadius: '0.5rem',
-                                                    fontSize: '0.875rem'
-                                                }}
                                             />
                                         </div>
-                                    )}
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Phone Number</label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
+                                                    type="text"
+                                                    value={editForm.phone}
+                                                    onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {/* Email Removed */}
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Edit/Save Button */}
-                                {!isEditingProfile ? (
-                                    <button
-                                        onClick={() => setIsEditingProfile(true)}
-                                        style={{
-                                            padding: '0.5rem 1rem',
-                                            backgroundColor: '#f3f4f6',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            color: '#374151',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.375rem'
-                                        }}
-                                    >
-                                        <Pencil1Icon />
-                                        Edit Profile
-                                    </button>
-                                ) : (
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => setIsEditingProfile(false)}
-                                            style={{
-                                                padding: '0.5rem 0.75rem',
-                                                backgroundColor: '#f3f4f6',
-                                                border: 'none',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            onClick={handleSaveProfile}
-                                            disabled={saving}
-                                            style={{
-                                                padding: '0.5rem 0.75rem',
-                                                backgroundColor: '#5C3A1A',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem',
-                                                fontWeight: '600',
-                                                cursor: saving ? 'not-allowed' : 'pointer',
-                                                opacity: saving ? 0.7 : 1
-                                            }}
-                                        >
-                                            {saving ? 'Saving...' : 'Save'}
-                                        </button>
+                                {/* Mobile Fields (Only Phone is shown in template card, Name/Email are above) */}
+                                <div className="md:hidden space-y-4">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name</label>
+                                        <div className="relative">
+                                            <input
+                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
+                                                type="text"
+                                                value={editForm.name}
+                                                onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Phone Number</label>
+                                        <div className="relative">
+                                            <input
+                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
+                                                type="text"
+                                                value={editForm.phone}
+                                                onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#0ac238]">
+                                                <Pencil1Icon className="w-4 h-4" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Saved Addresses Section */}
+                        <section>
+                            <div className="flex items-center justify-between mb-4 px-1 md:px-0">
+                                <h3 className="text-lg md:text-xl font-serif text-[#0d1c11] dark:text-white">Saved Addresses</h3>
+                                <button
+                                    onClick={() => {
+                                        setEditingAddress(null);
+                                        setAddressForm({ label: '', street: '', city: '', state: '', zipCode: '' });
+                                        setShowAddressModal(true);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0ac238]/10 text-[#0ac238] font-bold text-xs md:text-sm hover:bg-[#0ac238]/20 transition-colors"
+                                >
+                                    <PlusIcon className="w-4 h-4" />
+                                    Add New
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                                {addresses.map(addr => (
+                                    <div key={addr.id} className="group bg-white dark:bg-[#1e1e1e] rounded-xl p-4 border-2 border-gray-100 dark:border-gray-800 hover:border-[#0ac238]/50 dark:hover:border-[#0ac238]/50 transition-all flex items-start gap-4 shadow-sm hover:shadow-md">
+                                        <div className="bg-[#0ac238]/10 p-2.5 rounded-lg text-[#0ac238] shrink-0">
+                                            {addr.label.toLowerCase() === 'home' && <HomeIcon className="w-5 h-5" />}
+                                            {['work', 'office'].includes(addr.label.toLowerCase()) && <BackpackIcon className="w-5 h-5" />}
+                                            {!['home', 'work', 'office'].includes(addr.label.toLowerCase()) && <StarIcon className="w-5 h-5" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h4 className="font-bold text-[#0d1c11] dark:text-white text-base capitalize">{addr.label}</h4>
+                                                {addr.isPrimary && <span className="text-[10px] font-bold bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-md">PRIMARY</span>}
+                                            </div>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                                                {addr.street}, {addr.city}
+                                                {addr.zipCode && <span className="block text-xs text-gray-400 mt-0.5">{addr.state} - {addr.zipCode}</span>}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingAddress(addr);
+                                                    setAddressForm(addr);
+                                                    setShowAddressModal(true);
+                                                }}
+                                                className="p-2 text-gray-400 hover:text-[#0ac238] hover:bg-[#0ac238]/10 rounded-lg transition-colors"
+                                                title="Edit Address"
+                                            >
+                                                <Pencil1Icon className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteAddress(addr.id)}
+                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                title="Delete Address"
+                                            >
+                                                <TrashIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {addresses.length === 0 && (
+                                    <div className="col-span-full py-8 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/20">
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">No saved addresses yet.</p>
                                     </div>
                                 )}
                             </div>
+                        </section>
 
-                            {/* Avatar Selection (when editing) */}
-                            {isEditingProfile && (
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                                        Choose Avatar
-                                    </label>
-                                    <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
-                                        {AVATAR_PRESETS.map((url, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => setEditForm({ ...editForm, profilePicture: url })}
-                                                style={{
-                                                    width: '48px',
-                                                    height: '48px',
-                                                    borderRadius: '50%',
-                                                    border: editForm.profilePicture === url ? '3px solid #5C3A1A' : '2px solid transparent',
-                                                    overflow: 'hidden',
-                                                    cursor: 'pointer',
-                                                    flexShrink: 0
-                                                }}
-                                            >
-                                                <img src={url} style={{ width: '100%', height: '100%' }} alt="" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        {/* Payment Methods Section */}
+                        <section>
+                            <div className="flex items-center justify-between mb-4 px-1 md:px-0">
+                                <h3 className="text-lg md:text-xl font-serif text-[#0d1c11] dark:text-white">Payment Methods</h3>
+                                <button
+                                    onClick={() => {
+                                        setEditingPayment(null);
+                                        setPaymentForm({ cardType: 'Visa', lastFourDigits: '', expiryMonth: new Date().getMonth() + 1, expiryYear: new Date().getFullYear(), cardholderName: '' });
+                                        setShowPaymentModal(true);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0ac238]/10 text-[#0ac238] font-bold text-xs md:text-sm hover:bg-[#0ac238]/20 transition-colors"
+                                >
+                                    <PlusIcon className="w-4 h-4" />
+                                    Add New
+                                </button>
+                            </div>
 
-                        {/* Saved Addresses */}
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '1.5rem',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                        }}>
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem' }}>Saved Addresses</h3>
-
-                            {addresses.length === 0 ? (
-                                <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '1rem' }}>No saved addresses yet</p>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
-                                    {addresses.map(addr => (
-                                        <div key={addr.id} style={{
-                                            padding: '1rem',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '0.5rem',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'start'
-                                        }}>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                                                    <span style={{ fontWeight: '600', color: '#1f2937' }}>{addr.label}</span>
-                                                    {addr.isPrimary && (
-                                                        <span style={{
-                                                            fontSize: '0.75rem',
-                                                            padding: '0.125rem 0.5rem',
-                                                            backgroundColor: '#fef3c7',
-                                                            color: '#92400e',
-                                                            borderRadius: '0.25rem',
-                                                            fontWeight: '600'
-                                                        }}>
-                                                            Primary
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
-                                                    {addr.street}, {addr.city}, {addr.state} {addr.zipCode}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                                {paymentMethods.map(pm => (
+                                    <div key={pm.id} className="group bg-white dark:bg-[#1e1e1e] rounded-xl p-4 border-2 border-gray-100 dark:border-gray-800 hover:border-[#0ac238]/50 dark:hover:border-[#0ac238]/50 transition-all flex items-center justify-between gap-4 shadow-sm hover:shadow-md">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-xl shrink-0">
+                                                <div className="w-6 h-6 flex items-center justify-center text-[#0d1c11] dark:text-white text-xl">💳</div>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-[#0d1c11] dark:text-white text-base mb-0.5">{pm.cardType} •••• {pm.lastFourDigits}</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium font-mono">
+                                                    EXP: {String(pm.expiryMonth).padStart(2, '0')}/{String(pm.expiryYear).slice(2)}
                                                 </p>
                                             </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
-                                                {!addr.isPrimary && (
-                                                    <button
-                                                        onClick={() => handleSetPrimaryAddress(addr.id)}
-                                                        style={{
-                                                            padding: '0.375rem 0.625rem',
-                                                            backgroundColor: '#fdf9ee',
-                                                            color: '#5C3A1A',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            fontWeight: '600'
-                                                        }}
-                                                    >
-                                                        Set Primary
-                                                    </button>
-                                                )}
-                                                <button
-                                                    onClick={() => {
-                                                        setEditingAddress(addr);
-                                                        setAddressForm(addr);
-                                                        setShowAddressModal(true);
-                                                    }}
-                                                    style={{
-                                                        padding: '0.375rem 0.625rem',
-                                                        backgroundColor: '#fdf9ee',
-                                                        color: '#5C3A1A',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontWeight: '600'
-                                                    }}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteAddress(addr.id)}
-                                                    style={{
-                                                        padding: '0.375rem 0.625rem',
-                                                        backgroundColor: '#fdf9ee',
-                                                        color: '#ef4444',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontWeight: '600'
-                                                    }}
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <button
-                                onClick={() => {
-                                    setEditingAddress(null);
-                                    setAddressForm({ label: '', street: '', city: '', state: '', zipCode: '' });
-                                    setShowAddressModal(true);
-                                }}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    backgroundColor: '#fdf9ee',
-                                    border: '1px dashed #d1d5db',
-                                    borderRadius: '0.5rem',
-                                    color: '#5C3A1A',
-                                    fontSize: '0.875rem',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                <PlusIcon />
-                                Add New Address
-                            </button>
-                        </div>
-
-                        {/* Payment Methods */}
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '1.5rem',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                        }}>
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem' }}>Payment Methods</h3>
-
-                            {paymentMethods.length === 0 ? (
-                                <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '1rem' }}>No saved payment methods yet</p>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
-                                    {paymentMethods.map(pm => (
-                                        <div key={pm.id} style={{
-                                            padding: '1rem',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '0.5rem',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center'
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                <div style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    backgroundColor: '#f3f4f6',
-                                                    borderRadius: '0.5rem',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '1.25rem'
-                                                }}>
-                                                    💳
-                                                </div>
-                                                <div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.125rem' }}>
-                                                        <span style={{ fontWeight: '600', color: '#1f2937' }}>{pm.cardType} ending in {pm.lastFourDigits}</span>
-                                                        {pm.isPrimary && (
-                                                            <span style={{
-                                                                fontSize: '0.75rem',
-                                                                padding: '0.125rem 0.5rem',
-                                                                backgroundColor: '#fef3c7',
-                                                                color: '#92400e',
-                                                                borderRadius: '0.25rem',
-                                                                fontWeight: '600'
-                                                            }}>
-                                                                Primary
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>
-                                                        Expires {String(pm.expiryMonth).padStart(2, '0')}/{pm.expiryYear}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
-                                                {!pm.isPrimary && (
-                                                    <button
-                                                        onClick={() => handleSetPrimaryPayment(pm.id)}
-                                                        style={{
-                                                            padding: '0.375rem 0.625rem',
-                                                            backgroundColor: '#fdf9ee',
-                                                            color: '#5C3A1A',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            fontWeight: '600'
-                                                        }}
-                                                    >
-                                                        Set Primary
-                                                    </button>
-                                                )}
-                                                <button
-                                                    onClick={() => {
-                                                        setEditingPayment(pm);
-
-                                                        setPaymentForm(pm);
-                                                        setShowPaymentModal(true);
-                                                    }}
-                                                    style={{
-                                                        padding: '0.375rem 0.625rem',
-                                                        backgroundColor: '#fdf9ee',
-                                                        color: '#5C3A1A',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontWeight: '600'
-                                                    }}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeletePayment(pm.id)}
-                                                    style={{
-                                                        padding: '0.375rem 0.625rem',
-                                                        backgroundColor: '#fdf9ee',
-                                                        color: '#ef4444',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontWeight: '600'
-                                                    }}
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
+                                        <div className="flex items-center gap-2">
+                                            {pm.isPrimary && (
+                                                <span className="bg-[#0ac238]/10 text-[#0ac238] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-[#0ac238]/20">Primary</span>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeletePayment(pm.id)}
+                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                title="Delete Payment Method"
+                                            >
+                                                <TrashIcon className="w-4 h-4" />
+                                            </button>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <button
-                                onClick={() => {
-                                    setEditingPayment(null);
-                                    setPaymentForm({ cardType: 'Visa', lastFourDigits: '', expiryMonth: new Date().getMonth() + 1, expiryYear: new Date().getFullYear(), cardholderName: '' });
-                                    setShowPaymentModal(true);
-                                }}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    backgroundColor: '#fdf9ee',
-                                    border: '1px dashed #d1d5db',
-                                    borderRadius: '0.5rem',
-                                    color: '#5C3A1A',
-                                    fontSize: '0.875rem',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                <PlusIcon />
-                                Add New Card
-                            </button>
-                        </div>
-
-                        {/* Quick Links */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => router.push('/orders')}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#fdf9ee',
-                                    padding: '1rem 1.25rem',
-                                    borderRadius: '0.75rem',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                    border: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fed7aa', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ReaderIcon width={20} height={20} />
                                     </div>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <h3 style={{ fontWeight: 'bold', color: '#1f2937', margin: 0, fontSize: '0.9375rem' }}>Order History</h3>
-                                        <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>View past orders and receipts</p>
+                                ))}
+                                {paymentMethods.length === 0 && (
+                                    <div className="col-span-full py-8 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/20">
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">No saved payment methods yet.</p>
                                     </div>
-                                </div>
-                                <ChevronRightIcon style={{ color: '#9ca3af' }} width={20} height={20} />
-                            </button>
-
-                            <button
-                                onClick={() => router.push('/subscription')}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#fdf9ee',
-                                    padding: '1rem 1.25rem',
-                                    borderRadius: '0.75rem',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                    border: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#d1fae5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <StarIcon width={20} height={20} />
-                                    </div>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <h3 style={{ fontWeight: 'bold', color: '#1f2937', margin: 0, fontSize: '0.9375rem' }}>Subscription Plans</h3>
-                                        <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Manage your meal plans</p>
-                                    </div>
-                                </div>
-                                <ChevronRightIcon style={{ color: '#9ca3af' }} width={20} height={20} />
-                            </button>
-
-                            <button
-                                onClick={() => router.push('/?feedback=true')}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: '#fdf9ee',
-                                    padding: '1rem 1.25rem',
-                                    borderRadius: '0.75rem',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                    border: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ChatBubbleIcon width={20} height={20} />
-                                    </div>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <h3 style={{ fontWeight: 'bold', color: '#1f2937', margin: 0, fontSize: '0.9375rem' }}>Send Feedback</h3>
-                                        <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Share your experience with us</p>
-                                    </div>
-                                </div>
-                                <ChevronRightIcon style={{ color: '#9ca3af' }} width={20} height={20} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Right Column - Loyalty & Rewards */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {/* Loyalty Card Removed */}
-
-                        {/* Current Plan Card (if subscription exists) */}
-                        {subscription && (
-                            <div style={{
-                                backgroundColor: '#fdf9ee',
-                                borderRadius: '1rem',
-                                padding: '1.5rem',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>Current Plan</h3>
-                                    <span style={{
-                                        fontSize: '0.75rem',
-                                        padding: '0.25rem 0.75rem',
-                                        backgroundColor: '#d1fae5',
-                                        color: '#065f46',
-                                        borderRadius: '1rem',
-                                        fontWeight: '600'
-                                    }}>
-                                        Active
-                                    </span>
-                                </div>
-                                <p style={{ fontSize: '1rem', fontWeight: '600', color: '#374151', marginBottom: '0.25rem' }}>
-                                    {subscription.planType === 'MONTHLY_MESS' ? 'Premium Plan' : 'Trial Plan'}
-                                </p>
-                                <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1.5rem' }}>
-                                    Next billing on {new Date(subscription.endDate).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                </p>
-
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button
-                                        onClick={() => router.push('/subscription')}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.625rem',
-                                            backgroundColor: '#5C3A1A',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Manage Plan
-                                    </button>
-                                    <button
-                                        onClick={() => alert('Cancel subscription feature coming soon')}
-                                        style={{
-                                            padding: '0.625rem 1rem',
-                                            backgroundColor: '#fee2e2',
-                                            color: '#b91c1c',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
+                                )}
                             </div>
-                        )}
+                        </section>
                     </div>
-                </div>
-            </div >
+
+                    {/* Mobile Feedback & Logout */}
+                    <div className="md:hidden mt-8 space-y-3">
+                        <a
+                            href="mailto:hello@cafesouthcentral.com"
+                            className="block w-full"
+                        >
+                            <div className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-[#0d1c11] dark:text-white bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 shadow-sm font-bold">
+                                <Mail className="w-5 h-5" />
+                                Share Feedback
+                            </div>
+                        </a>
+
+                        <div className="p-6 bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 transition-colors font-bold"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Fixed Bottom Save Button (Mobile) & Inline (Desktop) */}
+                    <div className="fixed bottom-16 md:bottom-auto left-1/2 -translate-x-1/2 md:translate-x-0 w-full max-w-[430px] md:max-w-none md:static bg-white dark:bg-[#121212] md:bg-transparent border-t md:border-t-0 border-gray-100 dark:border-gray-800 z-20 px-6 pt-4 pb-2 md:p-0 md:mt-12 md:mb-12">
+                        <button
+                            onClick={handleSaveProfile}
+                            disabled={saving}
+                            className="w-full md:w-auto md:px-8 bg-[#0d1c11] dark:bg-[#0ac238] text-white py-4 md:py-3 rounded-2xl md:rounded-xl font-bold text-base hover:opacity-90 transition-all shadow-lg"
+                        >
+                            {saving ? 'Saving...' : 'Save All Changes'}
+                        </button>
+                    </div>
+
+                </main>
+            </div>
 
             {/* Address Modal */}
-            {
-                showAddressModal && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }} onClick={() => setShowAddressModal(false)}>
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            maxWidth: '500px',
-                            width: '90%'
-                        }} onClick={e => e.stopPropagation()}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-                                    {editingAddress ? 'Edit Address' : 'Add New Address'}
-                                </h3>
-                                <button onClick={() => setShowAddressModal(false)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>
-                                    <Cross2Icon width={20} height={20} />
-                                </button>
+            {showAddressModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAddressModal(false)}>
+                    <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 w-full max-w-lg shadow-2xl border border-gray-100 dark:border-gray-800 scale-100 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-serif font-bold text-[#0d1c11] dark:text-white">
+                                {editingAddress ? 'Edit Address' : 'Add New Address'}
+                            </h3>
+                            <button onClick={() => setShowAddressModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <PlusIcon className="w-6 h-6 rotate-45 text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col gap-5">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Label</label>
+                                <input
+                                    className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                    placeholder="e.g. Home, Work, Mom's House"
+                                    value={addressForm.label}
+                                    onChange={e => setAddressForm({ ...addressForm, label: e.target.value })}
+                                />
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Label</label>
-                                    <select
-                                        value={addressForm.label}
-                                        onChange={e => setAddressForm({ ...addressForm, label: e.target.value })}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
-                                    >
-                                        <option value="">Select label</option>
-                                        <option value="Home">Home</option>
-                                        <option value="Work">Work</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Street Address</label>
+                                <input
+                                    className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                    placeholder="Flat / House No / Street"
+                                    value={addressForm.street}
+                                    onChange={e => setAddressForm({ ...addressForm, street: e.target.value })}
+                                />
+                            </div>
 
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Street Address</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">City</label>
                                     <input
-                                        type="text"
-                                        value={addressForm.street}
-                                        onChange={e => setAddressForm({ ...addressForm, street: e.target.value })}
-                                        placeholder="456 Oak Avenue, Springfield"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
+                                        className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                        placeholder="City"
+                                        value={addressForm.city}
+                                        onChange={e => setAddressForm({ ...addressForm, city: e.target.value })}
                                     />
                                 </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>City</label>
-                                        <input
-                                            type="text"
-                                            value={addressForm.city}
-                                            onChange={e => setAddressForm({ ...addressForm, city: e.target.value })}
-                                            placeholder="IL"
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.625rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem'
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>State</label>
-                                        <input
-                                            type="text"
-                                            value={addressForm.state}
-                                            onChange={e => setAddressForm({ ...addressForm, state: e.target.value })}
-                                            placeholder="IL"
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.625rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem'
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>ZIP Code</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">State</label>
                                     <input
-                                        type="text"
-                                        value={addressForm.zipCode}
-                                        onChange={e => setAddressForm({ ...addressForm, zipCode: e.target.value })}
-                                        placeholder="62704"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
+                                        className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                        placeholder="State"
+                                        value={addressForm.state}
+                                        onChange={e => setAddressForm({ ...addressForm, state: e.target.value })}
                                     />
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-                                    <button
-                                        onClick={() => setShowAddressModal(false)}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.75rem',
-                                            backgroundColor: '#f3f4f6',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSaveAddress}
-                                        disabled={!addressForm.label || !addressForm.street || !addressForm.city || !addressForm.state || !addressForm.zipCode}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.75rem',
-                                            backgroundColor: '#5C3A1A',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer',
-                                            opacity: (!addressForm.label || !addressForm.street || !addressForm.city || !addressForm.state || !addressForm.zipCode) ? 0.5 : 1
-                                        }}
-                                    >
-                                        Save Address
-                                    </button>
                                 </div>
                             </div>
+
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Zip Code</label>
+                                <input
+                                    className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                    placeholder="Area Code"
+                                    value={addressForm.zipCode}
+                                    onChange={e => setAddressForm({ ...addressForm, zipCode: e.target.value })}
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleSaveAddress}
+                                className="w-full bg-[#0ac238] hover:bg-[#08a530] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all mt-4"
+                            >
+                                {editingAddress ? 'Update Address' : 'Save Address'}
+                            </button>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            )}
 
             {/* Payment Modal */}
-            {
-                showPaymentModal && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }} onClick={() => setShowPaymentModal(false)}>
-                        <div style={{
-                            backgroundColor: '#fdf9ee',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            maxWidth: '500px',
-                            width: '90%'
-                        }} onClick={e => e.stopPropagation()}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
-                                    {editingPayment ? 'Edit Payment Method' : 'Add New Card'}
-                                </h3>
-                                <button onClick={() => setShowPaymentModal(false)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>
-                                    <Cross2Icon width={20} height={20} />
-                                </button>
+            {showPaymentModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowPaymentModal(false)}>
+                    <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 w-full max-w-lg shadow-2xl border border-gray-100 dark:border-gray-800 scale-100 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-serif font-bold text-[#0d1c11] dark:text-white">
+                                {editingPayment ? 'Edit Method' : 'Add Payment Method'}
+                            </h3>
+                            <button onClick={() => setShowPaymentModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <PlusIcon className="w-6 h-6 rotate-45 text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col gap-5">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Card Type</label>
+                                <input
+                                    className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white"
+                                    placeholder="e.g. Visa, Mastercard"
+                                    value={paymentForm.cardType}
+                                    onChange={e => setPaymentForm({ ...paymentForm, cardType: e.target.value })}
+                                />
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Card Type</label>
-                                    <select
-                                        value={paymentForm.cardType}
-                                        onChange={e => setPaymentForm({ ...paymentForm, cardType: e.target.value })}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
-                                    >
-                                        <option value="Visa">Visa</option>
-                                        <option value="MasterCard">MasterCard</option>
-                                        <option value="Rupay">Rupay</option>
-                                        <option value="American Express">American Express</option>
-                                    </select>
-                                </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Last 4 Digits</label>
+                                <input
+                                    className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white font-mono"
+                                    placeholder="XXXX"
+                                    value={paymentForm.lastFourDigits}
+                                    onChange={e => setPaymentForm({ ...paymentForm, lastFourDigits: e.target.value })}
+                                    maxLength={4}
+                                />
+                            </div>
 
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Last 4 Digits</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Expiry Month</label>
                                     <input
-                                        type="text"
-                                        maxLength={4}
-                                        value={paymentForm.lastFourDigits}
-                                        onChange={e => setPaymentForm({ ...paymentForm, lastFourDigits: e.target.value.replace(/\D/g, '') })}
-                                        placeholder="1234"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
+                                        className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white text-center"
+                                        type="number"
+                                        placeholder="MM"
+                                        min={1} max={12}
+                                        value={paymentForm.expiryMonth}
+                                        onChange={e => setPaymentForm({ ...paymentForm, expiryMonth: parseInt(e.target.value) })}
                                     />
                                 </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Expiry Month</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            max="12"
-                                            value={paymentForm.expiryMonth}
-                                            onChange={e => setPaymentForm({ ...paymentForm, expiryMonth: parseInt(e.target.value) || 1 })}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.625rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem'
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Expiry Year</label>
-                                        <input
-                                            type="number"
-                                            min={new Date().getFullYear()}
-                                            value={paymentForm.expiryYear}
-                                            onChange={e => setPaymentForm({ ...paymentForm, expiryYear: parseInt(e.target.value) || new Date().getFullYear() })}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.625rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '0.5rem',
-                                                fontSize: '0.875rem'
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>Cardholder Name (Optional)</label>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Expiry Year</label>
                                     <input
-                                        type="text"
-                                        value={paymentForm.cardholderName}
-                                        onChange={e => setPaymentForm({ ...paymentForm, cardholderName: e.target.value })}
-                                        placeholder="John Doe"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.625rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem'
-                                        }}
+                                        className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3.5 text-base font-medium focus:ring-2 focus:ring-[#0ac238]/20 focus:border-[#0ac238] outline-none transition-all text-[#0d1c11] dark:text-white text-center"
+                                        type="number"
+                                        placeholder="YYYY"
+                                        value={paymentForm.expiryYear}
+                                        onChange={e => setPaymentForm({ ...paymentForm, expiryYear: parseInt(e.target.value) })}
                                     />
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-                                    <button
-                                        onClick={() => setShowPaymentModal(false)}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.75rem',
-                                            backgroundColor: '#f3f4f6',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSavePayment}
-                                        disabled={!paymentForm.lastFourDigits || paymentForm.lastFourDigits.length !== 4}
-                                        style={{
-                                            flex: 1,
-                                            padding: '0.75rem',
-                                            backgroundColor: '#5C3A1A',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '0.5rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            cursor: 'pointer',
-                                            opacity: (!paymentForm.lastFourDigits || paymentForm.lastFourDigits.length !== 4) ? 0.5 : 1
-                                        }}
-                                    >
-                                        Save Card
-                                    </button>
                                 </div>
                             </div>
+
+                            <button
+                                onClick={handleSavePayment}
+                                className="w-full bg-[#0ac238] hover:bg-[#08a530] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all mt-4"
+                            >
+                                {editingPayment ? 'Update Method' : 'Save Payment Method'}
+                            </button>
                         </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 }

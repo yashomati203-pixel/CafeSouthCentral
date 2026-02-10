@@ -80,32 +80,7 @@ export default function OrderHistoryPage() {
         }
     }, [user?.id]);
 
-    const handleCancel = async (orderId: string) => {
-        if (!confirm('Are you sure you want to cancel this order?')) return;
 
-        try {
-            const res = await fetch('/api/user/orders/cancel', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, userId: user.id })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Order cancelled successfully');
-                fetch(`/api/user/orders?userId=${user.id}`).then(r => r.json()).then(setOrders);
-            } else {
-                alert(data.error);
-            }
-        } catch (e) {
-            alert('Failed to cancel');
-        }
-    };
-
-    const isCancellable = (order: any) => {
-        if (order.status === 'CANCELLED' || order.status === 'SOLD' || order.status === 'DONE') return false;
-        const diff = Date.now() - new Date(order.createdAt).getTime();
-        return diff < 2 * 60 * 1000; // 2 minutes
-    };
 
     const toggleOrderExpansion = (orderId: string) => {
         const newExpanded = new Set(expandedOrders);
@@ -122,7 +97,8 @@ export default function OrderHistoryPage() {
             case 'SOLD':
                 return { bg: '#f3f4f6', color: '#374151', label: 'COMPLETED' };
             case 'CANCELLED':
-                return { bg: '#fee2e2', color: '#b91c1c', label: 'CANCELLED' };
+            case 'CANCELLED_USER':
+                return { bg: '#fee2e2', color: '#b91c1c', label: 'CANCELLED ORDER' };
             case 'DONE':
             case 'READY':
                 return { bg: '#d1fae5', color: '#065f46', label: 'READY' };
@@ -132,7 +108,7 @@ export default function OrderHistoryPage() {
             case 'PENDING':
                 return { bg: '#fef3c7', color: '#92400e', label: 'PREPARING' };
             default:
-                return { bg: '#e5e7eb', color: '#4b5563', label: status };
+                return { bg: '#e5e7eb', color: '#4b5563', label: status.replace('_', ' ') };
         }
     };
 
@@ -486,26 +462,7 @@ export default function OrderHistoryPage() {
 
                                             {/* Actions */}
                                             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-                                                {isCancellable(order) && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleCancel(order.id);
-                                                        }}
-                                                        style={{
-                                                            padding: '0.5rem 1rem',
-                                                            fontSize: '0.875rem',
-                                                            color: '#ef4444',
-                                                            backgroundColor: '#fee2e2',
-                                                            border: '1px solid #fecaca',
-                                                            borderRadius: '0.5rem',
-                                                            cursor: 'pointer',
-                                                            fontWeight: 'bold'
-                                                        }}
-                                                    >
-                                                        Cancel Order
-                                                    </button>
-                                                )}
+
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();

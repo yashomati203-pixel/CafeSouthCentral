@@ -43,3 +43,33 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to update menu item' }, { status: 500 });
     }
 }
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { name, description, price, category, type, imageUrl, stock, isVeg } = body;
+
+        if (!name || !price || !category) {
+            return NextResponse.json({ error: 'Name, Price, and Category are required' }, { status: 400 });
+        }
+
+        const newItem = await prisma.menuItem.create({
+            data: {
+                name,
+                description,
+                price: parseFloat(price),
+                category,
+                type: type || 'NORMAL',
+                imageUrl,
+                stock: parseInt(stock) || 0,
+                isVeg: isVeg !== undefined ? isVeg : true,
+                isAvailable: true
+            }
+        });
+
+        return NextResponse.json(newItem);
+    } catch (error) {
+        console.error('Failed to create menu item:', error);
+        return NextResponse.json({ error: 'Failed to create menu item' }, { status: 500 });
+    }
+}

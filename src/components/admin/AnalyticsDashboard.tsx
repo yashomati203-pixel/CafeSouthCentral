@@ -52,8 +52,11 @@ interface AnalyticsData {
     newCustomersList?: NewCustomer[];
 }
 
-const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
-    const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('week');
+const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
+    data?: AnalyticsData;
+    timeframe: 'today' | 'week' | 'month';
+    onTimeframeChange: (t: 'today' | 'week' | 'month') => void;
+}) => {
     const [showCustomersModal, setShowCustomersModal] = useState(false);
 
     // Safe access to data or defaults
@@ -87,7 +90,7 @@ const AnalyticsDashboard = ({ data }: { data?: AnalyticsData }) => {
                     {(['today', 'week', 'month'] as const).map((t) => (
                         <button
                             key={t}
-                            onClick={() => setTimeframe(t)}
+                            onClick={() => onTimeframeChange(t)}
                             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize ${timeframe === t
                                 ? 'bg-primary-brown text-white'
                                 : 'text-text-subtle hover:text-primary-brown'

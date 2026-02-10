@@ -11,15 +11,14 @@ interface MobileProfileMenuProps {
     onClose: () => void;
     user: any;
     onLogout: () => void;
-    onFeedback: () => void;
+    // onFeedback removed
 }
 
 export default function MobileProfileMenu({
     isOpen,
     onClose,
     user,
-    onLogout,
-    onFeedback
+    onLogout
 }: MobileProfileMenuProps) {
 
     if (!isOpen) return null;
@@ -54,13 +53,14 @@ export default function MobileProfileMenu({
                 </div>
 
                 <nav className="flex flex-col gap-4">
-                    <button
-                        onClick={() => { onFeedback(); onClose(); }}
+                    <a
+                        href="mailto:hello@cafesouthcentral.com"
+                        onClick={onClose}
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     >
                         <ChatBubbleIcon className="w-5 h-5" />
-                        <span className="font-medium">Feedback</span>
-                    </button>
+                        <span className="font-medium">Share Feedback</span>
+                    </a>
 
                     <button
                         onClick={async () => {

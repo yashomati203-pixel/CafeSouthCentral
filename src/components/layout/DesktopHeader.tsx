@@ -1,216 +1,85 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { DecorativeBorderLogo } from '@/components/ui/DecorativeBorder';
+import { User as UserIcon, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 interface DesktopHeaderProps {
     user?: any;
-    cartItemCount?: number;
-    onCartClick?: () => void;
     onLoginClick?: () => void;
 }
 
 export default function DesktopHeader({
     user,
-    cartItemCount = 0,
-    onCartClick,
     onLoginClick
 }: DesktopHeaderProps) {
     const router = useRouter();
+    const pathname = usePathname();
+    const { openCart, subTotalCount, totalItemsCount } = useCart();
 
     return (
-        <header className="hidden md:flex" style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto',
-            alignItems: 'center',
-            padding: '1rem 2rem',
-            borderBottom: '1px solid #e5e7eb',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: '#e2e9e0',
-            zIndex: 50
-        }}>
-            {/* Left: Logo */}
-            <div>
-                <div
-                    onClick={() => router.push('/')}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <Image
-                        src="/Final web logo.png"
-                        alt="Cafe South Central"
-                        width={200}
-                        height={60}
-                        style={{ objectFit: 'contain', objectPosition: 'left' }}
-                        priority
-                    />
-                </div>
-            </div>
+        <header className="sticky top-0 z-[100] w-full bg-[#e2e9e0]/90 backdrop-blur-md hidden md:block">
+            <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
+                <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto">
+                    <DecorativeBorderLogo size="md">
+                        <Image src="/Final-logo.png" alt="Cafe South Central" width={350} height={105} className="h-24 w-auto object-contain" priority />
+                    </DecorativeBorderLogo>
+                </Link>
 
-            {/* Right: Navigation Links + Cart + Profile */}
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'flex-end' }}>
-                {/* Navigation Links */}
-                <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
-
-                    <button
-                        onClick={() => {
-                            // Scroll to menu or navigate
-                            if (window.location.pathname !== '/') {
-                                router.push('/?section=menu');
-                            } else {
-                                document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
-                            }
-                        }}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#5C3A1A',
-                            fontSize: '1rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            padding: '0.5rem 0',
-                            transition: 'color 0.2s',
-                            fontFamily: 'inherit'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                {/* Centered Desktop Tabs */}
+                <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+                    <Link
+                        href="/menu"
+                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/menu' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
                     >
                         Menu
-                    </button>
-                    <button
-                        onClick={() => router.push('/subscription')}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#5C3A1A',
-                            fontSize: '1rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            padding: '0.5rem 0',
-                            transition: 'color 0.2s',
-                            fontFamily: 'inherit'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
+                    </Link>
+                    <Link
+                        href="/subscription"
+                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/subscription' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
                     >
                         Subscriptions
-                    </button>
-                    {user && (
-                        <button
-                            onClick={() => router.push('/orders')}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#5C3A1A',
-                                fontSize: '1rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                padding: '0.5rem 0',
-                                transition: 'color 0.2s',
-                                fontFamily: 'inherit'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#2F4F2F'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#5C3A1A'}
-                        >
-                            Orders
-                        </button>
-                    )}
+                    </Link>
                 </div>
 
-                {/* Right Actions: Cart & Profile/Login */}
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                <div className="hidden items-center gap-8 lg:flex">
+                    {/* Cart Button */}
+                    <button
+                        onClick={openCart}
+                        className="relative p-2 text-[#166534] hover:bg-[#e7f3eb] rounded-full transition-colors"
+                        aria-label="Open Cart"
+                    >
+                        <ShoppingBag className="w-6 h-6" />
+                        {totalItemsCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-[#d32f2f] text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm">
+                                {totalItemsCount}
+                            </span>
+                        )}
+                    </button>
 
-                    {/* Login Button - Pill Shape */}
                     {user ? (
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <button
-                                onClick={() => {
-                                    if (user && onCartClick) onCartClick();
-                                }}
-                                style={{
-                                    position: 'relative',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    fontSize: '1.5rem',
-                                    padding: '0.5rem',
-                                    color: '#5C3A1A'
-                                }}
-                                title="Cart"
-                            >
-                                🛒
-                                {cartItemCount > 0 && (
-                                    <span style={{
-                                        position: 'absolute',
-                                        top: '0',
-                                        right: '0',
-                                        backgroundColor: '#ef4444',
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        width: '18px',
-                                        height: '18px',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 'bold'
-                                    }}>
-                                        {cartItemCount}
-                                    </span>
-                                )}
-                            </button>
-
+                        <div className={`flex items-center gap-6 pb-1 border-b-2 ${pathname === '/account' ? 'border-[#DAA520]' : 'border-transparent'}`}>
+                            <span className="font-bold text-[#166534]">Welcome, {user.name?.split(' ')[0] || 'User'}</span>
                             <button
                                 onClick={() => router.push('/account')}
-                                style={{
-                                    height: '36px',
-                                    padding: '0 1rem',
-                                    borderRadius: '999px',
-                                    backgroundColor: '#5C3A1A',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 'bold'
-                                }}
-                                title="Profile"
+                                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e7f3eb] text-[#166534] transition-colors hover:bg-[#d1fae5]"
                             >
-                                {user.name || 'User'}
+                                <UserIcon className="h-5 w-5" />
                             </button>
                         </div>
                     ) : (
                         <button
                             onClick={() => onLoginClick?.()}
-                            style={{
-                                backgroundColor: '#3C2A21',
-                                color: '#FFF8F0', /* or white */
-                                border: 'none',
-                                padding: '0.6rem 2rem',
-                                borderRadius: '999px',
-                                fontSize: '1rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontFamily: 'inherit',
-                                boxShadow: '0 2px 5px rgba(60, 42, 33, 0.2)'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(60, 42, 33, 0.3)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'none';
-                                e.currentTarget.style.boxShadow = '0 2px 5px rgba(60, 42, 33, 0.2)';
-                            }}
+                            className="rounded-full bg-[#0e1b12] px-8 py-3 text-sm font-bold text-white transition-transform hover:scale-105 hover:shadow-lg"
                         >
                             Login / Sign Up
                         </button>
                     )}
                 </div>
             </div>
-        </header>
+        </header >
     );
 }

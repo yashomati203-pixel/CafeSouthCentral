@@ -14,7 +14,7 @@
 ```css
 /* Default → Hover → Active → Focus */
 .btn-primary {
-  background: var(--forest-green);
+  background: var(--color-palm-green-dark);
   transform: translateY(0);
   box-shadow: var(--shadow-green);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -22,14 +22,14 @@
 
 /* Hover (mouse over) */
 .btn-primary:hover {
-  background: var(--forest-green-600);
+  background: var(--color-palm-green-dark); /* Opacity or filter handled elsewhere */
   transform: translateY(-2px); /* Lift effect */
   box-shadow: var(--shadow-hover);
 }
 
 /* Active (click/tap) */
 .btn-primary:active {
-  background: var(--forest-green-700);
+  background: var(--color-palm-green-dark);
   transform: translateY(0); /* Return to base */
   box-shadow: var(--shadow-active);
   transition-duration: 0.1s; /* Faster for responsiveness */
@@ -37,7 +37,7 @@
 
 /* Focus (keyboard navigation) */
 .btn-primary:focus-visible {
-  outline: 3px solid var(--forest-green-light);
+  outline: 3px solid var(--color-palm-green-light);
   outline-offset: 3px;
 }
 ```
@@ -54,7 +54,7 @@
 .menu-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--forest-green-100);
+  border-color: var(--color-palm-green-light);
 }
 
 .menu-card:hover .menu-card-image {
@@ -83,7 +83,7 @@
 /* Focus */
 .input:focus {
   outline: none;
-  border-color: var(--forest-green-light);
+  border-color: var(--color-palm-green-light);
   box-shadow: 0 0 0 3px rgba(30, 58, 31, 0.1); /* Glow effect */
 }
 
@@ -133,7 +133,7 @@ function LoadingButton({ loading, children, ...props }) {
   transform: translate(-50%, -50%);
   width: 20px;
   height: 20px;
-  border: 3px solid var(--golden-yellow);
+  border: 3px solid var(--color-tropical-yellow);
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -426,8 +426,8 @@ function SuccessCheckmark() {
   right: 20px;
   width: 60px;
   height: 60px;
-  background: var(--forest-green);
-  color: var(--golden-yellow);
+  background: var(--color-palm-green-dark);
+  color: var(--color-tropical-yellow);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -622,7 +622,7 @@ function LoginModal({ onClose }) {
 .login-form h2 {
   font-family: 'Playfair Display', serif;
   font-size: var(--text-2xl);
-  color: var(--forest-green);
+  color: var(--color-palm-green-dark);
   margin-bottom: var(--space-2);
 }
 
@@ -830,9 +830,9 @@ function CartDrawer({ isOpen, onClose }) {
 
 .timing-options button.active,
 .payment-options button.active {
-  border-color: var(--forest-green);
-  background: var(--forest-green-50);
-  color: var(--forest-green);
+  border-color: var(--color-palm-green-dark);
+  background: var(--color-palm-green-light); /* using light green as background tint equivalent */
+  color: var(--color-palm-green-dark);
 }
 
 .cart-notices {
@@ -894,7 +894,7 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
       {/* Content */}
       <div className="modal-content">
         <div className="icon-wrapper">
-          <SparklesIcon size={48} className="text-golden-yellow" />
+          <SparklesIcon size={48} className="text-tropical-yellow" />
         </div>
         
         <h2>Never Think About Lunch Again!</h2>
@@ -950,7 +950,7 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
 .icon-wrapper {
   width: 80px;
   height: 80px;
-  background: var(--soft-beige);
+  background: var(--color-sand-beige);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -962,7 +962,7 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
   font-family: 'Playfair Display', serif;
   font-size: var(--text-2xl);
   text-align: center;
-  color: var(--forest-green);
+  color: var(--color-palm-green-dark);
   margin-bottom: var(--space-3);
 }
 
@@ -992,8 +992,8 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
 }
 
 .plan-card.popular {
-  border-color: var(--golden-yellow);
-  background: var(--soft-beige);
+  border-color: var(--color-tropical-yellow);
+  background: var(--color-sand-beige);
 }
 
 .popular-badge {
@@ -1001,8 +1001,8 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--golden-yellow);
-  color: var(--forest-green);
+  background: var(--color-tropical-yellow);
+  color: var(--color-palm-green-dark);
   padding: 4px 12px;
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
@@ -1020,7 +1020,7 @@ function SubscriptionInvitation({ onClose, onSubscribe }) {
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--forest-green);
+  color: var(--color-palm-green-dark);
 }
 
 .plan-benefit {
@@ -1076,7 +1076,7 @@ function MobileHeader() {
   left: 0;
   right: 0;
   height: 60px;
-  background: var(--cream-white);
+  background: var(--color-sand-beige);
   border-bottom: 1px solid var(--gray-100);
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -1089,7 +1089,7 @@ function MobileHeader() {
   font-family: 'Playfair Display', serif;
   font-size: var(--text-base);
   font-weight: 600;
-  color: var(--forest-green);
+  color: var(--color-palm-green-dark);
   text-align: center;
 }
 ```
@@ -1138,7 +1138,7 @@ function MobileBottomNav({ active }) {
 }
 
 .nav-link.active {
-  color: var(--forest-green);
+  color: var(--color-palm-green-dark);
 }
 
 .nav-link svg {
@@ -1216,7 +1216,7 @@ function DesktopLayout({ children, showCart }) {
 // CSS
 .desktop-layout {
   min-height: 100vh;
-  background: var(--cream-white);
+  background: var(--color-sand-beige);
 }
 
 .content-wrapper {
@@ -1309,7 +1309,7 @@ function LandingPage() {
   min-height: 700px;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, var(--cream-white), var(--soft-beige));
+  background: linear-gradient(135deg, var(--color-sand-beige), var(--color-sand-beige));
 }
 
 @media (max-width: 768px) {
@@ -1432,7 +1432,7 @@ Error Red (#DC2626) on White: 5.3:1 ✅ AA+
 ```tsx
 // Focus visible styles
 *:focus-visible {
-  outline: 3px solid var(--forest-green-light);
+  outline: 3px solid var(--color-palm-green-light);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -1450,8 +1450,8 @@ function SkipLink() {
   position: absolute;
   top: -40px;
   left: 0;
-  background: var(--forest-green);
-  color: var(--golden-yellow);
+  background: var(--color-palm-green-dark);
+  color: var(--color-tropical-yellow);
   padding: 8px 16px;
   text-decoration: none;
   z-index: 100;

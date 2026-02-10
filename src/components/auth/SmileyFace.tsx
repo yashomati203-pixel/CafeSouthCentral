@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-export default function SmileyFace({ focusState }: { focusState?: 'name' | 'phone' | 'otp' }) {
+export default function SmileyFace({ focusState }: { focusState?: 'name' | 'phone' | 'otp' | 'password' }) {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {

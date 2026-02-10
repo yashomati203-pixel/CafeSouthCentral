@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import StockItem from '@/components/admin/StockItem';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import AddDishModal from '@/components/admin/AddDishModal';
 import { printKOT, printBill } from '@/lib/printer';
 import {
     LayoutDashboard,
@@ -72,7 +73,9 @@ export default function AdminDashboard() {
     const [feedbacks, setFeedbacks] = useState<any[]>([]);
 
     // Analytics State
+    // Analytics State
     const [analytics, setAnalytics] = useState<any>(null);
+    const [analyticsTimeframe, setAnalyticsTimeframe] = useState<'today' | 'week' | 'month'>('week');
 
     // POS State
     const [posCart, setPosCart] = useState<{ item: any; qty: number }[]>([]);
@@ -80,6 +83,12 @@ export default function AdminDashboard() {
     const [posName, setPosName] = useState('');
     const [posSearch, setPosSearch] = useState('');
     const [posLoading, setPosLoading] = useState(false);
+
+    const [showAddDish, setShowAddDish] = useState(false);
+    const [showStockAlerts, setShowStockAlerts] = useState(false);
+
+    // Filter low stock items (threshold 10)
+    const lowStockItems = menuItems.filter(item => item.stock < 10);
 
     // Sound
     // const [play] = useSound('/notification.mp3'); // Requires file
@@ -212,9 +221,9 @@ export default function AdminDashboard() {
         }
     };
 
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = async (timeframe: 'today' | 'week' | 'month' = analyticsTimeframe) => {
         try {
-            const res = await fetch('/api/admin/analytics');
+            const res = await fetch(`/api/admin/analytics?timeframe=${timeframe}`);
             if (res.ok) {
                 const data = await res.json();
                 setAnalytics(data);
@@ -383,9 +392,9 @@ export default function AdminDashboard() {
         { id: 'sold', label: 'History', icon: History },
         { id: 'feedback', label: 'Feedback', icon: Star },
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    ] as const;
+    ];
 
-    const activeTabLabel = NAV_ITEMS.find(i => i.id === activeTab)?.label || 'Dashboard';
+    const activeTabLabel = NAV_ITEMS.find((i: any) => i.id === activeTab)?.label || 'Dashboard';
 
     return (
         <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
@@ -471,26 +480,81 @@ export default function AdminDashboard() {
 
                     <div className="flex gap-3">
                         <button
-                            onClick={async () => {
-                                if (confirm('Send "Lunch Time" notification?')) {
-                                    try {
-                                        await fetch('/api/admin/broadcast', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({
-                                                title: "It's Lunch Time! 🍛",
-                                                body: "Avoid the queue! Pre-order your food now."
-                                            })
-                                        });
-                                        alert('Sent!');
-                                    } catch (e) { alert('Error'); }
-                                }
-                            }}
+                            onClick={playNotification}
                             className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded-lg text-sm font-bold transition-colors"
                         >
                             <Bell className="w-4 h-4" />
                             Lunch Bell
                         </button>
+
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowStockAlerts(!showStockAlerts)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${lowStockItems.length > 0
+                                    ? 'bg-red-100 text-red-700 hover:bg-red-200 animate-pulse'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                <Bell className="w-4 h-4" />
+                                {lowStockItems.length > 0 && (
+                                    <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full absolute -top-1 -right-1">
+                                        {lowStockItems.length}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Stock Alert Dropdown */}
+                            {showStockAlerts && (
+                                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                                        <h4 className="font-bold text-gray-900">Stock Alerts</h4>
+                                        <span className="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-lg">
+                                            {lowStockItems.length} Items Low
+                                        </span>
+                                    </div>
+                                    <div className="max-h-64 overflow-y-auto">
+                                        {lowStockItems.length === 0 ? (
+                                            <div className="p-8 text-center text-gray-500 text-sm">
+                                                All items are well stocked! 📦
+                                            </div>
+                                        ) : (
+                                            lowStockItems.map(item => (
+                                                <div
+                                                    key={item.id}
+                                                    className="p-3 border-b border-gray-50 hover:bg-gray-50 flex justify-between items-center cursor-pointer"
+                                                    onClick={() => {
+                                                        setActiveTab('stock');
+                                                        setSelectedCategory(item.category);
+                                                        setShowStockAlerts(false);
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-2 h-2 rounded-full ${item.stock === 0 ? 'bg-red-500' : 'bg-orange-400'}`} />
+                                                        <div>
+                                                            <p className="text-sm font-bold text-gray-800">{item.name}</p>
+                                                            <p className="text-xs text-gray-500">{item.category}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`text-xs font-bold px-2 py-1 rounded-lg ${item.stock === 0 ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
+                                                        }`}>
+                                                        {item.stock} left
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                    <div
+                                        className="p-3 bg-gray-50 border-t border-gray-100 text-center text-xs font-bold text-primary-brown cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => {
+                                            setActiveTab('stock');
+                                            setShowStockAlerts(false);
+                                        }}
+                                    >
+                                        Manage Inventory →
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <button
                             onClick={() => window.location.href = '/admin-scan'}
                             className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-bold transition-colors"
@@ -658,7 +722,14 @@ export default function AdminDashboard() {
                                 <tbody>
                                     {users.map(user => (
                                         <tr key={user.id} style={{ borderTop: '1px solid #eee' }}>
-                                            <td style={{ padding: '1rem', fontWeight: 'bold' }}>{user.name}</td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ fontWeight: 'bold' }}>{user.name}</div>
+                                                {user.isMember && user.subscription && (
+                                                    <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '4px' }}>
+                                                        {user.subscription.creditsTotal - user.subscription.creditsUsed} coupons left
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td style={{ padding: '1rem' }}>{user.phone}</td>
                                             <td style={{ padding: '1rem' }}>
                                                 <span style={{
@@ -721,22 +792,41 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {/* Manual Refresh Button */}
-                                <button
-                                    onClick={() => fetchInventory()}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                        padding: '0.5rem 1rem',
-                                        backgroundColor: 'white',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '0.5rem',
-                                        cursor: 'pointer',
-                                        color: '#5C3A1A',
-                                        fontWeight: 'bold'
-                                    }}
-                                >
-                                    🔄 Refresh
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowAddDish(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-primary-brown text-white rounded-lg text-sm font-bold shadow-md hover:bg-primary-brown/90 transition-all"
+                                    >
+                                        + Add Dish
+                                    </button>
+                                    <button
+                                        onClick={() => fetchInventory()}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                            padding: '0.5rem 1rem',
+                                            backgroundColor: 'white',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '0.5rem',
+                                            cursor: 'pointer',
+                                            color: '#5C3A1A',
+                                            fontWeight: 'bold'
+                                        }}
+                                    >
+                                        🔄 Refresh
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* ADD DISH MODAL */}
+                            {showAddDish && (
+                                <AddDishModal
+                                    onClose={() => setShowAddDish(false)}
+                                    onSuccess={() => {
+                                        fetchInventory();
+                                        alert('Dish added successfully!');
+                                    }}
+                                />
+                            )}
 
                             {Object.entries(
                                 menuItems.reduce((acc, item) => {
@@ -896,7 +986,14 @@ export default function AdminDashboard() {
 
                     {/* ANALYTICS TAB */}
                     {activeTab === 'analytics' && (
-                        <AnalyticsDashboard data={analytics} />
+                        <AnalyticsDashboard
+                            data={analytics}
+                            timeframe={analyticsTimeframe}
+                            onTimeframeChange={(t) => {
+                                setAnalyticsTimeframe(t);
+                                fetchAnalytics(t);
+                            }}
+                        />
                     )}
 
                     {/* FEEDBACK TAB */}
@@ -1003,8 +1100,8 @@ export default function AdminDashboard() {
                                                 >
                                                     <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>{item.name}</div>
                                                     <div style={{ color: '#666', fontSize: '0.9rem' }}>₹{item.price}</div>
-                                                    <div style={{ fontSize: '0.8rem', color: item.inventoryCount > 0 ? '#10b981' : '#ef4444', marginTop: '0.5rem' }}>
-                                                        {item.inventoryCount > 0 ? `${item.inventoryCount} in stock` : 'Out of Stock'}
+                                                    <div style={{ fontSize: '0.8rem', color: item.stock > 0 ? '#10b981' : '#ef4444', marginTop: '0.5rem' }}>
+                                                        {item.stock > 0 ? `${item.stock} in stock` : 'Out of Stock'}
                                                     </div>
                                                 </div>
                                             ))}
@@ -1090,6 +1187,6 @@ export default function AdminDashboard() {
                     }
                 </div>
             </main>
-        </div>
+        </div >
     );
 }

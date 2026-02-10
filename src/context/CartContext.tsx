@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { MenuItem, MenuItemType, OrderMode } from '@/types/db';
 
 export type CartItem = MenuItem & {
@@ -19,14 +19,43 @@ interface CartContextType {
     subscriptionItems: CartItem[];
     normalItems: CartItem[];
     subTotalCount: number;
+    totalItemsCount: number;
     normalTotalAmount: number;
     clearCart: () => void;
+
+    // Drawer State
+    isCartOpen: boolean;
+    openCart: () => void;
+    closeCart: () => void;
+    toggleCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // Load from LocalStorage on mount
+    useEffect(() => {
+        const stored = localStorage.getItem('cafe_cart');
+        if (stored) {
+            try {
+                setItems(JSON.parse(stored));
+            } catch (e) {
+                console.error('Failed to parse cart', e);
+            }
+        }
+    }, []);
+
+    // Save to LocalStorage on change
+    useEffect(() => {
+        localStorage.setItem('cafe_cart', JSON.stringify(items));
+    }, [items]);
+
+    const openCart = () => setIsCartOpen(true);
+    const closeCart = () => setIsCartOpen(false);
+    const toggleCart = () => setIsCartOpen((prev) => !prev);
 
     const addToCart = (item: MenuItem, mode: 'NORMAL' | 'SUBSCRIPTION') => {
         // Map string mode to Enum
@@ -81,6 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const subTotalCount = useMemo(() => subscriptionItems.reduce((acc, i) => acc + i.qty, 0), [subscriptionItems]);
     const normalTotalAmount = useMemo(() => normalItems.reduce((acc, i) => acc + (i.price * i.qty), 0), [normalItems]);
+    const totalItemsCount = useMemo(() => items.reduce((acc, i) => acc + i.qty, 0), [items]);
 
     return (
         <CartContext.Provider value={{
@@ -91,8 +121,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             subscriptionItems,
             normalItems,
             subTotalCount,
+            totalItemsCount,
             normalTotalAmount,
-            clearCart
+            clearCart,
+            isCartOpen,
+            openCart,
+            closeCart,
+            toggleCart
         }}>
             {children}
         </CartContext.Provider>

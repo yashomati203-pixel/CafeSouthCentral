@@ -1,67 +1,110 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
-import { SunIcon, MoonIcon, PersonIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DecorativeBorderLogo } from '@/components/ui/DecorativeBorder';
+import { User, Menu as MenuIcon, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface MobileHeaderProps {
     user: any;
-    isDarkMode: boolean;
-    toggleTheme: () => void;
+    isDarkMode?: boolean;
+    toggleTheme?: () => void;
     onLoginClick: () => void;
-    onProfileClick?: () => void; // Optional if we want header avatar to do something
+    onProfileClick?: () => void;
 }
 
 export default function MobileHeader({
     user,
-    isDarkMode,
-    toggleTheme,
-    onLoginClick,
-    onProfileClick
+    onLoginClick
 }: MobileHeaderProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter();
+
+    const handleMenuClick = (path: string) => {
+        setIsOpen(false);
+        router.push(path);
+    };
+
     return (
-        <header className="sticky top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 md:hidden flex justify-between items-center transition-colors dark:bg-[#121212]/80 dark:border-gray-800">
-            {/* Logo Area */}
-            <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-                    <Image
-                        src="/logo.png"
-                        alt="Logo"
-                        fill
-                        className="object-cover"
-                    />
-                </div>
-                <h1 className="text-lg font-bold text-[#5C3A1A] dark:text-white leading-none">
-                    Cafe <span className="text-[#2F4F2F] dark:text-[#4B6F44]">SC</span>
-                </h1>
-            </div>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-4">
-                {/* Theme Toggle */}
-                <button
-                    onClick={toggleTheme}
-                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
+        <>
+            <header className="md:hidden flex justify-between items-center px-4 py-3 bg-[#e2e9e0]/95 backdrop-blur-sm sticky top-0 z-[100] border-b border-[#3C2A21]/10">
+                <Link
+                    href="/"
+                    className="relative z-[60] flex items-center cursor-pointer pointer-events-auto"
                 >
-                    {isDarkMode ? <MoonIcon /> : <SunIcon />}
-                </button>
+                    <DecorativeBorderLogo size="sm">
+                        {/* Increased Logo Size */}
+                        <div className="relative w-52 h-14">
+                            <Image
+                                src="/Final-logo.png"
+                                alt="Cafe South Central"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+                    </DecorativeBorderLogo>
+                </Link>
 
-                {/* User Avatar or Login */}
-                {user ? (
-                    <button
-                        onClick={onProfileClick}
-                        className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5C3A1A] text-white font-bold"
+                <button
+                    className="p-2 text-[#102214]"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label="Toggle Menu"
+                >
+                    {isOpen ? <X className="w-8 h-8" /> : <MenuIcon className="w-8 h-8" />}
+                </button>
+            </header>
+
+            {/* Mobile Menu Dropdown */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-[65px] left-0 w-full bg-[#f8fbf7] z-40 border-b border-[#3C2A21]/10 shadow-xl md:hidden flex flex-col p-6 gap-4"
                     >
-                        {user.name ? user.name[0].toUpperCase() : <PersonIcon />}
-                    </button>
-                ) : (
-                    <button
-                        onClick={onLoginClick}
-                        className="px-4 py-1.5 text-sm font-bold text-white bg-[#5C3A1A] rounded-full shadow-sm"
-                    >
-                        Login
-                    </button>
+                        {user ? (
+                            <div
+                                onClick={() => handleMenuClick('/account')}
+                                className="flex items-center gap-3 p-4 bg-[#e7f3eb] rounded-xl cursor-pointer"
+                            >
+                                <div className="w-10 h-10 bg-[#5C3A1A] rounded-full flex items-center justify-center text-[#F4D03F]">
+                                    <User size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-[#102214] text-lg">My Account</p>
+                                    <p className="text-xs text-[#4a5d50]">View Profile</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => { setIsOpen(false); onLoginClick(); }}
+                                className="w-full bg-[#005001] text-[#f7e231] py-3 rounded-xl font-bold text-lg mb-2"
+                            >
+                                Login / Sign Up
+                            </button>
+                        )}
+
+                        <button
+                            onClick={() => handleMenuClick('/menu')}
+                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        >
+                            Menu
+                        </button>
+
+                        <button
+                            onClick={() => handleMenuClick('/subscription')}
+                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        >
+                            Subscriptions
+                        </button>
+                    </motion.div>
                 )}
-            </div>
-        </header>
+            </AnimatePresence>
+        </>
     );
 }

@@ -52,12 +52,31 @@ export async function createNormalOrder(
     // 1. Optimistic Stock Check & Price Calculation
     // We do this BEFORE any DB transaction to fail fast.
     let totalAmount = 0;
-    const orderItemsPreview = [];
+    const orderItemsPreview: any[] = [];
 
     // We need to fetch items to get prices
     const menuItems = await prisma.menuItem.findMany({
         where: { id: { in: items.map(i => i.menuItemId) } }
     });
+
+    // 1a. Validate Time Slot (if provided)
+    if (timeSlotId) {
+        const now = new Date();
+        const [hours, minutes] = timeSlotId.split(':').map(Number);
+        const scheduledTime = new Date();
+        scheduledTime.setHours(hours, minutes, 0, 0);
+
+        // Handle case where scheduled time is for tomorrow (e.g., ordering at 11 PM for 1 AM)
+        // For simplicity in V1, we assume same-day or next-day if time < now
+        if (scheduledTime < now) {
+            scheduledTime.setDate(scheduledTime.getDate() + 1);
+        }
+
+        const diffHours = (scheduledTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+        if (diffHours < 0 || diffHours > 3) {
+            throw new Error('Scheduled time must be within 3 hours from now.');
+        }
+    }
 
     for (const itemReq of items) {
         const item = menuItems.find(i => i.id === itemReq.menuItemId);
@@ -174,6 +193,23 @@ export async function createSubscriptionOrder(userId: string, items: CartItem[],
             where: { userId, status: SubscriptionState.ACTIVE }
         });
         if (!sub) throw new Error('No active subscription');
+
+        // 1a. Validate Time Slot (if provided)
+        if (timeSlotId) {
+            const now = new Date();
+            const [hours, minutes] = timeSlotId.split(':').map(Number);
+            const scheduledTime = new Date();
+            scheduledTime.setHours(hours, minutes, 0, 0);
+
+            if (scheduledTime < now) {
+                scheduledTime.setDate(scheduledTime.getDate() + 1);
+            }
+
+            const diffHours = (scheduledTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+            if (diffHours < 0 || diffHours > 3) {
+                throw new Error('Scheduled time must be within 3 hours from now.');
+            }
+        }
 
         const dailyUsage = await tx.dailyUsage.upsert({
             where: { userId_date: { userId, date: today } },

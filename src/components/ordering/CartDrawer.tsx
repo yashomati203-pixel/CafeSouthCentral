@@ -1,13 +1,9 @@
 'use client';
 
-import { TrashIcon } from '@radix-ui/react-icons';
+import React, { useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
-import styles from './CartDrawer.module.css';
-import { useState, useEffect } from 'react';
-import OrderConfirmed from '@/components/ui/OrderConfirmed';
-import { QRCodeSVG } from 'qrcode.react';
-import PaymentSelector, { PaymentDetails } from '@/components/payment/PaymentSelector';
-
+import { useRouter } from 'next/navigation';
+import { X, Clock, Plus, Minus, Trash2, ArrowRight, Info, ShoppingBag } from 'lucide-react';
 
 interface CartProps {
     isOpen: boolean;
@@ -26,633 +22,259 @@ export default function CartDrawer({ isOpen, onClose, user, onOrderSuccess, vari
         removeFromCart,
         addToCart,
         decreaseQty,
-        clearCart
     } = useCart();
 
-    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({ method: 'CASH' });
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
-    const [lastOrderId, setLastOrderId] = useState<string | undefined>(undefined);
-    const [lastDisplayId, setLastDisplayId] = useState<string | undefined>(undefined);
-    const [note, setNote] = useState('');
-    const [orderType, setOrderType] = useState<'NOW' | 'LATER'>('NOW');
-    const [scheduledTime, setScheduledTime] = useState('');
-    const [timeError, setTimeError] = useState('');
-
-    // Generate available time slots (filter out past times)
-    const generateAvailableTimeSlots = () => {
-        const now = new Date();
-        const slots = [];
-
-        // Start from next 30-minute interval
-        let current = new Date(now);
-        const currentMinutes = current.getMinutes();
-        if (currentMinutes < 30) {
-            current.setMinutes(30);
-        } else {
-            current.setHours(current.getHours() + 1);
-            current.setMinutes(0);
-        }
-        current.setSeconds(0);
-        current.setMilliseconds(0);
-
-        // Generate slots for next 8 hours (16 slots of 30 min each)
-        for (let i = 0; i < 16; i++) {
-            const hours = current.getHours();
-            const minutes = current.getMinutes();
-            const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-            const label = current.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            slots.push({ value: timeStr, label });
-            current.setMinutes(current.getMinutes() + 30);
-        }
-        return slots;
-    };
-
-    // Get current time in HH:MM format for min attribute
-    const getCurrentTime = () => {
-        const now = new Date();
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
-    // Validate selected time is in the future
-    const validateTime = (time: string) => {
-        if (!time) return true;
-
-        const now = new Date();
-        const [hours, minutes] = time.split(':').map(Number);
-        const selectedTime = new Date();
-        selectedTime.setHours(hours, minutes, 0, 0);
-
-        if (selectedTime <= now) {
-            setTimeError('Please select a future time');
-            return false;
-        }
-
-        setTimeError('');
-        return true;
-    };
-
-    // Auto-close Effect REMOVED by user request
-    // useEffect(() => { ... }, []);
-
-    // If drawer is closed, don't render anything (unless we want to keep it mounted for transitions, but simple is better)
-    if (!isOpen && variant === 'drawer') return null;
-    if (!isOpen && variant === 'sidebar') return null; // Logic for sidebar rendering is controlled by parent, but safer to check.
-
-
+    const router = useRouter();
 
     const hasSubscription = subscriptionItems.length > 0;
     const hasNormal = normalItems.length > 0;
-    const isMixed = hasSubscription && hasNormal;
 
-    const handleAnimationComplete = () => {
-        setShowSuccessAnimation(false);
-        clearCart();
-        setNote('');
+    // Prevent body scroll when open
+    useEffect(() => {
+        if (isOpen && variant === 'drawer') {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => { document.body.style.overflow = 'unset'; };
+    }, [isOpen, variant]);
+
+    if (!isOpen && variant === 'drawer') return null;
+
+    const handleProceed = () => {
         onClose();
-        if (onOrderSuccess) {
-            try {
-                console.log("Calling onOrderSuccess...");
-                onOrderSuccess();
-            } catch (e) {
-                console.error("Error in onOrderSuccess:", e);
-            }
-        }
+        router.push('/checkout');
     };
 
-    const saveOfflineOrder = (payload: any, mode: 'SUBSCRIPTION' | 'NORMAL') => {
-        const offlineId = `OFFLINE-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        const pendingOrder = {
-            payload,
-            mode,
-            tempId: offlineId,
-            createdAt: Date.now(),
-            status: 'PENDING_SYNC'
-        };
+    const deliveryFee = normalTotalAmount > 0 ? normalTotalAmount * 0.05 : 0; // 5% tax/fee logic from prev code
+    const totalAmount = normalTotalAmount + deliveryFee;
 
-        const existing = JSON.parse(localStorage.getItem('pending_orders') || '[]');
-        existing.push(pendingOrder);
-        localStorage.setItem('pending_orders', JSON.stringify(existing));
-
-        return { orderId: offlineId, displayId: 'WAITING-NET' };
-    };
-
-    const handleCheckout = async () => {
-        try {
-            if (isProcessing) return;
-
-            if (!user?.id) {
-                alert('Please log in first');
-                return;
-            }
-
-            // Validate scheduled time if "Schedule for Later" is selected
-            if (orderType === 'LATER') {
-                if (!scheduledTime) {
-                    alert('Please select a time for your scheduled order');
-                    return;
-                }
-
-                const isValid = validateTime(scheduledTime);
-                if (!isValid) {
-                    alert('Please select a future time for your order');
-                    return;
-                }
-            }
-
-            setIsProcessing(true);
-
-            // CHECK ONLINE STATUS FIRST
-            const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
-
-            const processOrder = async (payload: any, mode: 'SUBSCRIPTION' | 'NORMAL') => {
-                if (isOffline) {
-                    return saveOfflineOrder(payload, mode);
-                }
-
-                try {
-                    const response = await fetch('/api/orders/create', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const text = await response.text();
-                        let data;
-                        try { data = JSON.parse(text); } catch (e) { throw new Error('Server error'); }
-                        throw new Error(data.error || 'Request failed');
-                    }
-                    return await response.json();
-                } catch (e: any) {
-                    if (e.message === 'Failed to fetch' || e.message.includes('NetworkError')) {
-
-                        return saveOfflineOrder(payload, mode);
-                    }
-                    throw e;
-                }
-            };
-
-            // 1. Process Subscription Part
-            if (hasSubscription) {
-                const subPayload = {
-                    userId: user.id,
-                    items: subscriptionItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
-                    mode: 'SUBSCRIPTION',
-                    note: note,
-                    timeSlot: orderType === 'LATER' ? scheduledTime : undefined
-                };
-
-                const result = await processOrder(subPayload, 'SUBSCRIPTION');
-                if (result.orderId) setLastOrderId(result.orderId);
-                if (result.displayId) setLastDisplayId(result.displayId);
-            }
-
-            // 2. Process Normal Part (Payment + Order Creation)
-            if (hasNormal) {
-                // Validate payment details
-                if (paymentDetails.method === 'UPI' && !paymentDetails.upiId) {
-                    alert('Please enter your UPI ID');
-                    return;
-                }
-                if (paymentDetails.method === 'CARD') {
-                    if (!paymentDetails.cardNumber || !paymentDetails.cardExpiry || !paymentDetails.cardCVV) {
-                        alert('Please fill in all card details');
-                        return;
-                    }
-                }
-                if (paymentDetails.method === 'NET_BANKING' && !paymentDetails.bankName) {
-                    alert('Please select your bank');
-                    return;
-                }
-
-                if (!isOffline && (paymentDetails.method === 'UPI' || paymentDetails.method === 'CARD' || paymentDetails.method === 'NET_BANKING')) {
-                    setIsProcessing(true);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-
-                const normalPayload = {
-                    userId: user.id,
-                    items: normalItems.map(i => ({ menuItemId: i.id, qty: i.qty })),
-                    mode: 'NORMAL',
-                    paymentMethod: paymentDetails.method,
-                    upiId: paymentDetails.upiId,
-                    paymentDetails: paymentDetails,
-                    note: note,
-                    timeSlot: orderType === 'LATER' ? scheduledTime : undefined
-                };
-
-                const result = await processOrder(normalPayload, 'NORMAL');
-                if (result.orderId) setLastOrderId(result.orderId);
-                if (result.displayId) setLastDisplayId(result.displayId);
-            }
-
-            // Success
-            setIsProcessing(false);
-            setShowSuccessAnimation(true);
-
-        } catch (err: any) {
-            setIsProcessing(false);
-            alert('Error: ' + err.message);
-        }
-    };
-
-    // Helper for Button Text
-    const getButtonText = () => {
-        if (isProcessing) return 'Processing Payment...';
-        if (!hasNormal) return 'Redeem Now';
-        if (paymentDetails.method === 'CASH') return `Confirm Order (₹${normalTotalAmount})`;
-        return `Proceed to Pay (₹${normalTotalAmount})`;
-    };
+    // Helper for currency
+    const formatPrice = (amount: number) => `₹${amount.toFixed(0)}`;
 
     return (
         <>
-
-            {variant === 'drawer' ? (
-                <div className={`${styles.overlay} ${!isOpen ? styles.hidden : ''}`}>
-                    <div className={styles.drawer} data-lenis-prevent>
-                        <header className={styles.header}>
-                            <h2>Your Order</h2>
-                            <button onClick={showSuccessAnimation ? handleAnimationComplete : onClose} className={styles.closeBtn}>×</button>
-                        </header>
-
-                        <CartContent
-                            styles={styles}
-                            hasSubscription={hasSubscription}
-                            hasNormal={hasNormal}
-                            isMixed={isMixed}
-                            subTotalCount={subTotalCount}
-                            normalTotalAmount={normalTotalAmount}
-                            subscriptionItems={subscriptionItems}
-                            normalItems={normalItems}
-                            paymentDetails={paymentDetails}
-                            setPaymentDetails={setPaymentDetails}
-                            decreaseQty={decreaseQty}
-                            addToCart={addToCart}
-                            removeFromCart={removeFromCart}
-                            isProcessing={isProcessing}
-                            handleCheckout={handleCheckout}
-                            getButtonText={getButtonText}
-                            showSuccessAnimation={showSuccessAnimation}
-                            onAnimationComplete={handleAnimationComplete}
-                            lastOrderId={lastOrderId}
-                            displayId={lastDisplayId}
-                            note={note}
-                            setNote={setNote}
-                            orderType={orderType}
-                            setOrderType={setOrderType}
-                            scheduledTime={scheduledTime}
-                            setScheduledTime={setScheduledTime}
-                            validateTime={validateTime}
-                            timeError={timeError}
-                            getCurrentTime={getCurrentTime}
-                        />
-                    </div>
-                </div>
-            ) : (
-                <div className={styles.sidebarWrapper}>
-                    <div className={styles.sidebar} data-lenis-prevent>
-                        <header className={styles.header}>
-                            <h2>Your Order</h2>
-                            {/* No close button for sidebar */}
-                        </header>
-
-                        <CartContent
-                            styles={styles}
-                            hasSubscription={hasSubscription}
-                            hasNormal={hasNormal}
-                            isMixed={isMixed}
-                            subTotalCount={subTotalCount}
-                            normalTotalAmount={normalTotalAmount}
-                            subscriptionItems={subscriptionItems}
-                            normalItems={normalItems}
-                            paymentDetails={paymentDetails}
-                            setPaymentDetails={setPaymentDetails}
-                            decreaseQty={decreaseQty}
-                            addToCart={addToCart}
-                            removeFromCart={removeFromCart}
-                            isProcessing={isProcessing}
-                            handleCheckout={handleCheckout}
-                            getButtonText={getButtonText}
-                            showSuccessAnimation={showSuccessAnimation}
-                            onAnimationComplete={handleAnimationComplete}
-                            lastOrderId={lastOrderId}
-                            displayId={lastDisplayId}
-                            note={note}
-                            setNote={setNote}
-                            orderType={orderType}
-                            setOrderType={setOrderType}
-                            scheduledTime={scheduledTime}
-                            setScheduledTime={setScheduledTime}
-                            validateTime={validateTime}
-                            timeError={timeError}
-                            getCurrentTime={getCurrentTime}
-                        />
-                    </div>
-                </div>
-            )}
-        </>
-    );
-}
-
-// Extracted Content Component to reuse between Drawer and Sidebar
-function CartContent({
-    styles,
-    hasSubscription,
-    hasNormal,
-    isMixed,
-    subTotalCount,
-    normalTotalAmount,
-    subscriptionItems,
-    normalItems,
-    paymentDetails,
-    setPaymentDetails,
-    decreaseQty,
-    addToCart,
-    removeFromCart,
-    isProcessing,
-    handleCheckout,
-    getButtonText,
-    showSuccessAnimation,
-    onAnimationComplete,
-    lastOrderId,
-    displayId,
-    note,
-    setNote,
-    orderType,
-    setOrderType,
-    scheduledTime,
-    setScheduledTime,
-    validateTime,
-    timeError,
-    getCurrentTime
-}: any) {
-    if (showSuccessAnimation) {
-        return (
-            <div className={styles.content} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <OrderConfirmed
-                    inline={true}
-                    onComplete={onAnimationComplete}
-                    orderId={lastOrderId}
-                    displayId={displayId}
+            {/* Overlay */}
+            {variant === 'drawer' && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity"
+                    onClick={onClose}
                 />
-            </div>
-        );
-    }
+            )}
 
-    return (
-        <>
-            <div className={styles.content}>
-                {/* Section 1: Subscription Items */}
-                {hasSubscription && (
-                    <div className={styles.section}>
-                        <h3 className={styles.sectionTitle}>
-                            🥗 Subscription Plan
-                            <span className={styles.badge}>{subTotalCount} Items</span>
-                        </h3>
-                        <p className={styles.infoText}>Will be deducted from your daily quota.</p>
-
-                        {subscriptionItems.map((item: any) => (
-                            <div key={item.id} className={styles.itemRow} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ flex: 1 }}>
-                                    <span>{item.name}</span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
-                                        <button
-                                            onClick={() => decreaseQty(item.id, 'SUBSCRIPTION')}
-                                            style={{ padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.2rem', lineHeight: '1' }}
-                                        >-</button>
-                                        <span style={{ padding: '0 4px', fontSize: '0.9rem', fontWeight: '600' }}>{item.qty}</span>
-                                        <button
-                                            onClick={() => addToCart(item, 'SUBSCRIPTION')}
-                                            style={{ padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1rem', lineHeight: '1' }}
-                                        >+</button>
-                                    </div>
-                                    <button
-                                        onClick={() => removeFromCart(item.id)}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ff4444' }}
-                                        aria-label="Remove item"
-                                    >
-                                        <TrashIcon width={18} height={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+            {/* Drawer Container */}
+            <aside
+                className={`
+                    fixed z-[60] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out
+                    ${variant === 'sidebar' ? 'relative w-full h-full shadow-none border rounded-xl' : ''}
+                    ${variant === 'drawer' ? `
+                        bottom-0 left-0 right-0 w-full rounded-t-3xl border-t h-[90vh]
+                        md:top-0 md:right-0 md:bg-white md:bottom-auto md:left-auto md:h-full md:w-[450px] md:rounded-none md:border-l
+                        transform
+                        ${isOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}
+                    ` : ''}
+                `}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Drag Handle (Mobile Only) */}
+                {variant === 'drawer' && (
+                    <div className="w-full flex justify-center pt-3 pb-1 md:hidden">
+                        <div className="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                     </div>
                 )}
 
-                {/* Divider if Mixed */}
-                {isMixed && <div className={styles.divider} />}
-
-                {/* Section 2: Normal Items */}
-                {hasNormal && (
-                    <div className={styles.section}>
-                        <h3 className={styles.sectionTitle}>
-                            🍔 Pay-Per-Order
-                            <span className={styles.badge}>₹ {normalTotalAmount}</span>
-                        </h3>
-                        <p className={styles.infoText}>Requires payment at checkout.</p>
-
-                        {normalItems.map((item: any) => (
-                            <div key={item.id} className={styles.itemRow} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ flex: 1 }}>
-                                    <span>{item.name}</span>
-                                </div>
-                                <div className={styles.priceGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
-                                        <button
-                                            onClick={() => decreaseQty(item.id, 'NORMAL')}
-                                            style={{ padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.2rem', lineHeight: '1' }}
-                                        >-</button>
-                                        <span style={{ padding: '0 4px', fontSize: '0.9rem', fontWeight: '600' }}>{item.qty}</span>
-                                        <button
-                                            onClick={() => addToCart(item, 'NORMAL')}
-                                            style={{ padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1rem', lineHeight: '1' }}
-                                        >+</button>
-                                    </div>
-                                    <span className={styles.price}>₹ {item.price * item.qty}</span>
-                                    <button
-                                        onClick={() => removeFromCart(item.id)}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ff4444' }}
-                                        aria-label="Remove item"
-                                    >
-                                        <TrashIcon width={18} height={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                {/* Header */}
+                <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0">
+                    <div>
+                        <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">Your Cart</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{subTotalCount} items from South Central</p>
                     </div>
-                )}
-
-                {/* Customization Note */}
-                {(hasSubscription || hasNormal) && (
-                    <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                            📝 Special Instructions
-                        </h3>
-                        <textarea
-                            placeholder="Add customization notes (e.g., 'Less Spicy', 'Extra Chutney')"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            style={{
-                                width: '100%',
-                                minHeight: '60px',
-                                padding: '0.5rem',
-                                border: '1px solid #ddd',
-                                borderRadius: '0.5rem',
-                                fontFamily: 'inherit',
-                                fontSize: '0.9rem',
-                                resize: 'vertical'
-                            }}
-                        />
-                    </div>
-                )}
-
-                {/* Scheduling */}
-                {(hasSubscription || hasNormal) && (
-                    <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                            ⏰ Order Timing
-                        </h3>
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                <input
-                                    type="radio"
-                                    checked={orderType === 'NOW'}
-                                    onChange={() => setOrderType('NOW')}
-                                    style={{ accentColor: '#5C3A1A' }}
-                                />
-                                <span style={{ fontWeight: 500 }}>Prepare Now</span>
-                            </label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                <input
-                                    type="radio"
-                                    checked={orderType === 'LATER'}
-                                    onChange={() => setOrderType('LATER')}
-                                    style={{ accentColor: '#5C3A1A' }}
-                                />
-                                <span style={{ fontWeight: 500 }}>Schedule for Later</span>
-                            </label>
-                        </div>
-                        {orderType === 'LATER' && (
-                            <>
-                                <input
-                                    type="time"
-                                    value={scheduledTime}
-                                    min={getCurrentTime()}
-                                    onChange={(e) => {
-                                        setScheduledTime(e.target.value);
-                                        validateTime(e.target.value);
-                                    }}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.5rem',
-                                        border: timeError ? '2px solid #dc2626' : '1px solid #ddd',
-                                        borderRadius: '0.5rem',
-                                        marginTop: '0.5rem',
-                                        fontSize: '0.9rem'
-                                    }}
-                                />
-                                {timeError && (
-                                    <p style={{
-                                        fontSize: '0.75rem',
-                                        color: '#dc2626',
-                                        marginTop: '0.25rem',
-                                        marginBottom: 0
-                                    }}>
-                                        {timeError}
-                                    </p>
-                                )}
-                            </>
-                        )}
-                        {orderType === 'LATER' && scheduledTime && (
-                            <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.2rem' }}>
-                                Order will be confirmed for around {scheduledTime}.
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                {/* Payment Options (Only for Normal Orders) */}
-                {hasNormal && (
-                    <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-                        <PaymentSelector
-                            amount={normalTotalAmount}
-                            onPaymentChange={setPaymentDetails}
-                            variant="compact"
-                        />
-                    </div>
-                )}
-
-                {/* Prep Time Notice (Replaces Time Slot) */}
-                <div className={styles.section} style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-                    <div style={{
-                        backgroundColor: '#fff3cd',
-                        color: '#856404',
-                        padding: '0.75rem',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.9rem',
-                        border: '1px solid #ffeeba',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                    }}>
-                        <span style={{ fontSize: '1.2rem' }}>⏳</span>
-                        <div>
-                            <strong>Preparation Time:</strong>
-                            <p style={{ margin: 0 }}>Orders are usually done within 10 minutes after preparation starts.</p>
-                        </div>
-                    </div>
-
-                    {/* Cancellation Policy Notice */}
-                    <div style={{
-                        backgroundColor: '#f8d7da',
-                        color: '#721c24',
-                        padding: '0.75rem',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.9rem',
-                        border: '1px solid #f5c6cb',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        marginTop: '0.75rem'
-                    }}>
-                        <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
-                        <div>
-                            <strong>Cancellation Policy:</strong>
-                            <p style={{ margin: 0 }}>Orders can only be cancelled within 2 minutes after placement.</p>
-                        </div>
-                    </div>
+                    {variant === 'drawer' && (
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                        >
+                            <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+                        </button>
+                    )}
                 </div>
 
-                {!hasSubscription && !hasNormal && (
-                    <div className={styles.emptyState}>Your cart is empty.</div>
-                )}
-            </div>
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
 
-            <footer className={styles.footer}>
-                {isMixed && (
-                    <div className={styles.mixedWarning}>
-                        <strong>Note:</strong> You are placing a mixed order.
-                        Subscription items will be redeemed, and you will pay
-                        ₹{normalTotalAmount} for the rest.
+                    {/* Empty State */}
+                    {!hasSubscription && !hasNormal && (
+                        <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-60">
+                            <ShoppingBag className="w-16 h-16 text-gray-300" />
+                            <p className="text-gray-500 font-medium">Your cart is empty</p>
+                            <button
+                                onClick={() => {
+                                    onClose();
+                                    router.push('/?menu=true');
+                                }}
+                                className="px-4 py-2 border border-gray-200 rounded-full text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                            >
+                                Browse Menu
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Prep Time Banner (Only if not empty) */}
+                    {(hasSubscription || hasNormal) && (
+                        <div className="bg-[#fffae5] dark:bg-yellow-900/20 border border-[#f9e18b] dark:border-yellow-900/40 rounded-xl p-4 flex items-start gap-3">
+                            <Clock className="w-5 h-5 text-yellow-700 dark:text-yellow-500 mt-0.5" />
+                            <div>
+                                <p className="text-sm md:text-base font-semibold text-yellow-900 dark:text-yellow-100 leading-tight">Estimated preparation time: 10-15 mins</p>
+                                <p className="text-xs md:text-sm text-yellow-800 dark:text-yellow-200/70 mt-0.5 leading-relaxed">
+                                    Orders are usually done quickly. Thank you for your patience!
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Subscription Items */}
+                    {hasSubscription && (
+                        <div className="space-y-4">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">Subscription Items</h3>
+                            {subscriptionItems.map((item: any) => (
+                                <CartItemRow
+                                    key={item.id}
+                                    item={item}
+                                    type="SUBSCRIPTION"
+                                    onIncrease={() => addToCart(item, 'SUBSCRIPTION')}
+                                    onDecrease={() => decreaseQty(item.id, 'SUBSCRIPTION')}
+                                    onRemove={() => removeFromCart(item.id)}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Normal Items */}
+                    {hasNormal && (
+                        <div className="space-y-4">
+                            {hasSubscription && <div className="border-t border-dashed border-gray-200 my-4" />}
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">Pay-Per-Order</h3>
+                            {normalItems.map((item: any) => (
+                                <CartItemRow
+                                    key={item.id}
+                                    item={item}
+                                    type="NORMAL"
+                                    onIncrease={() => addToCart(item, 'NORMAL')}
+                                    onDecrease={() => decreaseQty(item.id, 'NORMAL')}
+                                    onRemove={() => removeFromCart(item.id)}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Upsell / Add More (Clickable text) */}
+                    {(hasSubscription || hasNormal) && (
+                        <div className="pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
+                            <button
+                                onClick={onClose}
+                                className="flex items-center gap-2 text-[#166534] font-bold text-sm hover:underline"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Add more items
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                {(hasSubscription || hasNormal) && (
+                    <div className="p-6 pt-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 safe-area-pb">
+                        {/* Note */}
+
+
+                        {/* Totals */}
+                        <div className="space-y-2 mb-4">
+                            <div className="flex justify-between text-sm text-gray-500">
+                                <span>Subtotal</span>
+                                <span className="font-mono">{formatPrice(normalTotalAmount)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-gray-500">
+                                <span>Taxes & Fees (5%)</span>
+                                <span className="font-mono">{formatPrice(deliveryFee)}</span>
+                            </div>
+                            <div className="flex justify-between items-end pt-2 border-t border-gray-50">
+                                <span className="text-base font-bold text-gray-900 dark:text-white">Total</span>
+                                <span className="text-2xl font-bold font-mono text-[#0e1b12] dark:text-white">{formatPrice(totalAmount)}</span>
+                            </div>
+                        </div>
+
+                        {/* Checkout Button */}
+                        <button
+                            onClick={handleProceed}
+                            className="w-full bg-[#166534] hover:bg-[#0f913b] text-white py-4 rounded-xl font-bold text-lg tracking-wide transition-all shadow-lg shadow-[#166534]/20 flex items-center justify-center gap-3 active:scale-[0.98]"
+                        >
+                            <span>Proceed to Review</span>
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+
+                        {/* Continue Shopping */}
+                        {variant === 'drawer' && (
+                            <button
+                                onClick={onClose}
+                                className="w-full mt-3 text-sm text-gray-400 font-medium hover:text-gray-600 transition-colors py-1"
+                            >
+                                Continue Shopping
+                            </button>
+                        )}
                     </div>
                 )}
-
-                <button
-                    className={styles.checkoutBtn}
-                    disabled={(!hasSubscription && !hasNormal) || isProcessing}
-                    onClick={handleCheckout}
-                    style={{ opacity: isProcessing ? 0.7 : 1 }}
-                >
-                    {getButtonText()}
-                </button>
-            </footer>
+            </aside>
         </>
     );
 }
 
+function CartItemRow({ item, type, onIncrease, onDecrease, onRemove }: any) {
+    // Fallback image logic if needed, or use what's in item
+    // Assuming item has imageUrl or we use a placeholer
+    const formatPrice = (p: number) => `₹${p}`;
+
+    return (
+        <div className="flex gap-4 group">
+            <div
+                className="h-20 w-20 flex-shrink-0 rounded-lg bg-center bg-cover border border-gray-100 bg-gray-100"
+                style={{ backgroundImage: `url(${item.imageUrl || 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=200&auto=format&fit=crop'})` }}
+            />
+            <div className="flex-1 flex flex-col justify-between">
+                <div className="flex justify-between items-start">
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight line-clamp-2">{item.name}</h3>
+                    <span className="font-mono font-bold text-gray-900 dark:text-white whitespace-nowrap ml-2">
+                        {type === 'SUBSCRIPTION' ? '1 Cr' : formatPrice(item.price)}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between mt-2">
+                    {/* Qty Control */}
+                    <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white dark:bg-gray-800 dark:border-gray-700">
+                        <button
+                            onClick={onDecrease}
+                            className="px-2.5 py-1 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-[#166534] transition-colors"
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="px-2 text-sm font-bold font-mono border-x border-gray-100 dark:border-gray-700 min-w-[30px] text-center">
+                            {item.qty}
+                        </span>
+                        <button
+                            onClick={onIncrease}
+                            className="px-2.5 py-1 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-[#166534] transition-colors"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={onRemove}
+                        className="text-xs text-red-500 font-medium hover:text-red-600 flex items-center gap-1 transition-colors p-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}

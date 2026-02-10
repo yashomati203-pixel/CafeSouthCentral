@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import HeroSection from './HeroSection';
-import FeaturesSection from './FeaturesSection';
+
+import Link from 'next/link';
+import FAQSection from './FAQSection';
 import CategoriesSection from './CategoriesSection';
 import Footer from '../layout/Footer';
-import { UtensilsCrossed, CreditCard, Bike } from 'lucide-react';
+import { UtensilsCrossed, CreditCard, ShoppingBag } from 'lucide-react';
 
 interface LandingPageProps {
     onExplore: () => void;
@@ -38,7 +40,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
             <section style={{
                 position: 'relative',
                 width: '100%',
-                background: '#e2e9e0', // Green theme
+                background: '#f8fbf7', // Lighter background for contrast
                 padding: '6rem 2rem 8rem 2rem',
                 overflow: 'hidden',
                 textAlign: 'center',
@@ -46,18 +48,22 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
             }}>
                 {/* Title */}
                 <div style={{ marginBottom: '4rem', position: 'relative', zIndex: 10 }}>
-                    <h2 style={{
-                        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-                        fontWeight: 800,
-                        color: '#3C2A21',
+                    <h2 className="font-serif-heading" style={{
+                        fontFamily: '"Playfair Display", serif',
+                        fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+                        fontWeight: 400,
+                        color: '#0e1b12',
                         marginBottom: '1rem',
                         letterSpacing: '-0.02em'
                     }}>
                         How It Works
                     </h2>
-                    <p style={{ fontSize: '1.2rem', color: '#6B5B52', maxWidth: '600px', margin: '0 auto' }}>
-                        Your favorite food, ready in 3 simple steps.
-                    </p>
+                    <div style={{
+                        width: '60px',
+                        height: '4px',
+                        background: '#e2e9e0',
+                        margin: '0 auto'
+                    }}></div>
                 </div>
 
                 {/* Steps Container */}
@@ -65,64 +71,85 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: '4rem',
+                    gap: '2rem',
                     maxWidth: '1200px',
                     margin: '0 auto',
                     position: 'relative',
                     zIndex: 10
                 }}>
                     {/* Step 1 */}
-                    <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{
+                        flex: '1 1 300px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1.5rem',
+                        background: '#ffffff',
+                        padding: '3rem 2rem',
+                        borderRadius: '24px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                        border: '1px solid #e7f3eb'
+                    }}>
                         <div style={{
-                            width: '100px', height: '100px',
-                            borderRadius: '50%',
-                            backgroundColor: '#fff',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
-                            color: '#3C2A21'
+                            color: '#0e1b12',
+                            marginBottom: '0.5rem'
                         }}>
-                            <UtensilsCrossed size={48} strokeWidth={1.5} />
+                            <UtensilsCrossed size={32} strokeWidth={2} />
                         </div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#3C2A21', margin: 0 }}>1. Select Your Meal</h3>
-                        <p style={{ color: '#6B5B52', lineHeight: 1.6 }}>Browse our authentic South Indian menu and choose your favorites.</p>
+                        <h3 className="font-serif-heading" style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', fontWeight: 500, color: '#0e1b12', margin: 0 }}>1. Browse Menu</h3>
+                        <p style={{ fontFamily: '"Playfair Display", serif', color: '#4e9767', lineHeight: 1.6, fontSize: '0.95rem' }}>Explore our rotating daily menu of authentic home-cooked meals.</p>
                     </div>
 
                     {/* Step 2 */}
-                    <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{
+                        flex: '1 1 300px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1.5rem',
+                        background: '#ffffff',
+                        padding: '3rem 2rem',
+                        borderRadius: '24px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                        border: '1px solid #e7f3eb'
+                    }}>
                         <div style={{
-                            width: '100px', height: '100px',
-                            borderRadius: '50%',
-                            backgroundColor: '#fff',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
-                            color: '#3C2A21'
+                            color: '#0e1b12',
+                            marginBottom: '0.5rem'
                         }}>
-                            <CreditCard size={48} strokeWidth={1.5} />
+                            <CreditCard size={32} strokeWidth={2} />
                         </div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#3C2A21', margin: 0 }}>2. Order & Pay</h3>
-                        <p style={{ color: '#6B5B52', lineHeight: 1.6 }}>Quick secure checkout or Cash on Delivery options.</p>
+                        <h3 className="font-serif-heading" style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', fontWeight: 500, color: '#0e1b12', margin: 0 }}>2. Order & Pay</h3>
+                        <p style={{ fontFamily: '"Playfair Display", serif', color: '#4e9767', lineHeight: 1.6, fontSize: '0.95rem' }}>Select your meal type and secure your spot with easy online payment.</p>
                     </div>
 
                     {/* Step 3 */}
-                    <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{
+                        flex: '1 1 300px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1.5rem',
+                        background: '#ffffff',
+                        padding: '3rem 2rem',
+                        borderRadius: '24px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                        border: '1px solid #e7f3eb'
+                    }}>
                         <div style={{
-                            width: '100px', height: '100px',
-                            borderRadius: '50%',
-                            backgroundColor: '#fff',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
-                            color: '#3C2A21'
+                            color: '#0e1b12',
+                            marginBottom: '0.5rem'
                         }}>
-                            <Bike size={48} strokeWidth={1.5} />
+                            <ShoppingBag size={32} strokeWidth={2} />
                         </div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#3C2A21', margin: 0 }}>3. Enjoy!</h3>
-                        <p style={{ color: '#6B5B52', lineHeight: 1.6 }}>Pick up hot from the counter or get it delivered to your doorstep.</p>
+                        <h3 className="font-serif-heading" style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', fontWeight: 500, color: '#0e1b12', margin: 0 }}>3. Quick Pickup</h3>
+                        <p style={{ fontFamily: '"Playfair Display", serif', color: '#4e9767', lineHeight: 1.6, fontSize: '0.95rem' }}>Skip the queue. Your fresh meal will be hot and ready for your arrival.</p>
                     </div>
                 </div>
             </section>
 
             {/* New Features and Footer Sections */}
-            <FeaturesSection />
+            <FAQSection />
             <Footer />
         </div>
     );

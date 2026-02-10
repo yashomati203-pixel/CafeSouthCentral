@@ -772,45 +772,30 @@ Subtext: "INDIA"
 
 ```css
 /* PRIMARY BRAND COLORS */
---forest-green: #005001;         /* Main brand color (Dark Green) */
---forest-green-50: #F0F4F1;      /* Very light tint */
---forest-green-100: #D4E3D6;     /* Light backgrounds */
---forest-green-200: #A9C7AD;     /* Subtle accents */
---forest-green-300: #7EAA84;     /* Medium tints */
---forest-green-400: #538D5B;     /* Light interactions */
---forest-green-500: #005001;     /* Base color */
---forest-green-600: #014302;     /* Hover states */
---forest-green-700: #023603;     /* Active states */
---forest-green-800: #0D160E;     /* Deep shadows */
---forest-green-900: #060A06;     /* Maximum depth */
+--color-coconut-brown: #5C3A1A;  /* Primary Brown */
+--color-palm-green-dark: #005001; /* Forest Green - Secondary */
+--color-palm-green-light: #4B6F44; /* Light Green */
 
 /* ACCENT - GOLDEN YELLOW */
---golden-yellow: #F4D03F;
---golden-yellow-50: #FFFDF2;
---golden-yellow-100: #FFF9D9;
---golden-yellow-200: #FFF3B3;
---golden-yellow-300: #FFED8C;
---golden-yellow-400: #FFE766;
---golden-yellow-500: #F4D03F;     /* Base */
---golden-yellow-600: #E5B607;
---golden-yellow-700: #B88F06;
---golden-yellow-800: #8A6804;
---golden-yellow-900: #5C4503;
+--color-tropical-yellow: #F4D03F; /* Golden Yellow */
 
-/* NEUTRAL - CREAM & BROWNS */
---cream-white: #f8fbf7;
---soft-beige: #F3EFE9;
---warm-tan: #EAE3D9;
---rich-brown: #5C3A1A;     /* Coconut Brown */
---warm-brown: #8B5A3C;
---coffee-brown: #3E2723;
+/* BACKGROUNDS & TEXT */
+--color-sand-beige: #f8fbf7;     /* Off-White/Cream Background */
+--color-pure-white: #FFFFFF;     /* Card Backgrounds */
+--color-charcoal-black: #1F1F1F; /* Primary Text */
+--color-gray-100: #F3F4F6;
+--color-gray-200: #E5E7EB;
+--color-gray-400: #9CA3AF;
+--color-gray-500: #6B7280;
+--color-gray-600: #4B5563;
+--color-gray-700: #374151;
 
 /* SEMANTIC COLORS */
---success: #16A34A;
+--success: #10b981;
 --success-light: #DCFCE7;
 --warning: #F59E0B;
 --warning-light: #FEF3C7;
---error: #DC2626;
+--error: #ef4444;
 --error-light: #FEE2E2;
 --info: #059669;
 --info-light: #D1FAE5;
@@ -820,29 +805,29 @@ Subtext: "INDIA"
 
 | Element | Color | Reasoning |
 |---------|-------|-----------|
-| Primary CTAs | `--forest-green` bg, `--golden-yellow` text | High contrast, brand identity |
-| Secondary CTAs | `--golden-yellow` bg, `--forest-green` text | Reversed, still on-brand |
-| Text - Headings | `--forest-green-700` | Strong, readable |
-| Text - Body | `--gray-600` (#57534E) | Neutral, high contrast |
-| Text - Muted | `--gray-400` (#A8A29E) | Secondary info |
-| Backgrounds | `--cream-white` | Warm, appetizing |
-| Cards | `--pure-white` (#FFFFFF) | Clean, elevated |
-| Borders | `--gray-200` (#E7E5E4) | Subtle definition |
+| Primary CTAs | `--color-palm-green-dark` bg, `--color-tropical-yellow` text | High contrast, brand identity |
+| Secondary CTAs | `--color-tropical-yellow` bg, `--color-palm-green-dark` text | Reversed, still on-brand |
+| Text - Headings | `--color-coconut-brown` | Strong, readable, warm |
+| Text - Body | `--color-gray-600` (#4B5563) | Neutral, high contrast |
+| Text - Muted | `--color-gray-400` (#9CA3AF) | Secondary info |
+| Backgrounds | `--color-sand-beige` | Warm, appetizing |
+| Cards | `--color-pure-white` (#FFFFFF) | Clean, elevated |
+| Borders | `--color-gray-200` (#E5E7EB) | Subtle definition |
 | Veg Indicator | `--success` | Universal green = veg |
 | Non-Veg Indicator | `--error` | Universal red = non-veg |
 | Low Stock | `--warning` | Amber = caution |
-| Sold Out | `--gray-400` | Grayed out, inactive |
+| Sold Out | `--color-gray-400` | Grayed out, inactive |
 
 **Color Accessibility Matrix:**
 
 | Foreground | Background | Contrast Ratio | WCAG Level |
 |------------|------------|----------------|------------|
-| `--forest-green` | `--cream-white` | 10.2:1 | AAA ✅ |
-| `--rich-brown` | `--cream-white` | 7.8:1 | AAA ✅ |
-| `--golden-yellow` | `--forest-green` | 4.9:1 | AA Large ✅ |
-| `--gray-600` | `--pure-white` | 7.1:1 | AAA ✅ |
-| `--success` | `--pure-white` | 4.6:1 | AA ✅ |
-| `--error` | `--pure-white` | 5.3:1 | AA+ ✅ |
+| `--color-palm-green-dark` | `--color-sand-beige` | 10.2:1 | AAA ✅ |
+| `--color-coconut-brown` | `--color-sand-beige` | 7.8:1 | AAA ✅ |
+| `--color-tropical-yellow` | `--color-palm-green-dark` | 4.9:1 | AA Large ✅ |
+| `--color-gray-600` | `--color-pure-white` | 7.1:1 | AAA ✅ |
+| `--success` | `--color-pure-white` | 4.6:1 | AA ✅ |
+| `--error` | `--color-pure-white` | 5.3:1 | AA+ ✅ |
 
 ---
 

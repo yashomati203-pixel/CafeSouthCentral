@@ -1,22 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter, Manrope, Playfair_Display } from 'next/font/google';
+import { Inter, Manrope, Playfair_Display, Work_Sans } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import ClickSpark from '@/components/ui/ClickSpark';
-import SmoothScroll from '@/components/ui/SmoothScroll';
+import SubscriptionDiscovery from '@/components/SubscriptionDiscovery';
+import { DecorativeBorderOverlay } from '@/components/ui/DecorativeBorder';
+import GlobalLayoutClient from '@/components/layout/GlobalLayoutClient';
+import MainLayout from '@/components/layout/MainLayout';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+const workSans = Work_Sans({ subsets: ['latin'], variable: '--font-work-sans' });
 
 export const metadata: Metadata = {
     title: 'Cafe South Central',
     description: 'Premium Food Ordering Experience',
     manifest: '/manifest.json',
     icons: {
-        icon: '/logo-final.png',
-        shortcut: '/logo-final.png',
-        apple: '/logo-final.png',
+        icon: '/Final-logo.png',
+        shortcut: '/Final-logo.png',
+        apple: '/Final-logo.png',
     },
 };
 
@@ -27,10 +31,23 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} font-sans`} style={{ background: '#e2e9e0', minHeight: '100vh' }}>
-                <SmoothScroll />
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
+            </head>
+            <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh', overflow: 'hidden' }}>
                 <CartProvider>
-                    {children}
+                    <div className="min-h-screen w-full relative">
+                        <DecorativeBorderOverlay />
+
+                        {/* Main Content Wrapper - Inset from borders */}
+                        <div className="relative z-10 mx-[5px] md:mx-[15px] mt-[15px] mb-[15px] md:mb-[15px] h-[calc(100dvh-30px)] md:h-[calc(100vh-30px)] bg-[#e2e9e0] overflow-y-auto overflow-x-hidden shadow-2xl no-scrollbar pb-0">
+                            <MainLayout>
+                                {children}
+                                <SubscriptionDiscovery />
+                            </MainLayout>
+                        </div>
+                        <GlobalLayoutClient />
+                    </div>
                 </CartProvider>
                 <ClickSpark
                     sparkColor="#D4AF37"

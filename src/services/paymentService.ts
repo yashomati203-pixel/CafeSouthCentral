@@ -23,7 +23,7 @@ export const paymentService = {
      */
     async createOrder(amount: number, receiptId: string) {
         if (!razorpay) {
-            console.warn("[Payment] Mocking order creation");
+            console.warn("🧪 [DEV MODE] Payment Gateway: Mocking order creation (Razorpay keys not configured)");
             return {
                 id: "order_mock_" + Math.random().toString(36).substring(7),
                 amount: amount * 100,
@@ -42,8 +42,19 @@ export const paymentService = {
 
         try {
             return await razorpay.orders.create(options);
-        } catch (error) {
+        } catch (error: any) {
             console.error("[Payment] Create Order Failed:", error);
+            // In development, fallback to mock if Razorpay fails
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn("🧪 [DEV MODE] Razorpay failed, using mock order");
+                return {
+                    id: "order_mock_fallback_" + Math.random().toString(36).substring(7),
+                    amount: amount * 100,
+                    currency: "INR",
+                    receipt: receiptId,
+                    status: "created"
+                };
+            }
             throw new Error("Failed to create payment order");
         }
     },

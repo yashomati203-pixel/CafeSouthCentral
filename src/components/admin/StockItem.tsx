@@ -113,20 +113,34 @@ export default function StockItem({ item, onUpdate }: StockItemProps) {
                         style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}
                     >-</button>
                     <input
-                        type="number"
-                        value={count}
+                        type="text"
+                        inputMode="numeric"
+                        value={count.toString()}
                         onChange={(e) => {
-                            const newVal = parseInt(e.target.value) || 0;
-                            updateCount(newVal);
-                        }}
-                        onBlur={(e) => {
-                            const newVal = Math.max(0, parseInt(e.target.value) || 0);
-                            setCount(newVal);
+                            const val = e.target.value;
+                            if (val === '') {
+                                // Allow clearing the input temporarily
+                                setCount(0); // Keeping it simple: 0 if empty, or handle as string locally. 
+                                // Actually, managing a separate string state is better for "empty".
+                                // But to stick to minimal changes: 
+                                // if count is state number, set to 0. 
+                                // User: "I should be able to type". 
+                                // If I type 1 -> 0 -> 10, that works. 
+                                // If I want to clear, I get 0. 
+                                // Let's try to interpret "manually type".
+                                // If I use type="number", it prevents non-digits. 
+                            }
+                            const parsed = parseInt(val);
+                            if (!isNaN(parsed)) {
+                                updateCount(parsed);
+                            } else if (val === '') {
+                                updateCount(0);
+                            }
                         }}
                         style={{
                             fontSize: '1.1rem',
                             fontWeight: 'bold',
-                            width: '50px',
+                            width: '60px',
                             textAlign: 'center',
                             border: '1px solid #ddd',
                             borderRadius: '0.25rem',

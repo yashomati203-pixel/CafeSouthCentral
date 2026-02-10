@@ -25,7 +25,7 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit, isLoading = f
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -40,14 +40,14 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit, isLoading = f
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden"
+                        className="relative w-full max-w-md max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-xl"
                     >
-                        {/* Close Button */}
+                        {/* Close Button - Sticky so always visible */}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                            className="sticky top-2 float-right mr-2 mt-2 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shadow-sm"
                         >
-                            <Cross1Icon className="w-6 h-6" />
+                            <Cross1Icon className="w-5 h-5" />
                         </button>
 
                         <div className="p-8 text-center">
@@ -96,8 +96,8 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit, isLoading = f
                                 onClick={handleSubmit}
                                 disabled={rating === 0 || isLoading}
                                 className={`w-full py-3.5 rounded-xl font-semibold text-white transition-all transform active:scale-[0.98] ${rating > 0 && !isLoading
-                                        ? "bg-slate-500 hover:bg-slate-600 shadow-lg shadow-slate-200"
-                                        : "bg-gray-300 cursor-not-allowed"
+                                    ? "bg-slate-500 hover:bg-slate-600 shadow-lg shadow-slate-200"
+                                    : "bg-gray-300 cursor-not-allowed"
                                     }`}
                             >
                                 {isLoading ? "Submitting..." : "Submit Feedback"}

@@ -53,6 +53,7 @@ export default function CategoriesSection({ onCategorySelect, onViewAll }: Categ
                     transition={{ duration: 0.6 }}
                 >
                     <h2 style={{
+                        fontFamily: '"Playfair Display", serif',
                         fontSize: 'clamp(2rem, 4vw, 3rem)',
                         fontWeight: 800,
                         color: '#3C2A21',

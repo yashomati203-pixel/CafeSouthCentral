@@ -4,8 +4,8 @@ import { redis } from '@/lib/redis';
 
 // Configuration
 const RATE_LIMIT_WINDOW = 60; // 1 minute
-const RATE_LIMIT_MAX_PUBLIC = 60; // 60 requests
-const RATE_LIMIT_MAX_AUTH = 10;   // 10 requests (Login/OTP)
+const RATE_LIMIT_MAX_PUBLIC = 300; // Increased for admin dashboard polling
+const RATE_LIMIT_MAX_AUTH = 50;   // 50 requests (Login/OTP)
 const CSRF_HEADER = 'x-csrf-token';
 
 /**

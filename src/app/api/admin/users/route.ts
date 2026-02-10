@@ -21,7 +21,7 @@ export async function GET() {
                     where: { status: 'ACTIVE' }, // Fixed from isActive: true
                     orderBy: { endDate: 'desc' },
                     take: 1,
-                    select: { endDate: true, planType: true, status: true } // Added status
+                    select: { endDate: true, planType: true, status: true, creditsTotal: true, creditsUsed: true } // Added credits info
                 },
                 _count: {
                     select: { orders: true }

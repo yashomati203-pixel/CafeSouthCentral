@@ -1,8 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import FoodCarousel from './FoodCarousel';
+import RotatingBadge from './RotatingBadge';
+import { User } from 'lucide-react';
+import { DecorativeBorderLogo } from '@/components/ui/DecorativeBorder';
 
 interface HeroSectionProps {
     onExplore?: () => void;
@@ -11,321 +15,227 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onExplore, onLoginClick, user }: HeroSectionProps) {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     return (
-        <section style={{
-            position: 'relative',
-            minHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            padding: '1rem 4rem 1rem 6rem',
-            maxWidth: '100%',
-            width: '100%',
-            margin: '0 auto',
-            backgroundColor: '#e2e9e0'
-        }}>
+        <section className="relative min-h-[90vh] flex flex-col overflow-hidden px-4 md:px-16 lg:px-24 py-4 max-w-full w-full mx-auto bg-[#e2e9e0]">
 
-            {/* Header / Nav Area */}
-            <header style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '0',
-                zIndex: 10,
-                paddingTop: '0.5rem',
-                maxWidth: '1600px',
-                width: '100%',
-                margin: '0 auto'
-            }}>
-                {/* Logo */}
-                <div style={{ flex: '0 0 auto' }}>
-                    <Image
-                        src="/Final web logo.png"
-                        alt="Cafe South Central"
-                        width={400}
-                        height={120}
-                        style={{ objectFit: 'contain' }}
-                        priority
-                    />
-                </div>
 
-                {/* Right Side Nav */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    gap: '2.5rem',
-                }}>
-                    <nav style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5rem',
-                        marginRight: '5rem',
-                    }}>
-                        <button
-                            onClick={onExplore}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                fontFamily: 'var(--font-playfair)',
-                                fontWeight: 800,
-                                color: '#4a3b32',
-                                cursor: 'pointer',
-                                fontSize: '1.2rem' // Explicit font size to match
-                            }}>
-                            Menu
-                        </button>
-                        <Link href="/subscription" style={{
-                            fontFamily: 'var(--font-playfair)',
-                            fontWeight: 800,
-                            color: '#4a3b32',
-                            textDecoration: 'none',
-                            fontSize: '1.2rem'
-                        }}>
-                            Subscriptions
-                        </Link>
-                        {user ? (
-                            <Link href="/account">
-                                <button
-                                    style={{
-                                        backgroundColor: '#5C3A1A',
-                                        color: 'white',
-                                        padding: '0.8rem 1.5rem',
-                                        borderRadius: '999px',
-                                        border: 'none',
-                                        fontFamily: 'var(--font-playfair)',
-                                        fontWeight: 800,
-                                        fontSize: '1.2rem',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}>
-                                    <span>{user.name || 'User'}</span>
-                                </button>
-                            </Link>
-                        ) : (
-                            <button
-                                onClick={onLoginClick}
-                                style={{
-                                    backgroundColor: '#005001',
-                                    color: '#f7e231',
-                                    padding: '1rem 2rem',
-                                    borderRadius: '999px',
-                                    border: 'none',
-                                    fontFamily: 'var(--font-playfair)',
-                                    fontWeight: 800,
-                                    fontSize: '1.2rem',
-                                    cursor: 'pointer'
-                                }}>
-                                Login / Sign Up
-                            </button>
-                        )}
-                    </nav>
 
-                    <span style={{
-                        fontFamily: 'var(--font-playfair)',
-                        fontStyle: 'italic',
-                        color: '#8c7662',
-                        fontSize: '1.2rem',
-                        marginRight: '0.5rem',
-                        marginTop: '-1.5rem',
-                        opacity: 0.8
-                    }}>
-                        "You become what you eat"
-                    </span>
-                </div>
-            </header>
-
-            {/* Main Content Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)',
-                gap: '2rem',
-                flex: 1,
-                alignItems: 'center',
-                position: 'relative',
-                paddingBottom: '2rem',
-                maxWidth: '1600px',
-                width: '100%',
-                margin: '0 auto'
-            }}>
-
-                {/* Left Content */}
-                <div style={{ paddingRight: '1rem', zIndex: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    {/* Main Headline - Dark Green */}
-                    <h1 style={{
-                        fontFamily: 'var(--font-playfair)',
-                        fontWeight: 450,
-                        fontSize: 'clamp(1.5rem, 5vw, 3.5rem)', // Slightly larger again to match visual weight
-                        color: '#005001', // Dark Green
-                        lineHeight: 1,
-                        marginBottom: '0rem',
-                        marginTop: '-4rem'
-                    }}>
-                        Hearty breakfast.<br />
-                        Quick bites.<br />
-                        Clean lunch.
-                    </h1>
-
-                    {/* Subheadline - Brown, Sans Serif */}
-                    <h2 style={{
-                        fontFamily: 'var(--font-manrope)',
-                        fontWeight: 600,
-                        fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-                        color: '#5c3a1a',
-                        marginTop: '0.5rem',
-                        marginBottom: '0.5rem', // More space before button
-                        lineHeight: 1.2
-                    }}>
-                        We’ve got a plate<br />
-                        ready for you.
-                    </h2>
-
-                    {/* CTA Button */}
-                    <button
-                        onClick={onExplore}
-                        style={{
-                            backgroundColor: '#005001',
-                            color: '#f7e231',
-                            fontSize: '2rem',//larger text
-                            fontWeight: 700,
-                            fontFamily: 'var(--font-manrope)',
-                            padding: '1rem 8rem',
-                            borderRadius: '999px',
-                            border: 'none',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 14px rgba(0, 80, 1, 0.3)',
-                            marginBottom: '0.5rem'
-                        }}>
-                        Explore Menu
-                    </button>
-
-                    {/* Tagline - Greenish Grey */}
-                    <p style={{
-                        fontFamily: 'var(--font-manrope)',
-                        color: '#4a5d50', // Greenish Grey
-                        fontSize: '1.2rem',
-                        fontWeight: 500,
-                        marginTop: '0',
-                        marginLeft: '11rem',//ightly right
-                    }}>
-                        Deadlines can wait. Good food can’t.
+            {/* Mobile Layout */}
+            <div className="md:hidden flex flex-col px-6 pt-6">
+                {/* Center Quote - Mobile */}
+                <div className="w-full text-center pb-4">
+                    <p className="font-serif italic text-lg opacity-80 text-[#102214]">
+                        &quot;You become what you eat&quot;
                     </p>
                 </div>
 
-                {/* Right Content - Abstract Collage */}
-                <div style={{
-                    position: 'relative',
-                    height: '100%',
-                    minHeight: '600px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    {/* Dosa Plate - Top Right Large */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '100%',
-                        maxWidth: '400px',
-                        zIndex: 2,
-                        right: '5%', // Moved left
-                        top: '-1%'
-                    }}>
-                        <div style={{
-                            position: 'relative',
-                            width: '100%',
-                            paddingBottom: '100%',
-                            borderRadius: '40px 40px 40px 40px',
-                            overflow: 'hidden'
-                        }}>
+                {/* Main Headline - Mobile */}
+                <h1 className="font-serif text-4xl font-extrabold leading-tight mb-6 text-center text-[#2f4f2f]">
+                    Healthy breakfast.<br />
+                    Quick bites.<br />
+                    Clean lunch.
+                </h1>
+
+                {/* Subheadline - Mobile */}
+                <p className="text-lg font-medium mb-8 text-center opacity-90 text-[#4a5d50] font-serif">
+                    We've got a plate ready for you.
+                </p>
+
+                {/* CTA Button - Mobile */}
+                <Link
+                    href="/menu"
+                    className="w-full bg-[#102214] text-[#f7e231] py-5 px-8 rounded-full font-bold text-xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all mb-4 font-serif block text-center"
+                >
+                    Explore Menu
+                </Link>
+
+                {/* Tagline - Mobile */}
+                <p className="mt-2 mb-8 text-sm font-medium italic opacity-60 text-center text-[#4a5d50]">
+                    Deadlines can wait. Good food can't.
+                </p>
+
+                {/* Static Collage - Mobile (Replaces Grid) */}
+                <div className="relative h-[380px] w-full mb-8 overflow-visible">
+                    {/* Fresh Badge - Moving further below Idli and to the right */}
+                    <div className="absolute top-[33%] right-[-10%] z-30 transform rotate-12">
+                        <RotatingBadge />
+                    </div>
+
+                    {/* Idli Plate - Top Right (Moved with Badge) */}
+                    <div className="absolute w-[45%] max-w-[160px] z-10 right-[0%] top-[0%]">
+                        <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-xl"
+                            style={{ borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' }}>
                             <Image
-                                src="/images/hero/dosa.png"
+                                src="/images/hero/Idli vada.png"
+                                alt="Idli"
+                                fill
+                                sizes="(max-width: 768px) 50vw, 33vw"
+                                style={{ objectFit: 'cover' }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Dosa Plate - Center/Left (Large) */}
+                    <div className="absolute w-[80%] max-w-[300px] z-20 left-[-5%] top-[25%]">
+                        <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-2xl"
+                            style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }}>
+                            <Image
+                                src="/images/hero/Dosa.png"
                                 alt="Dosa Plate"
                                 fill
-                                style={{ objectFit: 'contain' }}
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                style={{ objectFit: 'cover', scale: '1.1' }}
                             />
                         </div>
                     </div>
 
-                    {/* Idli Plate - Center Left */}
-                    <motion.div
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                        style={{
-                            position: 'absolute',
-                            width: '70%',
-                            maxWidth: '300px',
-                            left: '-5%',
-                            top: '35%',// Centered vertically relative
-                            zIndex: 3
-                        }}
-                    >
-                        <Image
-                            src="/images/hero/idli.png"
-                            alt="Idli"
-                            width={300}
-                            height={300}
-                            style={{ width: '100%', height: 'auto', borderRadius: '30%', }}
-                        />
-                    </motion.div>
-
-                    {/* Fresh Badge - Below Idli */}
-                    <div style={{
-                        position: 'absolute',
-                        left: '5%',
-                        bottom: '8%',
-                        zIndex: 3,
-                        backgroundColor: '#e6f0e6',
-                        border: '1px solid #1a2e1a',
-                        borderRadius: '999px',
-                        padding: '0.5rem 1.5rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                    }}>
-                        <span style={{
-                            fontFamily: 'var(--font-playfair)',
-                            fontWeight: 700,
-                            color: '#002200',
-                            fontSize: '1rem'
-                        }}>
-                            100% Fresh • Made Today
-                        </span>
-                    </div>
-
-                    {/* Coffee - Bottom Right */}
-                    <motion.div
-                        animate={{ y: [0, 10, 0] }}
-                        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                        style={{
-                            position: 'absolute',
-                            width: '35%',
-                            maxWidth: '260px',
-                            right: '0%',
-                            bottom: '10%',
-                            zIndex: 4
-                        }}
-                    >
-                        <div style={{
-                            position: 'relative',
-                            width: '100%',
-                            paddingBottom: '100%',
-                            borderRadius: '40px',
-                            overflow: 'hidden'
-                        }}>
+                    {/* Coffee - Bottom Right (Visible) */}
+                    <div className="absolute w-[35%] max-w-[130px] z-30 right-[2%] bottom-[10%]">
+                        <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-xl"
+                            style={{ borderRadius: '40% 60% 60% 40% / 40% 40% 60% 60%' }}>
                             <Image
-                                src="/images/hero/filter-coffee.png"
+                                src="/images/hero/Filter coffee.png"
                                 alt="Filter Coffee"
                                 fill
-                                style={{ objectFit: 'contain' }}
+                                sizes="(max-width: 768px) 50vw, 33vw"
+                                style={{ objectFit: 'cover' }}
                             />
                         </div>
-                    </motion.div>
-
+                    </div>
                 </div>
 
+                {/* Quick Action Cards - Mobile */}
+                <div className="hidden grid grid-cols-2 gap-4 pb-8">
+                    <Link
+                        href="/menu"
+                        className="bg-white p-4 rounded-xl border border-[#102214]/5 flex flex-col items-center gap-2 text-center hover:shadow-md transition-shadow"
+                    >
+                        <div className="w-12 h-12 bg-[#f7e231] rounded-full flex items-center justify-center">
+                            <span className="text-2xl">🍽️</span>
+                        </div>
+                        <span className="font-bold text-sm text-[#102214]">Explore Menu</span>
+                    </Link>
+                    <Link href="/subscription" className="bg-white p-4 rounded-xl border border-[#102214]/5 flex flex-col items-center gap-2 text-center hover:shadow-md transition-shadow">
+                        <div className="w-12 h-12 bg-[#f7e231] rounded-full flex items-center justify-center">
+                            <span className="text-2xl">⭐</span>
+                        </div>
+                        <span className="font-bold text-sm text-[#102214]">Subscriptions</span>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="hidden md:block">
+                {/* Center Quote - Desktop */}
+                <div className="w-full text-center pt-2 pb-2 relative z-20">
+                    <p className="font-serif italic text-2xl md:text-3xl opacity-90 text-[#102214]">
+                        &quot;You become what you eat&quot;
+                    </p>
+                </div>
+
+                {/* Main Content Grid */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+                    gap: '1rem',
+                    flex: 1,
+                    alignItems: 'center',
+                    position: 'relative',
+                    paddingBottom: '1rem',
+                    maxWidth: '1600px',
+                    width: '100%',
+                    margin: '0 auto',
+                    zIndex: 10
+                }}>
+
+                    {/* Left Content */}
+                    <div style={{ paddingRight: '1rem', paddingLeft: '3rem', zIndex: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+
+                        {/* Main Headline */}
+                        <h1 className="font-serif text-5xl md:text-7xl font-black leading-tight mb-4 max-w-4xl text-[#2f4f2f]">
+                            Healthy breakfast.<br />
+                            Quick bites.<br />
+                            Clean lunch.
+                        </h1>
+
+                        <div className="flex flex-col items-center text-center w-fit self-start">
+                            {/* Subheadline */}
+                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#5c3a1a] font-serif">
+                                We've got a plate ready for you.
+                            </h2>
+
+                            {/* CTA Button */}
+                            <div className="flex flex-col sm:flex-row gap-6 mb-4 justify-center">
+                                <Link
+                                    href="/menu"
+                                    className="bg-[#102214] text-[#f7e231] px-14 py-5 rounded-full text-2xl font-bold shadow-xl hover:scale-105 transition-transform font-serif"
+                                >
+                                    Explore Menu
+                                </Link>
+                            </div>
+
+                            {/* Tagline */}
+                            <p className="mt-2 text-[#4a5d50] text-xl font-medium font-serif italic">
+                                Deadlines can wait. Good food can't.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Right Content - Abstract Collage */}
+                    <div className="relative h-full min-h-[500px] flex items-center justify-center -translate-x-12">
+
+                        {/* Dosa Plate - Center Large Blob - Moved UP */}
+                        <div className="absolute w-[70%] max-w-[450px] z-10 left-[5%] top-[10%] animate-float-slow">
+                            <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-2xl"
+                                style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }}>
+                                <Image
+                                    src="/images/hero/Dosa.png"
+                                    alt="Dosa Plate"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    style={{ objectFit: 'cover', transform: 'scale(1.1)' }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Idli Plate - Top Right Small Blob - Moved UP */}
+                        <div className="absolute w-[35%] max-w-[220px] z-0 right-[5%] top-[5%] animate-float-medium">
+                            <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-xl"
+                                style={{ borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' }}>
+                                <Image
+                                    src="/images/hero/Idli vada.png"
+                                    alt="Idli"
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                    style={{ objectFit: 'cover' }}
+                                />
+                            </div>
+
+                            {/* Fresh Badge - Attached to Idli */}
+                            <div className="absolute -top-4 -right-4 z-20 bg-[#f0fdf4] border-2 border-[#102214] text-[#102214] rounded-full w-24 h-24 flex items-center justify-center text-center shadow-lg rotate-12">
+                                <span className="font-serif font-bold text-xs leading-tight">
+                                    100% Fresh<br />•<br />100%<br />Made Today
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Coffee - Bottom Right Small Blob - Moved UP slightly if needed, but relative to others */}
+                        <div className="absolute w-[30%] max-w-[180px] z-20 right-[10%] bottom-[10%] animate-float-fast">
+                            <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-xl"
+                                style={{ borderRadius: '40% 60% 60% 40% / 40% 40% 60% 60%' }}>
+                                <Image
+                                    src="/images/hero/Filter coffee.png"
+                                    alt="Filter Coffee"
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                    style={{ objectFit: 'cover' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
