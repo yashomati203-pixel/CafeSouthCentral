@@ -150,7 +150,7 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
 
             {/* New Features and Footer Sections */}
             <FAQSection />
-            <Footer />
+            <br />
         </div>
     );
 }

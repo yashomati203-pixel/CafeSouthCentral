@@ -6,9 +6,10 @@ import { X, Check } from 'lucide-react';
 interface AddDishModalProps {
     onClose: () => void;
     onSuccess: () => void;
+    editItem?: any;
 }
 
-export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) {
+export default function AddDishModal({ onClose, onSuccess, editItem }: AddDishModalProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -22,16 +23,39 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
     const [type, setType] = useState('NORMAL');
     const [isVeg, setIsVeg] = useState(true);
 
+    // Populate form if editing
+    React.useEffect(() => {
+        if (editItem) {
+            setName(editItem.name);
+            setPrice(editItem.price.toString());
+            setCategory(editItem.category || '');
+            setDescription(editItem.description || '');
+            setImageUrl(editItem.image || '');
+            setStock(editItem.stock.toString());
+            // Assuming type/isVeg might not be in the minimal MenuItem interface used in InventoryManager, 
+            // but if they are passed, use them. defaulting if missing.
+            // Check if editItem has these properties based on usage in InventoryManager
+            // For now, we'll leave defaults or try to safely access if they exist on the object (even if TS complains slightly, or cast)
+            const item: any = editItem;
+            if (item.type) setType(item.type);
+            if (item.isVeg !== undefined) setIsVeg(item.isVeg);
+        }
+    }, [editItem]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            const res = await fetch('/api/menu', {
-                method: 'POST',
+            const url = editItem ? `/api/menu?id=${editItem.id}` : '/api/menu';
+            const method = editItem ? 'PATCH' : 'POST';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    id: editItem?.id, // specific handling for PATCH if needed by API
                     name,
                     price: parseFloat(price),
                     category,
@@ -81,7 +105,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                                 required
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-brown focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0e2a1a] focus:border-transparent outline-none transition-all"
                                 placeholder="e.g. Masala Dosa"
                             />
                         </div>
@@ -93,7 +117,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                                 min="0"
                                 value={price}
                                 onChange={e => setPrice(e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-brown outline-none transition-all"
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0e2a1a] outline-none transition-all"
                                 placeholder="0.00"
                             />
                         </div>
@@ -107,7 +131,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                                 value={category}
                                 onChange={e => setCategory(e.target.value)}
                                 list="categories"
-                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-brown outline-none transition-all"
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0e2a1a] outline-none transition-all"
                                 placeholder="e.g. Breakfast"
                             />
                             <datalist id="categories">
@@ -124,7 +148,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                                 min="0"
                                 value={stock}
                                 onChange={e => setStock(e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-brown outline-none transition-all"
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0e2a1a] outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -134,7 +158,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                         <textarea
                             value={description}
                             onChange={e => setDescription(e.target.value)}
-                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-brown outline-none transition-all resize-none h-20"
+                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0e2a1a] outline-none transition-all resize-none h-20"
                             placeholder="Brief description of the dish..."
                         />
                     </div>
@@ -210,7 +234,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                             <select
                                 value={type}
                                 onChange={e => setType(e.target.value)}
-                                className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-primary-brown outline-none"
+                                className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#0e2a1a] outline-none"
                             >
                                 <option value="NORMAL">Normal</option>
                                 <option value="SUBSCRIPTION">Subscription</option>
@@ -230,7 +254,7 @@ export default function AddDishModal({ onClose, onSuccess }: AddDishModalProps) 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 px-4 py-2 bg-primary-brown text-white font-bold rounded-xl hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2 bg-[#0e2a1a] text-white font-bold rounded-xl hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-2">

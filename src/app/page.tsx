@@ -13,14 +13,14 @@ import dynamic from 'next/dynamic';
 import { Plus, Minus, Search, ShoppingBag, User as UserIcon, Menu as MenuIcon, X, Check } from 'lucide-react';
 import { DecorativeBorderLogo } from '@/components/ui/DecorativeBorder';
 
-const LandingPage = dynamic(() => import('@/components/marketing/LandingPage'), { ssr: false });
+const LandingPage = dynamic(() => import('@/components/marketing/LandingPage'));
 const CartDrawer = dynamic(() => import('@/components/ordering/CartDrawer'), { ssr: false });
 const MobileHeader = dynamic(() => import('@/components/layout/MobileHeader'), { ssr: false });
 const MobileBottomNav = dynamic(() => import('@/components/layout/MobileBottomNav'), { ssr: false });
 const MobileProfileMenu = dynamic(() => import('@/components/layout/MobileProfileMenu'), { ssr: false });
 
 const SubscriptionView = dynamic(() => import('@/components/subscription/SubscriptionView'), { ssr: false });
-const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
+// Footer removed as it is not used in this file
 
 const LoginPage = dynamic(() => import('@/components/auth/LoginPage'), { ssr: false });
 const ModeToggle = dynamic(() => import('@/components/ui/ModeToggle'), { ssr: false });

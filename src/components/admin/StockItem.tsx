@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Edit2, Trash2, Archive, CheckSquare, Square } from 'lucide-react';
 
 // Custom Hook for Debouncing
 function useDebounce<T extends (...args: any[]) => any>(callback: T, delay: number) {
@@ -16,14 +19,14 @@ function useDebounce<T extends (...args: any[]) => any>(callback: T, delay: numb
 
 interface StockItemProps {
     item: any;
-    onUpdate: (id: string, updates: any) => void;
+    onUpdate?: (id: string, updates: any) => void;
+    onRefresh: () => void;
+    onEdit: () => void;
 }
 
-export default function StockItem({ item, onUpdate }: StockItemProps) {
+export default function StockItem({ item, onUpdate, onRefresh, onEdit }: StockItemProps) {
     const [count, setCount] = useState(item.stock);
     const [isAvailable, setIsAvailable] = useState(item.isAvailable);
-    const [clickCount, setClickCount] = useState(0);
-    const [previousCount, setPreviousCount] = useState<number | null>(null);
 
     // Sync local state if prop changes (external update)
     useEffect(() => {
@@ -39,7 +42,8 @@ export default function StockItem({ item, onUpdate }: StockItemProps) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, stock: newCount, isAvailable: newAvail })
             });
-            onUpdate(id, { stock: newCount, isAvailable: newAvail });
+            if (onUpdate) onUpdate(id, { stock: newCount, isAvailable: newAvail });
+            // onRefresh(); // Don't refresh whole list on simple updates to prevent jitter
         } catch (e) {
             console.error("Failed to update stock", e);
         }
@@ -51,145 +55,117 @@ export default function StockItem({ item, onUpdate }: StockItemProps) {
     const updateCount = (newVal: number) => {
         const safeVal = Math.max(0, newVal);
         setCount(safeVal);
-        // Optimistic UI update handled by local state 'count'
-        // API call is debounced
         debouncedUpdate(item.id, safeVal, isAvailable);
     };
 
-    // Toggle is immediate, not debounced (usually better for UX on switches)
     const toggleAvailability = () => {
         const newVal = !isAvailable;
         setIsAvailable(newVal);
         updateApi(item.id, count, newVal);
     };
 
-    const handleSoldOut = () => {
-        if (clickCount === 0) {
-            setClickCount(1);
-            setTimeout(() => setClickCount(0), 1000); // Reset after 1s
-        } else {
-            // Double tap confirmed
-            setPreviousCount(count); // Save current count before zeroing
-            setCount(0);
-            updateApi(item.id, 0, isAvailable); // Immediate update for Sold Out
-            setClickCount(0);
-        }
-    };
-
-    const handleUndo = () => {
-        if (previousCount !== null) {
-            setCount(previousCount);
-            updateApi(item.id, previousCount, isAvailable);
-            setPreviousCount(null);
+    const handleDelete = async () => {
+        if (confirm(`Are you sure you want to delete "${item.name}"? This cannot be undone.`)) {
+            try {
+                const res = await fetch(`/api/admin/inventory?id=${item.id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    onRefresh();
+                }
+            } catch (e) {
+                console.error("Delete failed", e);
+            }
         }
     };
 
     return (
-        <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '1rem', borderBottom: '1px solid #eee', backgroundColor: 'white'
-        }}>
-            <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                <div style={{ fontSize: '0.8rem', color: '#666' }}>{item.category}</div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                {/* Toggle Availability */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={{ fontSize: '0.8rem', marginBottom: '0.2rem' }}>Active</label>
-                    <input
-                        type="checkbox"
-                        checked={isAvailable}
-                        onChange={toggleAvailability}
-                        style={{ width: '20px', height: '20px', accentColor: '#5C3A1A' }}
-                    />
+        <tr className={`group transition-colors rounded-lg overflow-hidden ${isAvailable ? 'hover:bg-gray-50' : 'bg-gray-50 opacity-70'}`}>
+            {/* Item Name & Image Placeholder */}
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                        {item.image ? (
+                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                        ) : (
+                            <span className="text-xs font-bold text-gray-400">{item.name.slice(0, 2).toUpperCase()}</span>
+                        )}
+                    </div>
+                    <div>
+                        <div className="text-sm font-bold text-gray-900">{item.name}</div>
+                        {!isAvailable && (
+                            <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">UNAVAILABLE</span>
+                        )}
+                    </div>
                 </div>
+            </td>
 
-                {/* Quantity Control */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {/* Category */}
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">
+                    {item.category || 'General'}
+                </span>
+            </td>
+
+            {/* Price */}
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                ₹{item.price}
+            </td>
+
+            {/* Stock Controls */}
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
                     <button
                         onClick={() => updateCount(count - 1)}
-                        style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}
-                    >-</button>
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-white hover:shadow-sm disabled:opacity-50 transition-all font-bold text-gray-500"
+                        disabled={count <= 0}
+                    >
+                        -
+                    </button>
                     <input
-                        type="text"
-                        inputMode="numeric"
-                        value={count.toString()}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === '') {
-                                // Allow clearing the input temporarily
-                                setCount(0); // Keeping it simple: 0 if empty, or handle as string locally. 
-                                // Actually, managing a separate string state is better for "empty".
-                                // But to stick to minimal changes: 
-                                // if count is state number, set to 0. 
-                                // User: "I should be able to type". 
-                                // If I type 1 -> 0 -> 10, that works. 
-                                // If I want to clear, I get 0. 
-                                // Let's try to interpret "manually type".
-                                // If I use type="number", it prevents non-digits. 
-                            }
-                            const parsed = parseInt(val);
-                            if (!isNaN(parsed)) {
-                                updateCount(parsed);
-                            } else if (val === '') {
-                                updateCount(0);
-                            }
-                        }}
-                        style={{
-                            fontSize: '1.1rem',
-                            fontWeight: 'bold',
-                            width: '60px',
-                            textAlign: 'center',
-                            border: '1px solid #ddd',
-                            borderRadius: '0.25rem',
-                            padding: '0.25rem'
-                        }}
+                        type="number"
+                        min="0"
+                        value={count}
+                        onChange={(e) => updateCount(parseInt(e.target.value) || 0)}
+                        className="w-12 text-center text-sm font-bold bg-transparent border-none focus:ring-0 p-0"
                     />
                     <button
                         onClick={() => updateCount(count + 1)}
-                        style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}
-                    >+</button>
-                </div>
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-white hover:shadow-sm transition-all font-bold text-gray-500"
+                    >
+                        +
+                    </button>
 
-                {/* Sold Out (Double Tap) or Undo */}
-                {count === 0 && previousCount !== null ? (
+                    {/* Status Toggle */}
                     <button
-                        onClick={handleUndo}
-                        style={{
-                            padding: '0.5rem 1rem',
-                            backgroundColor: '#10b981',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '0.5rem',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            width: '100px'
-                        }}
+                        onClick={toggleAvailability}
+                        className={`ml-4 p-1.5 rounded-lg transition-colors ${isAvailable ? 'text-[#14b84b] hover:bg-[#14b84b]/10' : 'text-gray-300 hover:text-gray-500 hover:bg-gray-100'}`}
+                        title={isAvailable ? "Mark Unavailable" : "Mark Available"}
                     >
-                        Undo
+                        {isAvailable ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                     </button>
-                ) : (
+                </div>
+            </td>
+
+            {/* Actions */}
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div className="flex items-center justify-end gap-2">
                     <button
-                        onClick={handleSoldOut}
-                        style={{
-                            padding: '0.5rem 1rem',
-                            backgroundColor: clickCount === 1 ? '#d9534f' : '#fff',
-                            color: clickCount === 1 ? 'white' : '#d9534f',
-                            border: '1px solid #d9534f',
-                            borderRadius: '0.5rem',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            width: '100px'
-                        }}
+                        onClick={onEdit}
+                        className="p-2 text-gray-400 hover:text-[#0e2a1a] hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Edit Item"
                     >
-                        {clickCount === 1 ? 'Confirm?' : 'Sold Out'}
+                        <Edit2 className="w-4 h-4" />
                     </button>
-                )}
-            </div>
-        </div>
+                    <button
+                        onClick={handleDelete}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Item"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            </td>
+        </tr>
     );
 }

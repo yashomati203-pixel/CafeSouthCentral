@@ -81,8 +81,6 @@ export default function AccountPage() {
         cardholderName: ''
     });
 
-    // Subscription State
-    const [subscription, setSubscription] = useState<any>(null);
 
     const AVATAR_PRESETS = [
         `https://api.dicebear.com/7.x/avataaars/svg?seed=Felix`,
@@ -112,6 +110,7 @@ export default function AccountPage() {
     }, [router]);
 
     const loadUserData = async (userId: string) => {
+
         // Load addresses (will fail until migration runs - graceful handling)
         try {
             const addrRes = await fetch(`/api/user/addresses?userId=${userId}`);
@@ -123,15 +122,6 @@ export default function AccountPage() {
             const pmRes = await fetch(`/api/user/payment-methods?userId=${userId}`);
             if (pmRes.ok) setPaymentMethods(await pmRes.json());
         } catch (e) { console.log('Payment methods not available yet'); }
-
-        // Load subscription
-        try {
-            const subRes = await fetch(`/api/user/subscription?userId=${userId}`);
-            if (subRes.ok) {
-                const data = await subRes.json();
-                setSubscription(data.subscription || null);
-            }
-        } catch (e) { console.log('Subscription check failed'); }
     };
 
     const handleSaveProfile = async () => {

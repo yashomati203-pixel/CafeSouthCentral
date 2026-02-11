@@ -456,7 +456,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
             setIsProcessing(false);
             alert('Order Placed Successfully!');
             clearCart();
-            router.push('/orders');
+            router.push('/orders?newOrder=true');
 
         } catch (err: any) {
             setIsProcessing(false);

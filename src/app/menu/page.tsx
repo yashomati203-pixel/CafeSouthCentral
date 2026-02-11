@@ -42,10 +42,8 @@ export default function MenuPage() {
         const elementId = cat.toLowerCase().replace(/\s+/g, '-');
         const element = document.getElementById(elementId);
         if (element) {
-            const offset = 180; // Account for sticky headers
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            // Use scrollIntoView which respects scroll-margin-top
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -133,7 +131,7 @@ export default function MenuPage() {
 
                 {/* CATEGORY NAV */}
                 <div className="sticky top-[86px] z-40 mb-12 -mx-6 px-6 py-2 bg-[#e2e9e0]/95 border-b border-[#3C2A21]/10 backdrop-blur-sm">
-                    <div className="flex items-center gap-2 md:gap-4 overflow-x-auto py-4 no-scrollbar scroll-smooth">
+                    <div className="flex items-center gap-2 md:gap-4 overflow-x-auto py-4 scroll-smooth">
                         <button
                             onClick={() => { setSelectedCategory('All'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                             className={`flex-shrink-0 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm
@@ -157,7 +155,7 @@ export default function MenuPage() {
                 {/* MENU GRID */}
                 <div className="space-y-24 pb-40">
                     {availableCategories.map(category => (
-                        <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-32">
+                        <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-[180px]">
                             <div className="flex items-center gap-6 mb-12">
                                 <h2 className="font-serif-heading text-3xl md:text-4xl font-black text-[#0e1b12] tracking-tight">{category}</h2>
                                 <div className="h-[1px] flex-1 bg-[#3C2A21]/10"></div>

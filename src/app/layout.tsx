@@ -24,6 +24,8 @@ export const metadata: Metadata = {
     },
 };
 
+import { Toaster } from 'sonner';
+
 export default function RootLayout({
     children,
 }: {
@@ -47,6 +49,7 @@ export default function RootLayout({
                             </MainLayout>
                         </div>
                         <GlobalLayoutClient />
+                        <Toaster richColors position="top-center" />
                     </div>
                 </CartProvider>
                 <ClickSpark

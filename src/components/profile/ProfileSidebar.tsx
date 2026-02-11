@@ -42,7 +42,6 @@ export default function ProfileSidebar({ user, onLogout }: ProfileSidebarProps) 
 
     const navItems = [
         { label: 'My Orders', icon: ShoppingBag, href: '/orders' },
-        { label: 'Subscription', icon: CreditCard, href: '/?view=subscription' },
         { label: 'Settings', icon: Settings, href: '/account' }, // Active on profile page
         { label: 'Share Feedback', icon: HelpCircle, href: 'mailto:hello@cafesouthcentral.com' },
     ];
@@ -56,36 +55,11 @@ export default function ProfileSidebar({ user, onLogout }: ProfileSidebarProps) 
             `}
         >
             {/* Header / User Info */}
-            <div className={`p-6 flex items-center gap-3 mb-4 ${isCollapsed ? 'justify-center p-4' : ''}`}>
-                {!isCollapsed && (
-                    <div
-                        className="w-12 h-12 rounded-full bg-center bg-cover bg-no-repeat shrink-0 border border-gray-200"
-                        style={{
-                            backgroundImage: `url(${user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`})`
-                        }}
-                    />
-                )}
-                {isCollapsed && (
-                    <div
-                        className="w-10 h-10 rounded-full bg-center bg-cover bg-no-repeat shrink-0 border border-gray-200"
-                        style={{
-                            backgroundImage: `url(${user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`})`
-                        }}
-                    />
-                )}
-
-                {!isCollapsed && (
-                    <div className="flex flex-col overflow-hidden">
-                        <h1 className="text-lg font-bold font-serif text-[#0d1c11] dark:text-white leading-tight truncate">
-                            Cafe South Central
-                        </h1>
-                        <p className="text-sm font-medium text-[#499c5e] truncate">Customer Profile</p>
-                    </div>
-                )}
-            </div>
+            {/* Header / User Info Removed */}
+            <div className="mt-8"></div>
 
             {/* Navigation */}
-            <nav className="flex flex-col gap-2 px-3 flex-1">
+            <nav className="flex flex-col gap-2 px-6 flex-1">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -117,7 +91,7 @@ export default function ProfileSidebar({ user, onLogout }: ProfileSidebarProps) 
             </nav>
 
             {/* Collapse Toggle */}
-            <div className={`px-3 py-2 flex ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
+            <div className={`px-6 py-2 flex ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
                 <button
                     onClick={toggleSidebar}
                     className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -127,7 +101,7 @@ export default function ProfileSidebar({ user, onLogout }: ProfileSidebarProps) 
             </div>
 
             {/* Logout */}
-            <div className="p-6 mt-auto border-t border-gray-100 dark:border-gray-800">
+            <div className="p-6 mt-auto">
                 <button
                     onClick={onLogout}
                     className={`
