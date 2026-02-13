@@ -2,6 +2,25 @@
 
 All notable changes to the **Cafe South Central** project will be documented in this file.
 
+## [2026-02-12]
+### Added
+- **System Alert System**: Real-time monitoring for operational issues (low stock, order delays).
+- **React Portal Integration**: Implemented for modals to escape stacking contexts and ensure visibility.
+- **Enhanced Analytics**: Added custom date range filtering (Start/End Date) and performance detail views.
+
+### Changed
+- **Admin Sidebar**: 
+    - Full vertical layout optimization for better space efficiency.
+    - Repositioned "Sign Out" to bottom-left with optimized spacing.
+    - Updated branding with centered official logo.
+- **Reporting**: Upgraded CSV export to include revenue trends and item-level performance.
+
+### Fixed
+- **Checkout Logic**: "Cash at Counter" no longer triggers UPI ID validation.
+- **Order ID Unification**: Shared sequential ID generation for both POS and Web orders (e.g., `FEB26-xxxx`).
+- **Z-Index Stacking**: Resolved layout overlap issues where decorative borders obscured interactive modals.
+- **Inventory Management**: Fixed delete functionality for menu items.
+
 ## [2025-12-07]
 ### Core Development
 - **Checkout Flow**: Implemented payment method selection (Cash/UPI/Scan) with simulated processing delays.

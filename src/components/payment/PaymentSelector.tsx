@@ -51,8 +51,21 @@ export default function PaymentSelector({ amount, onPaymentChange, variant = 'fu
 
     // Sync initial state on mount
     useEffect(() => {
-        notifyChange(selectedMethod);
-    }, []);
+        // Immediately notify parent of initial state
+        const initialMethod = excludeCash ? 'UPI' : 'CASH';
+        onPaymentChange({
+            method: initialMethod,
+            upiId: initialMethod === 'UPI' ? upiId : undefined,
+            upiProvider: initialMethod === 'UPI' ? upiProvider : undefined,
+            cardNumber: undefined,
+            cardExpiry: undefined,
+            cardCVV: undefined,
+            cardholderName: undefined,
+            bankName: undefined,
+            accountHolderName: undefined,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run only once on mount
 
     const handleMethodChange = (method: PaymentMethodType) => {
         setSelectedMethod(method);

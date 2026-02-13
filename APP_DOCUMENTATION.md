@@ -54,6 +54,9 @@ This application is a specialized food ordering system designed for high-traffic
 *   **Kitchen Scanner** (`/api/admin/scan`):
     *   Validates Order QR Tokens.
     *   Prevents race conditions on pickup.
+*   **System Alerts Service** (`/api/admin/system-alerts`):
+    *   Monitors low stock items and delivery delays.
+    *   Provides real-time badges to the Admin Header.
 *   **Notification Service** (`src/services/notificationService.ts`):
     *   Unified interface for sending alerts.
     *   **WhatsApp-First**: Uses Direct Meta Graph API (No middleman fees).

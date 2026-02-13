@@ -340,7 +340,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
     // State
     const [pickupType, setPickupType] = useState<'ASAP' | 'SCHEDULE'>('ASAP');
     const [scheduleSlot, setScheduleSlot] = useState('');
-    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({ method: 'UPI' }); // Default will be updated by PaymentSelector on mount
+    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({ method: 'CASH' }); // Start with CASH to match PaymentSelector default
 
     const [specialInstructions, setSpecialInstructions] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);

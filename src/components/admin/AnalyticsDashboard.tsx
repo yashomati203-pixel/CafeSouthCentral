@@ -57,13 +57,19 @@ interface AnalyticsData {
     newCustomersList?: NewCustomer[];
 }
 
-const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
+const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange, onDateRangeChange }: {
     data?: AnalyticsData;
     timeframe: 'today' | 'week' | 'month';
     onTimeframeChange: (t: 'today' | 'week' | 'month') => void;
+    onDateRangeChange?: (startDate: string, endDate: string) => void;
 }) => {
     const [showCustomersModal, setShowCustomersModal] = useState(false);
+    const [showBestsellersModal, setShowBestsellersModal] = useState(false);
     const [emailScheduled, setEmailScheduled] = useState(false);
+
+    // Date range state
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     // Safe access to data or defaults
     const revenue = data?.kpi?.totalRevenue || 0;
@@ -85,16 +91,68 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
     const linePath = `M${points}`;
 
     const handleExport = () => {
-        toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
-            loading: 'Generating Report...',
-            success: 'Report downloaded successfully!',
-            error: 'Failed to download report'
+        // Generate CSV content from analytics data
+        const csvRows: string[] = [];
+
+        // Header
+        csvRows.push('Analytics Report');
+        csvRows.push(`Generated: ${new Date().toLocaleDateString()}`);
+        csvRows.push('');
+
+        // KPIs
+        csvRows.push('Key Performance Indicators');
+        csvRows.push('Metric,Value');
+        csvRows.push(`Total Revenue,₹${revenue}`);
+        csvRows.push(`Average Order Value,₹${avgValue}`);
+        csvRows.push(`New Customers,${newCust}`);
+        csvRows.push(`Total Orders,${data?.kpi?.totalOrders || 0}`);
+        csvRows.push('');
+
+        // Sales Chart
+        csvRows.push('Revenue Trends');
+        csvRows.push('Period,Revenue');
+        data?.salesChart?.labels.forEach((label, idx) => {
+            csvRows.push(`${label},₹${data.salesChart.data[idx] || 0}`);
         });
+        csvRows.push('');
+
+        // Top Items
+        csvRows.push('Menu Bestsellers');
+        csvRows.push('Item,Orders');
+        data?.topSellingItems.forEach(item => {
+            csvRows.push(`${item.name},${item.count}`);
+        });
+
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `analytics_report_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast.success('Report downloaded successfully!');
     };
 
     const handleScheduleEmail = () => {
         setEmailScheduled(!emailScheduled);
         toast.success(emailScheduled ? 'Weekly email report disabled' : 'Weekly email report scheduled!');
+    };
+
+    const handleApplyDateFilter = () => {
+        if (startDate && endDate && onDateRangeChange) {
+            onDateRangeChange(startDate, endDate);
+        }
+    };
+
+    const handleTimeframeChange = (t: 'today' | 'week' | 'month') => {
+        // Reset custom dates when switching to preset timeframe
+        setStartDate('');
+        setEndDate('');
+        onTimeframeChange(t);
     };
 
     return (
@@ -114,7 +172,7 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
                     {(['today', 'week', 'month'] as const).map((t) => (
                         <button
                             key={t}
-                            onClick={() => onTimeframeChange(t)}
+                            onClick={() => handleTimeframeChange(t)}
                             className={`px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${timeframe === t
                                 ? 'bg-[#0e2a1a] text-white shadow-md'
                                 : 'text-gray-500 hover:text-[#0e2a1a] hover:bg-gray-50'
@@ -194,20 +252,34 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
                         <Calendar className="w-4 h-4 text-gray-400" />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        <div>
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Start Date</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-bold text-[#0e2a1a]">Oct 01, 2023</span>
-                                <ChevronDown className="w-4 h-4 text-gray-400" />
-                            </div>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-[#0e2a1a] focus:ring-2 focus:ring-[#14b84b]/20 outline-none"
+                            />
                         </div>
-                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                        <div>
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">End Date</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-bold text-[#0e2a1a]">Oct 31, 2023</span>
-                                <ChevronDown className="w-4 h-4 text-gray-400" />
-                            </div>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-[#0e2a1a] focus:ring-2 focus:ring-[#14b84b]/20 outline-none"
+                            />
                         </div>
+                        {startDate && endDate && (
+                            <div className="sm:col-span-2">
+                                <button
+                                    onClick={handleApplyDateFilter}
+                                    className="w-full px-4 py-2 bg-[#0e2a1a] text-white rounded-xl text-sm font-bold hover:bg-[#0e2a1a]/90 transition-all"
+                                >
+                                    Apply Date Filter
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -289,7 +361,12 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
                 <div className="bg-white p-6 rounded-2xl border border-[#14b84b]/10 shadow-sm">
                     <div className="mb-6 flex justify-between items-center">
                         <h4 className="text-lg font-bold text-[#0e2a1a]">Menu Bestsellers</h4>
-                        <button className="text-xs font-bold text-[#14b84b] hover:underline">View All Items</button>
+                        <button
+                            onClick={() => setShowBestsellersModal(true)}
+                            className="text-xs font-bold text-[#14b84b] hover:underline"
+                        >
+                            View All Items
+                        </button>
                     </div>
                     <div className="space-y-6">
                         {(data?.topSellingItems || []).slice(0, 5).map((item, idx) => (
@@ -346,6 +423,48 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange }: {
                             {(!data?.newCustomersList || data.newCustomersList.length === 0) && (
                                 <p className="text-center text-gray-400 py-8">No new customers found.</p>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Bestsellers Modal */}
+            {showBestsellersModal && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    onClick={() => setShowBestsellersModal(false)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="bg-[#0e2a1a] text-white p-6 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-2xl font-serif font-bold">All Menu Bestsellers</h3>
+                                <p className="text-white/70 text-sm">Complete list of popular items</p>
+                            </div>
+                            <button onClick={() => setShowBestsellersModal(false)} className="text-white/70 hover:text-white">✕</button>
+                        </div>
+                        <div className="overflow-y-auto p-6 space-y-4">
+                            {data?.topSellingItems?.map((item, idx) => (
+                                <div key={idx} className="space-y-2 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="flex justify-between text-sm font-bold text-[#0e2a1a]">
+                                        <span className="flex items-center gap-2">
+                                            <span className="w-6 h-6 rounded-full bg-[#0e2a1a] text-white text-xs flex items-center justify-center">
+                                                {idx + 1}
+                                            </span>
+                                            {item.name}
+                                        </span>
+                                        <span className="text-gray-400">{item.count} orders</span>
+                                    </div>
+                                    <div className="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full ${idx === 0 ? 'bg-[#14b84b]' : idx === 1 ? 'bg-[#f59e0b]' : 'bg-[#14b84b]'}`}
+                                            style={{ width: item.width }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

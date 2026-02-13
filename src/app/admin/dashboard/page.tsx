@@ -76,11 +76,19 @@ export default function AdminDashboard() {
         } catch (e) { console.error(e); }
     };
 
-    const fetchAnalytics = async (timeframe: 'today' | 'week' | 'month' = analyticsTimeframe) => {
+    const fetchAnalytics = async (timeframe: 'today' | 'week' | 'month' = analyticsTimeframe, startDate?: string, endDate?: string) => {
         try {
-            const res = await fetch(`/api/admin/analytics?timeframe=${timeframe}`);
+            let url = `/api/admin/analytics?timeframe=${timeframe}`;
+            if (startDate && endDate) {
+                url += `&startDate=${startDate}&endDate=${endDate}`;
+            }
+            const res = await fetch(url);
             if (res.ok) setAnalyticsData(await res.json());
         } catch (e) { console.error(e); }
+    };
+
+    const handleDateRangeChange = (startDate: string, endDate: string) => {
+        fetchAnalytics(analyticsTimeframe, startDate, endDate);
     };
 
     // -------------------------------------------------------------------------
@@ -259,6 +267,7 @@ export default function AdminDashboard() {
                                     setAnalyticsTimeframe(t);
                                     fetchAnalytics(t);
                                 }}
+                                onDateRangeChange={handleDateRangeChange}
                             />
                         )}
 
@@ -289,7 +298,7 @@ export default function AdminDashboard() {
                                                     <td className="px-6 py-4 font-bold">₹{order.totalAmount}</td>
                                                     <td className="px-6 py-4">
                                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                                order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                                            order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
                                                             }`}>
                                                             {order.status}
                                                         </span>

@@ -49,34 +49,29 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 {/* Header */}
-                <div className="p-6 md:p-8 flex items-center justify-between border-b border-[#14b84b]/5">
-                    <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md">
+                <div className="p-3 md:p-4 flex items-center justify-between border-b border-[#14b84b]/5">
+                    <div className="flex items-center gap-3 mx-auto">
+                        <div className="relative w-32 h-12 rounded-lg overflow-hidden">
                             <Image
-                                src="/coconut-logo.png.png"
+                                src="/final-logo.png"
                                 alt="Logo"
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                             />
-                        </div>
-                        <div>
-                            <h1 className="font-serif text-xl font-bold text-[#0e2a1a] leading-tight">
-                                Cafe South<br />Central
-                            </h1>
                         </div>
                     </div>
                     {/* Mobile Close Button */}
                     <button
                         onClick={onClose}
-                        className="md:hidden p-2 text-gray-500 hover:text-gray-900"
+                        className="md:hidden p-2 text-gray-500 hover:text-gray-900 absolute right-4"
                     >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
-                    <p className="px-4 text-[10px] font-bold text-[#0e2a1a]/40 uppercase tracking-widest mb-4 mt-2">
+                <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto custom-scrollbar">
+                    <p className="px-4 text-[10px] font-bold text-[#0e2a1a]/40 uppercase tracking-widest mb-1 mt-0">
                         Management
                     </p>
                     {NAV_ITEMS.map((item) => {
@@ -89,7 +84,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                     if (window.innerWidth < 768) onClose();
                                 }}
                                 className={`
-                                    w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group relative
+                                    w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 group relative
                                     ${isActive
                                         ? 'bg-[#0e2a1a] text-white shadow-lg shadow-[#0e2a1a]/20'
                                         : 'text-[#0e2a1a]/60 hover:bg-[#0e2a1a]/5 hover:text-[#0e2a1a]'
@@ -114,7 +109,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
                                 {/* Active Indicator Strip */}
                                 {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-[#f59e0b] rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-[#f59e0b] rounded-r-full" />
                                 )}
                             </button>
                         );
@@ -122,10 +117,10 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                 </nav>
 
                 {/* Footer / Logout */}
-                <div className="p-4 border-t border-[#14b84b]/5 bg-[#f8fbf7]">
+                <div className="p-3 pb-16 mt-auto border-t border-[#14b84b]/5">
                     <button
                         onClick={onLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 hover:shadow-sm transition-all group"
+                        className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 hover:shadow-sm transition-all group"
                     >
                         <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         Sign Out

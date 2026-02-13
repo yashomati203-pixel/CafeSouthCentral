@@ -1,15 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Bell,
     Menu,
     Search,
     Printer,
     FileText,
-    QrCode
+    QrCode,
+    AlertTriangle
 } from 'lucide-react';
 import Image from 'next/image';
+import SystemAlertsModal from './SystemAlertsModal';
 
 interface AdminHeaderProps {
     title: string;
@@ -19,6 +21,29 @@ interface AdminHeaderProps {
 }
 
 export default function AdminHeader({ title, onToggleSidebar, notificationsCount, actions }: AdminHeaderProps) {
+    const [showAlertsModal, setShowAlertsModal] = useState(false);
+    const [alertCount, setAlertCount] = useState(0);
+
+    // Fetch alert count on mount and periodically
+    useEffect(() => {
+        const fetchAlertCount = async () => {
+            try {
+                const res = await fetch('/api/admin/system-alerts');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAlertCount(data.counts?.total || 0);
+                }
+            } catch (error) {
+                console.error('Failed to fetch alert count:', error);
+            }
+        };
+
+        fetchAlertCount();
+        // Refresh every 30 seconds
+        const interval = setInterval(fetchAlertCount, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <header className="sticky top-0 z-30 h-16 md:h-20 bg-[#f8fbf7]/80 backdrop-blur-md border-b border-[#14b84b]/10 px-4 md:px-8 flex items-center justify-between">
             {/* Left: Mobile Toggle & Title */}
@@ -49,17 +74,6 @@ export default function AdminHeader({ title, onToggleSidebar, notificationsCount
                         className="bg-transparent border-none outline-none text-sm ml-2 w-full text-gray-700 placeholder-gray-400"
                     />
                 </div>
-
-                {/* Notification Bell */}
-                <button className="relative p-2 rounded-full hover:bg-white hover:shadow-sm transition-all group">
-                    <Bell className="w-5 h-5 text-[#0e2a1a]/70 group-hover:text-[#0e2a1a]" />
-                    {notificationsCount > 0 && (
-                        <span className="absolute top-1 right-1 flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                        </span>
-                    )}
-                </button>
 
                 {/* Lunch Bell & Alerts */}
                 <div className="flex items-center gap-2 border-l border-[#14b84b]/10 pl-4 md:pl-6 ml-2 md:ml-0">
@@ -103,8 +117,19 @@ export default function AdminHeader({ title, onToggleSidebar, notificationsCount
                                 Notifications Off
                             </button>
                             <hr className="my-1 border-gray-100" />
-                            <button className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
-                                System Alert
+                            <button
+                                onClick={() => setShowAlertsModal(true)}
+                                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center justify-between group"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4" />
+                                    System Alert
+                                </span>
+                                {alertCount > 0 && (
+                                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        {alertCount}
+                                    </span>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -120,6 +145,11 @@ export default function AdminHeader({ title, onToggleSidebar, notificationsCount
                 </div>
 
             </div>
+
+            <SystemAlertsModal
+                isOpen={showAlertsModal}
+                onClose={() => setShowAlertsModal(false)}
+            />
         </header>
     );
 }

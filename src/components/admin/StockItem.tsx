@@ -70,11 +70,23 @@ export default function StockItem({ item, onUpdate, onRefresh, onEdit }: StockIt
                 const res = await fetch(`/api/admin/inventory?id=${item.id}`, {
                     method: 'DELETE'
                 });
+
                 if (res.ok) {
                     onRefresh();
+                    import('sonner').then(({ toast }) => {
+                        toast.success('Item deleted successfully');
+                    });
+                } else {
+                    const errorData = await res.json();
+                    import('sonner').then(({ toast }) => {
+                        toast.error(errorData.error || 'Delete failed');
+                    });
                 }
             } catch (e) {
                 console.error("Delete failed", e);
+                import('sonner').then(({ toast }) => {
+                    toast.error('Network error: Unable to delete item');
+                });
             }
         }
     };

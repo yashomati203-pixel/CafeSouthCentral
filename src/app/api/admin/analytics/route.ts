@@ -7,6 +7,8 @@ export async function GET(req: NextRequest) {
         const userHeader = req.headers.get('x-user-data');
         const isPublicAccess = req.nextUrl.searchParams.get('public') === 'true';
         const timeframe = req.nextUrl.searchParams.get('timeframe') || 'week'; // 'today' | 'week' | 'month'
+        const customStartDate = req.nextUrl.searchParams.get('startDate');
+        const customEndDate = req.nextUrl.searchParams.get('endDate');
 
         if (!isPublicAccess && userHeader) {
             const user = JSON.parse(userHeader);
@@ -17,15 +19,25 @@ export async function GET(req: NextRequest) {
 
         // Determine Date Range
         const now = new Date();
-        const startDate = new Date();
+        let startDate = new Date();
+        let endDate = new Date();
 
-        if (timeframe === 'today') {
+        // Use custom dates if provided
+        if (customStartDate && customEndDate) {
+            startDate = new Date(customStartDate);
             startDate.setHours(0, 0, 0, 0);
-        } else if (timeframe === 'month') {
-            startDate.setDate(now.getDate() - 30);
+            endDate = new Date(customEndDate);
+            endDate.setHours(23, 59, 59, 999);
         } else {
-            // Default 'week'
-            startDate.setDate(now.getDate() - 7);
+            // Use timeframe logic
+            if (timeframe === 'today') {
+                startDate.setHours(0, 0, 0, 0);
+            } else if (timeframe === 'month') {
+                startDate.setDate(now.getDate() - 30);
+            } else {
+                // Default 'week'
+                startDate.setDate(now.getDate() - 7);
+            }
         }
 
         // 1. Fetch Key Data (Filtered by Date)
@@ -36,7 +48,8 @@ export async function GET(req: NextRequest) {
                     in: ['CONFIRMED', 'PREPARING', 'READY', 'COMPLETED']
                 },
                 createdAt: {
-                    gte: startDate
+                    gte: startDate,
+                    lte: endDate
                 }
             },
             include: {
@@ -51,7 +64,8 @@ export async function GET(req: NextRequest) {
                 AND: [
                     {
                         createdAt: {
-                            gte: startDate
+                            gte: startDate,
+                            lte: endDate
                         }
                     },
                     {
@@ -78,7 +92,8 @@ export async function GET(req: NextRequest) {
         const feedbacks = await prisma.feedback.findMany({
             where: {
                 createdAt: {
-                    gte: startDate
+                    gte: startDate,
+                    lte: endDate
                 }
             }
         });

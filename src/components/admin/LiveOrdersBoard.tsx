@@ -61,19 +61,6 @@ export default function LiveOrdersBoard({ orders, onUpdateStatus }: LiveOrdersBo
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-serif font-bold text-[#0e2a1a]">Live Kitchen View</h2>
-                    <p className="text-sm text-[#0e2a1a]/60">Manage active orders efficiently</p>
-                </div>
-                <div className="flex gap-2">
-                    <span className="flex items-center gap-1 text-xs font-bold text-[#14b84b] bg-[#14b84b]/10 px-2 py-1 rounded-lg">
-                        <div className="w-2 h-2 rounded-full bg-[#14b84b] animate-pulse" />
-                        Live Updates
-                    </span>
-                </div>
-            </div>
-
             {/* Grid Layout - Compact Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {sortedOrders.length === 0 ? (
