@@ -74,7 +74,7 @@ Create a digital experience that feels like walking into a modern South Indian c
 1. **The "Fresh Heritage" Color Story**
    - Deep forest green (tradition, nature, trust)
    - Golden yellow (sunshine, warmth, energy)
-   - Off-white backgrounds (#f8fbf7) (fresh, clean, appetizing)
+   - Radial Gradient Background (#f6cb07 → White) (warm, energetic, premium)
    - **Why it works:** Evokes both heritage and health-consciousness
 
 80. **Serif + Sans Fusion**
@@ -780,7 +780,7 @@ Subtext: "INDIA"
 --color-tropical-yellow: #F4D03F; /* Golden Yellow */
 
 /* BACKGROUNDS & TEXT */
---color-sand-beige: #f8fbf7;     /* Off-White/Cream Background */
+--color-sand-beige: radial-gradient(circle at center, #f6cb07 0%, #ffffff 100%);     /* Radial Gold to White */
 --color-pure-white: #FFFFFF;     /* Card Backgrounds */
 --color-charcoal-black: #1F1F1F; /* Primary Text */
 --color-gray-100: #F3F4F6;

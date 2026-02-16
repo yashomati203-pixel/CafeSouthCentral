@@ -6,6 +6,9 @@ import { MenuItem, MenuItemType } from '@/types/db';
 import { useRouter } from 'next/navigation';
 import { useMenu, CATEGORY_ORDER } from '@/hooks/useMenu';
 import { Plus, Minus, Search, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const LoginPage = dynamic(() => import('@/components/auth/LoginPage'), { ssr: false });
 
 export default function MenuPage() {
     const router = useRouter();
@@ -13,6 +16,7 @@ export default function MenuPage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [showCategorySelector, setShowCategorySelector] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [mode] = useState<'NORMAL' | 'SUBSCRIPTION'>('NORMAL');
 
     const { menuItems, isMenuLoading, MOCK_MENU } = useMenu();
@@ -29,9 +33,39 @@ export default function MenuPage() {
         }
     }, []);
 
+    const handleLogin = async (userData: any, stayLoggedIn: boolean) => {
+        try {
+            const res = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || 'Login failed');
+                return;
+            }
+            const fullUser = { ...userData, id: data.user?.id || data.userId, role: data.user?.role || data.role };
+            if (stayLoggedIn) localStorage.setItem('cafe_user', JSON.stringify(fullUser));
+            else sessionStorage.setItem('cafe_user', JSON.stringify(fullUser));
+
+            if (['SUPER_ADMIN', 'MANAGER', 'KITCHEN_STAFF'].includes(fullUser.role)) {
+                router.push('/admin/dashboard');
+            } else {
+                setUser(fullUser);
+                setShowLoginModal(false);
+                sessionStorage.setItem('cafe_has_explored', 'true');
+                window.dispatchEvent(new Event('storage-update'));
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Failed to login.');
+        }
+    };
+
     const handleAddToCart = (item: MenuItem) => {
         if (!user) {
-            router.push('/?login=true');
+            setShowLoginModal(true);
             return;
         }
         addToCart(item, mode);
@@ -95,6 +129,22 @@ export default function MenuPage() {
     }
 
     const availableCategories = CATEGORY_ORDER.filter(c => itemsByCategory[c]?.length > 0);
+
+    if (showLoginModal && !user) {
+        return (
+            <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-lg flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <button
+                    onClick={() => setShowLoginModal(false)}
+                    className="absolute top-6 right-6 z-[110] p-2 bg-white/20 rounded-full hover:bg-white/30 transition-all text-white backdrop-blur-md border border-white/20 shadow-lg"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+                <div className="w-full max-w-sm relative z-10">
+                    <LoginPage onLogin={handleLogin} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-[#e2e9e0] text-[#0e1b12] min-h-screen font-sans">

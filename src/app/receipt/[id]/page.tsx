@@ -52,6 +52,7 @@ export default function ReceiptPage() {
                 {/* Header */}
                 <div style={{ textAlign: 'center', borderBottom: '2px dashed #ddd', paddingBottom: '1rem' }}>
                     <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, textTransform: 'uppercase' }}>Cafe South Central</h1>
+                    {/* TODO: Update these with real cafe details before production */}
                     <p style={{ margin: '0.2rem 0', fontSize: '0.9rem' }}>VIT-AP University</p>
                     <p style={{ margin: '0.2rem 0', fontSize: '0.9rem' }}>+91 98765 43210</p>
                 </div>

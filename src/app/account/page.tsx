@@ -521,29 +521,83 @@ export default function AccountPage() {
                                 )}
                             </div>
                         </section>
+                        {/* Danger Zone (Desktop) */}
+                        <section className="hidden md:block">
+                            <h3 className="text-xl font-serif text-red-600 mb-4">Danger Zone</h3>
+                            <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-2xl p-6 flex items-center justify-between">
+                                <div>
+                                    <h4 className="font-bold text-red-700 dark:text-red-400">Delete Account</h4>
+                                    <p className="text-sm text-red-600/70 dark:text-red-400/70 mt-1">
+                                        Permanently delete your account and anonymize your data. This action cannot be undone.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        const confirmDelete = prompt("Type 'DELETE' to confirm account deletion. This will anonymize your data.");
+                                        if (confirmDelete === 'DELETE') {
+                                            try {
+                                                const res = await fetch('/api/user/delete', { method: 'POST', body: JSON.stringify({ userId: user.id }) });
+                                                if (res.ok) {
+                                                    alert('Account deleted successfully.');
+                                                    localStorage.clear();
+                                                    sessionStorage.clear();
+                                                    window.dispatchEvent(new Event('storage-update'));
+                                                    router.push('/');
+                                                } else {
+                                                    alert('Failed to delete account.');
+                                                }
+                                            } catch (e) {
+                                                alert('Error deleting account.');
+                                            }
+                                        }
+                                    }}
+                                    className="px-6 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-sm"
+                                >
+                                    Delete Account
+                                </button>
+                            </div>
+                        </section>
                     </div>
 
                     {/* Mobile Feedback & Logout */}
                     <div className="md:hidden mt-8 space-y-3">
-                        <a
-                            href="mailto:hello@cafesouthcentral.com"
-                            className="block w-full"
-                        >
-                            <div className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-[#0d1c11] dark:text-white bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-gray-800 shadow-sm font-bold">
-                                <Mail className="w-5 h-5" />
-                                Share Feedback
-                            </div>
-                        </a>
 
-                        <div className="p-6 bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+
+                        <div className="p-6 bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 space-y-3">
                             <button
                                 onClick={handleLogout}
-                                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 transition-colors font-bold"
+                                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 transition-colors font-bold"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
                                 Sign Out
+                            </button>
+
+                            <button
+                                onClick={async () => {
+                                    const confirmDelete = prompt("Type 'DELETE' to confirm account deletion. This will anonymize your data.");
+                                    if (confirmDelete === 'DELETE') {
+                                        try {
+                                            const res = await fetch('/api/user/delete', { method: 'POST', body: JSON.stringify({ userId: user.id }) });
+                                            if (res.ok) {
+                                                alert('Account deleted successfully.');
+                                                localStorage.clear();
+                                                sessionStorage.clear();
+                                                window.dispatchEvent(new Event('storage-update'));
+                                                router.push('/');
+                                            } else {
+                                                alert('Failed to delete account.');
+                                            }
+                                        } catch (e) {
+                                            alert('Error deleting account.');
+                                        }
+                                    }
+                                }}
+                                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-red-600 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 transition-colors font-bold"
+                            >
+                                <TrashIcon className="w-5 h-5" />
+                                Delete Account
                             </button>
                         </div>
                     </div>

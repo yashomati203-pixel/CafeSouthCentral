@@ -23,7 +23,6 @@ const FAQS = [
 export default function FAQSection() {
     return (
         <section style={{
-            backgroundColor: '#e2e9e0',
             padding: '6rem 2rem 8rem 2rem',
             position: 'relative'
         }}>

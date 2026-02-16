@@ -18,7 +18,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
-        <section className="relative min-h-[90vh] flex flex-col overflow-hidden px-4 md:px-16 lg:px-24 py-4 max-w-full w-full mx-auto bg-[#e2e9e0]">
+        <section className="relative min-h-[90vh] flex flex-col overflow-hidden px-4 md:px-16 lg:px-24 py-4 max-w-full w-full mx-auto">
 
 
 

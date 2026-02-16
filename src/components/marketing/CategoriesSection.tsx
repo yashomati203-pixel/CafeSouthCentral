@@ -35,7 +35,6 @@ export default function CategoriesSection({ onCategorySelect, onViewAll }: Categ
             ref={ref}
             style={{
                 padding: '4rem 0',
-                backgroundColor: '#e2e9e0',
                 overflow: 'hidden',
                 position: 'relative'
             }}

@@ -12,7 +12,12 @@ import UserManagement from '@/components/admin/UserManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import PosTerminal from '@/components/admin/PosTerminal';
 
+import QuickScannerButton from '@/components/admin/QuickScannerButton';
+
+// ... (existing imports)
+
 export default function AdminDashboard() {
+
     // -------------------------------------------------------------------------
     // STATE MANAGEMENT
     // -------------------------------------------------------------------------
@@ -196,131 +201,140 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="flex h-screen bg-[#f8fbf7] overflow-hidden font-sans text-gray-900">
-            {/* Sidebar */}
-            <AdminSidebar
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                ordersCount={activeOrders.length}
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
-                onLogout={handleLogout}
-            />
+        <div className="min-h-screen bg-[#f3f4f6]">
+            {/* Quick Access Scanner */}
+            <QuickScannerButton />
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-
-                <AdminHeader
-                    title={
-                        activeTab === 'active' ? 'Live Orders' :
-                            activeTab === 'pos' ? 'POS Terminal' :
-                                activeTab === 'inventory' ? 'Inventory' :
-                                    activeTab === 'members' ? 'Members' :
-                                        activeTab === 'analytics' ? 'Analytics' :
-                                            'Dashboard'
-                    }
-                    onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-                    notificationsCount={activeOrders.length}
+            <div className="flex h-screen bg-[#f8fbf7] overflow-hidden font-sans text-gray-900">
+                {/* Sidebar */}
+                <AdminSidebar
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                    ordersCount={activeOrders.length}
+                    isOpen={isSidebarOpen}
+                    onClose={() => setIsSidebarOpen(false)}
+                    onLogout={handleLogout}
                 />
 
-                <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth bg-gray-50/50">
-                    <div className="max-w-7xl mx-auto">
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col h-full overflow-hidden relative">
 
-                        {/* VIEW: LIVE ORDERS */}
-                        {activeTab === 'active' && (
-                            <LiveOrdersBoard
-                                orders={activeOrders}
-                                onUpdateStatus={handleUpdateStatus}
-                            />
-                        )}
+                    <AdminHeader
+                        title={
+                            activeTab === 'active' ? 'Live Orders' :
+                                activeTab === 'pos' ? 'POS Terminal' :
+                                    activeTab === 'inventory' ? 'Inventory' :
+                                        activeTab === 'members' ? 'Members' :
+                                            activeTab === 'analytics' ? 'Analytics' :
+                                                'Dashboard'
+                        }
+                        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                        notificationsCount={activeOrders.length}
+                    />
 
-                        {/* VIEW: POS TERMINAL */}
-                        {activeTab === 'pos' && (
-                            <PosTerminal
-                                items={menuItems}
-                                onOrderPlaced={() => {
-                                    fetchOrders();
-                                    setActiveTab('active'); // Switch to live view to see new order
-                                }}
-                            />
-                        )}
+                    <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth bg-gray-50/50">
+                        <div className="max-w-7xl mx-auto">
 
-                        {/* VIEW: INVENTORY */}
-                        {activeTab === 'inventory' && (
-                            <InventoryManager
-                                items={menuItems}
-                                onRefresh={fetchInventory}
-                            />
-                        )}
 
-                        {/* VIEW: MEMBERS */}
-                        {activeTab === 'members' && (
-                            <UserManagement users={users} />
-                        )}
 
-                        {/* VIEW: ANALYTICS */}
-                        {activeTab === 'analytics' && (
-                            <AnalyticsDashboard
-                                data={analyticsData}
-                                timeframe={analyticsTimeframe}
-                                onTimeframeChange={(t) => {
-                                    setAnalyticsTimeframe(t);
-                                    fetchAnalytics(t);
-                                }}
-                                onDateRangeChange={handleDateRangeChange}
-                            />
-                        )}
-
-                        {/* VIEW: HISTORY */}
-                        {activeTab === 'sold' && (
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-serif font-bold text-[#0e2a1a]">Order History</h2>
-                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-50 border-b border-gray-100">
-                                            <tr>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Order ID</th>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Customer</th>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Date</th>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Total</th>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
-                                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-50">
-                                            {historyOrders.map((order: any) => (
-                                                <tr key={order.id} className="hover:bg-gray-50">
-                                                    <td className="px-6 py-4 font-bold text-[#0e2a1a]">#{order.displayId || order.id.slice(0, 5)}</td>
-                                                    <td className="px-6 py-4 text-sm">{order.user.name}</td>
-                                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                                        {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </td>
-                                                    <td className="px-6 py-4 font-bold">₹{order.totalAmount}</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                            order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
-                                                            }`}>
-                                                            {order.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <button
-                                                            onClick={() => printBill(order)}
-                                                            className="text-indigo-600 hover:text-indigo-900 text-xs font-bold"
-                                                        >
-                                                            Reprint Bill
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                            {/* VIEW: LIVE ORDERS */}
+                            {activeTab === 'active' && (
+                                <div className="space-y-6">
+                                    <LiveOrdersBoard
+                                        orders={activeOrders}
+                                        onUpdateStatus={handleUpdateStatus}
+                                    />
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                    </div>
-                </main>
+                            {/* VIEW: POS TERMINAL */}
+                            {activeTab === 'pos' && (
+                                <PosTerminal
+                                    items={menuItems}
+                                    onOrderPlaced={() => {
+                                        fetchOrders();
+                                        setActiveTab('active'); // Switch to live view to see new order
+                                    }}
+                                />
+                            )}
+
+                            {/* VIEW: INVENTORY */}
+                            {activeTab === 'inventory' && (
+                                <InventoryManager
+                                    items={menuItems}
+                                    onRefresh={fetchInventory}
+                                />
+                            )}
+
+                            {/* VIEW: MEMBERS */}
+                            {activeTab === 'members' && (
+                                <UserManagement users={users} />
+                            )}
+
+                            {/* VIEW: ANALYTICS */}
+                            {activeTab === 'analytics' && (
+                                <AnalyticsDashboard
+                                    data={analyticsData}
+                                    timeframe={analyticsTimeframe}
+                                    onTimeframeChange={(t) => {
+                                        setAnalyticsTimeframe(t);
+                                        fetchAnalytics(t);
+                                    }}
+                                    onDateRangeChange={handleDateRangeChange}
+                                />
+                            )}
+
+                            {/* VIEW: HISTORY */}
+                            {activeTab === 'sold' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-serif font-bold text-[#0e2a1a]">Order History</h2>
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-gray-50 border-b border-gray-100">
+                                                <tr>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Order ID</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Customer</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Date</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Total</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-50">
+                                                {historyOrders.map((order: any) => (
+                                                    <tr key={order.id} className="hover:bg-gray-50">
+                                                        <td className="px-6 py-4 font-bold text-[#0e2a1a]">#{order.displayId || order.id.slice(0, 5)}</td>
+                                                        <td className="px-6 py-4 text-sm">{order.user.name}</td>
+                                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                                            {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </td>
+                                                        <td className="px-6 py-4 font-bold">₹{order.totalAmount}</td>
+                                                        <td className="px-6 py-4">
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                                                                order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                                                }`}>
+                                                                {order.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <button
+                                                                onClick={() => printBill(order)}
+                                                                className="text-indigo-600 hover:text-indigo-900 text-xs font-bold"
+                                                            >
+                                                                Reprint Bill
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+                    </main>
+                </div>
             </div>
         </div>
     );

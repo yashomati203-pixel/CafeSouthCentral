@@ -25,14 +25,32 @@ export default function PaymentSettingsPage() {
     const handleSaveSettings = async () => {
         setIsSaving(true);
 
-        // Simulate API call to save payment settings
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const res = await fetch('/api/user/subscription/payment', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    autoRenew,
+                    paymentMethod: paymentDetails.method,
+                    paymentDetails
+                })
+            });
 
-        // Here you would make an API call to save the settings
-        // await fetch('/api/user/subscription/payment', { ... })
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || 'Failed to save settings');
+                setIsSaving(false);
+                return;
+            }
 
-        setSaveSuccess(true);
-        setIsSaving(false);
+            setSaveSuccess(true);
+        } catch (error) {
+            console.error('Failed to save settings:', error);
+            alert('Something went wrong. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
 
         setTimeout(() => {
             setSaveSuccess(false);

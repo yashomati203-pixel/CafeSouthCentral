@@ -14,7 +14,7 @@ This document serves as the **Single Source of Truth** for the User Interface, U
 | Role | Color Name | Hex Code | Usage |
 | :--- | :--- | :--- | :--- |
 | **Primary Brand** | **Deep Brown** | `#5C3A1A` | Primary buttons, Active states, Headers, Accents. |
-| **Background** | **Off-White** | `#f8fbf7` | Main application background (Canvas). |
+| **Background** | **Radial Gradient** | `#f6cb07` → `#ffffff` | Radial gradient from center gold to white edges. |
 | **Surface** | **Pure White** | `#ffffff` | Cards, Panels, Modals, Sidebar. |
 | **Success** | **Emerald Green** | `#10b981` | Stock available, Order Success, "Ready" status. |
 | **Error / Action** | **Red** | `#ef4444` | Delete, Out of Stock, Error states. |

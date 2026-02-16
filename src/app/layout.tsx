@@ -26,6 +26,14 @@ export const metadata: Metadata = {
 
 import { Toaster } from 'sonner';
 
+import SystemAlertBanner from '@/components/layout/SystemAlertBanner';
+
+// ...
+
+import CookieBanner from '@/components/layout/CookieBanner';
+
+// ...
+
 export default function RootLayout({
     children,
 }: {
@@ -38,11 +46,14 @@ export default function RootLayout({
             </head>
             <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh', overflow: 'hidden' }}>
                 <CartProvider>
+                    <SystemAlertBanner />
                     <div className="min-h-screen w-full relative">
                         <DecorativeBorderOverlay />
 
                         {/* Main Content Wrapper - Inset from borders */}
-                        <div className="relative z-10 mx-[5px] md:mx-[15px] mt-[15px] mb-[15px] md:mb-[15px] h-[calc(100dvh-30px)] md:h-[calc(100vh-30px)] bg-[#e2e9e0] overflow-y-auto overflow-x-hidden shadow-2xl no-scrollbar pb-0">
+                        <div
+                            className="relative z-10 mx-[5px] md:mx-[15px] mt-[15px] mb-[15px] md:mb-[15px] h-[calc(100dvh-30px)] md:h-[calc(100vh-30px)] overflow-y-auto overflow-x-hidden shadow-2xl no-scrollbar pb-0 bg-sand-beige"
+                        >
                             <MainLayout>
                                 {children}
                                 <SubscriptionDiscovery />
@@ -50,6 +61,7 @@ export default function RootLayout({
                         </div>
                         <GlobalLayoutClient />
                         <Toaster richColors position="top-center" />
+                        <CookieBanner />
                     </div>
                 </CartProvider>
                 <ClickSpark

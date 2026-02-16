@@ -9,9 +9,22 @@ export async function PATCH(
     try {
         const { status } = await req.json();
 
+        let updateData: any = { status };
+
+        // Handle Rescheduling specifically
+        if (status.startsWith('RESCHEDULED:')) {
+            const time = status.split('RESCHEDULED: ')[1];
+            updateData = {
+                status: 'CONFIRMED', // Keep as confirmed but update note
+                note: `Rescheduled for pickup in ${time}`
+            };
+        } else {
+            updateData = { status: status as OrderStatus };
+        }
+
         const updatedOrder = await prisma.order.update({
             where: { id: params.id },
-            data: { status: status as OrderStatus },
+            data: updateData,
             include: { user: true }
         });
 

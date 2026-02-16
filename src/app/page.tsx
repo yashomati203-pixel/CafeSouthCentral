@@ -62,9 +62,24 @@ function DashboardContent() {
     // Handle initial view mode from query param
     useEffect(() => {
         const view = searchParams.get('view');
+        const menuParam = searchParams.get('menu');
+        const sectionParam = searchParams.get('section');
+
         if (view === 'subscription') {
             setViewMode('SUBSCRIPTION');
             setHasExplored(true);
+        }
+        if (searchParams.get('show_landing') === 'true') {
+            setHasExplored(false);
+            sessionStorage.removeItem('cafe_has_explored');
+        } else if (menuParam === 'true') {
+            setHasExplored(true);
+            sessionStorage.setItem('cafe_has_explored', 'true');
+        }
+        if (sectionParam === 'cart') {
+            setHasExplored(true);
+            sessionStorage.setItem('cafe_has_explored', 'true');
+            setIsCartOpen(true);
         }
     }, [searchParams]);
 
@@ -369,7 +384,7 @@ function DashboardContent() {
                         </div>
 
                         {/* CATEGORY NAV */}
-                        <div className="sticky top-[86px] z-40 mb-12 -mx-6 px-6 py-2 bg-[#e2e9e0]/95 border-b border-[#3C2A21]/10 backdrop-blur-sm">
+                        <div className="sticky top-[86px] z-40 mb-12 -mx-6 px-6 py-2 bg-[#f8fbf7]/95 border-b border-[#3C2A21]/10 backdrop-blur-sm">
                             <div className="flex items-center gap-2 md:gap-4 overflow-x-auto py-4 no-scrollbar scroll-smooth">
                                 <button
                                     onClick={() => { setSelectedCategory('All'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

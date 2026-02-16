@@ -43,7 +43,6 @@ export default function ProfileSidebar({ user, onLogout }: ProfileSidebarProps) 
     const navItems = [
         { label: 'My Orders', icon: ShoppingBag, href: '/orders' },
         { label: 'Settings', icon: Settings, href: '/account' }, // Active on profile page
-        { label: 'Share Feedback', icon: HelpCircle, href: 'mailto:hello@cafesouthcentral.com' },
     ];
 
     return (

@@ -68,7 +68,7 @@ export default function MemberDashboard({ user }: MemberDashboardProps) {
                     </div>
                 </div>
                 <button
-                    onClick={() => router.push('/subscription')}
+                    onClick={() => router.push('/manage-subscription')}
                     className="flex items-center justify-center gap-2 rounded-xl h-11 px-6 bg-primary-green text-white text-sm font-bold shadow-md hover:bg-primary-green/90 transition-all"
                 >
                     <Settings className="w-4 h-4" />

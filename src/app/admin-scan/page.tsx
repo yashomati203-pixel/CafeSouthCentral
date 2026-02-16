@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QrReader } from 'react-qr-reader';
 import { useRouter } from 'next/navigation';
 
@@ -8,7 +8,31 @@ export default function AdminScanPage() {
     const [data, setData] = useState('No result');
     const [status, setStatus] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS' | 'ERROR'>('IDLE');
     const [message, setMessage] = useState('');
+    const [authorized, setAuthorized] = useState(false);
     const router = useRouter();
+
+    // Auth guard
+    useEffect(() => {
+        const storedUser = localStorage.getItem('cafe_user') || sessionStorage.getItem('cafe_user');
+        if (storedUser) {
+            try {
+                const parsed = JSON.parse(storedUser);
+                if (['SUPER_ADMIN', 'MANAGER', 'KITCHEN_STAFF'].includes(parsed.role)) {
+                    setAuthorized(true);
+                    return;
+                }
+            } catch (e) { /* ignore */ }
+        }
+        router.push('/');
+    }, [router]);
+
+    if (!authorized) {
+        return (
+            <div style={{ padding: '2rem', textAlign: 'center', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p>Checking authorization...</p>
+            </div>
+        );
+    }
 
     const handleScan = async (result: any, error: any) => {
         if (!!result) {

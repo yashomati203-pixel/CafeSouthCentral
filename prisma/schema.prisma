@@ -231,6 +231,8 @@ enum OrderStatus {
   CANCELLED_USER
   CANCELLED_ADMIN
   FAILED
+  REFUNDED
+  DISPOSED
 }
 
 enum SubscriptionState {

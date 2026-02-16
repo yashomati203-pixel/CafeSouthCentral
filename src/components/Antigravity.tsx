@@ -20,6 +20,25 @@ interface AntigravityProps {
   fieldStrength?: number;
 }
 
+interface Particle {
+  t: number;
+  factor: number;
+  speed: number;
+  xFactor: number;
+  yFactor: number;
+  zFactor: number;
+  mx: number;
+  my: number;
+  mz: number;
+  cx: number;
+  cy: number;
+  cz: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  randomRadiusOffset: number;
+}
+
 const AntigravityInner: React.FC<AntigravityProps> = ({
   count = 300,
   magnetRadius = 10,
@@ -46,7 +65,7 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
   const virtualMouse = useRef({ x: 0, y: 0 });
 
   const particles = useMemo(() => {
-    const temp = [];
+    const temp: Particle[] = [];
     const width = viewport.width || 100;
     const height = viewport.height || 100;
 

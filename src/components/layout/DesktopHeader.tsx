@@ -21,7 +21,7 @@ export default function DesktopHeader({
     const { openCart, subTotalCount, totalItemsCount } = useCart();
 
     return (
-        <header className="sticky top-0 z-[100] w-full bg-[#e2e9e0]/90 backdrop-blur-md hidden md:block">
+        <header className="sticky top-0 z-[100] w-full bg-[#f8fbf7]/90 backdrop-blur-md hidden md:block">
             <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
                 <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto">
                     <DecorativeBorderLogo size="md">
@@ -31,6 +31,12 @@ export default function DesktopHeader({
 
                 {/* Centered Desktop Tabs */}
                 <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+                    <Link
+                        href="/?show_landing=true"
+                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
+                    >
+                        Home
+                    </Link>
                     <Link
                         href="/menu"
                         className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/menu' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}

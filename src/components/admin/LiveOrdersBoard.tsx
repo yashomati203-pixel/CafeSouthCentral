@@ -128,6 +128,48 @@ export default function LiveOrdersBoard({ orders, onUpdateStatus }: LiveOrdersBo
                                 {/* Actions Footer */}
                                 <div className="space-y-3 pt-3 border-t border-gray-100">
 
+                                    <div className="flex gap-2 mb-2">
+                                        <button
+                                            onClick={() => window.open(`tel:${order.user.phone}`)}
+                                            className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-xs font-bold text-blue-700 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            title="Call Customer"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                            Call
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const time = prompt("Enter new pickup time (e.g. 10 mins):");
+                                                if (time) onUpdateStatus(order.id, `RESCHEDULED: ${time}`);
+                                            }}
+                                            className="flex-1 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-xs font-bold text-yellow-700 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            title="Reschedule Pickup"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                            Delay
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm("Mark order as REFUNDED?")) onUpdateStatus(order.id, 'REFUNDED');
+                                            }}
+                                            className="flex-1 py-1.5 bg-purple-50 hover:bg-purple-100 text-xs font-bold text-purple-700 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            title="Mark Refunded"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                                            Refund
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm("Dispose unclaimed order?")) onUpdateStatus(order.id, 'DISPOSED');
+                                            }}
+                                            className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                                            title="Dispose Order"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            Bin
+                                        </button>
+                                    </div>
+
                                     {/* Print Actions */}
                                     <div className="flex gap-2">
                                         <button

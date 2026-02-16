@@ -30,7 +30,7 @@ export default function MobileHeader({
 
     return (
         <>
-            <header className="md:hidden flex justify-between items-center px-4 py-3 bg-[#e2e9e0]/95 backdrop-blur-sm sticky top-0 z-[100] border-b border-[#3C2A21]/10">
+            <header className="md:hidden flex justify-between items-center px-4 py-3 bg-[#f8fbf7]/95 backdrop-blur-sm sticky top-0 z-[100] border-b border-[#3C2A21]/10">
                 <Link
                     href="/"
                     className="relative z-[60] flex items-center cursor-pointer pointer-events-auto"
@@ -88,6 +88,13 @@ export default function MobileHeader({
                                 Login / Sign Up
                             </button>
                         )}
+
+                        <button
+                            onClick={() => handleMenuClick('/?show_landing=true')}
+                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        >
+                            Home
+                        </button>
 
                         <button
                             onClick={() => handleMenuClick('/menu')}

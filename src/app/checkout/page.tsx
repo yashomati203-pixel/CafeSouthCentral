@@ -350,8 +350,8 @@ function FoodCheckoutContent({ user }: { user: any }) {
         setAvailableSlots(generateAvailableTimeSlots());
     }, []);
 
-    const deliveryFee = normalTotalAmount > 0 ? normalTotalAmount * 0.05 : 0;
-    const totalAmount = normalTotalAmount + deliveryFee;
+    // const deliveryFee = normalTotalAmount > 0 ? normalTotalAmount * 0.05 : 0; // Removed as per request
+    const totalAmount = normalTotalAmount;
 
     const handlePlaceOrder = async () => {
         try {
@@ -556,10 +556,10 @@ function FoodCheckoutContent({ user }: { user: any }) {
                                     <span className="text-[#0e1b12]/60">Subtotal</span>
                                     <span className="text-[#0e1b12] font-medium">₹{normalTotalAmount.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
+                                {/* <div className="flex justify-between text-sm">
                                     <span className="text-[#0e1b12]/60">Delivery & Packaging (5%)</span>
-                                    <span className="text-[#0e1b12] font-medium">₹{deliveryFee.toFixed(2)}</span>
-                                </div>
+                                    <span className="text-[#0e1b12] font-medium">₹{(normalTotalAmount * 0.05).toFixed(2)}</span>
+                                </div> */}
                                 {subscriptionItems.length > 0 && (
                                     <div className="flex justify-between text-sm">
                                         <span className="text-[#0e1b12]/60">Subscription Credits</span>

@@ -20,7 +20,6 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
     return (
         <div style={{
             minHeight: '100vh',
-            background: '#e2e9e0', // Green theme
             fontFamily: 'sans-serif',
             display: 'flex',
             flexDirection: 'column',
@@ -40,7 +39,6 @@ export default function LandingPage({ onExplore, onCategorySelect, onViewPlans, 
             <section style={{
                 position: 'relative',
                 width: '100%',
-                background: '#f8fbf7', // Lighter background for contrast
                 padding: '6rem 2rem 8rem 2rem',
                 overflow: 'hidden',
                 textAlign: 'center',

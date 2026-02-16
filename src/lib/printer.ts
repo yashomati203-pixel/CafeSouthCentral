@@ -146,14 +146,21 @@ export const printBill = (order: PrintableOrder & { totalAmount: number; payment
     const timeString = new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const dateString = new Date(order.createdAt).toLocaleDateString();
 
+    // DUMMY UPI DETAILS - USER SHOULD REPLACE THESE
+    const MERCHANT_UPI_ID = "cafe-south-central@upi";
+    const MERCHANT_NAME = "Cafe South Central";
+
     // Calculate total if not provided (fallback)
-    const total = order.totalAmount || order.items.reduce((acc, i) => acc + (i.quantity * 0), 0); // Price not in PrintableOrder? Needs type update if using prices.
+    const total = order.totalAmount || order.items.reduce((acc, i) => acc + (i.quantity * (i as any).price || 0), 0);
+
+    const upiUrl = `upi://pay?pa=${MERCHANT_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${total}&cu=INR&tn=Order_${order.displayId || order.id.slice(0, 5)}`;
 
     const html = `
         <!DOCTYPE html>
         <html>
         <head>
             <title>Receipt #${order.displayId || order.id.slice(0, 5)}</title>
+            <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
             <style>
                 @media print {
                     @page { margin: 0; size: 80mm auto; }
@@ -226,6 +233,26 @@ export const printBill = (order: PrintableOrder & { totalAmount: number; payment
                     font-weight: bold;
                     margin-bottom: 5px;
                 }
+                .qr-container {
+                    margin-top: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 5px;
+                }
+                .qr-label {
+                    font-size: 10px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+                #qrcode {
+                    padding: 5px;
+                    background: white;
+                }
+                #qrcode img {
+                    width: 120px;
+                    height: 120px;
+                }
             </style>
         </head>
         <body>
@@ -269,12 +296,32 @@ export const printBill = (order: PrintableOrder & { totalAmount: number; payment
             <div class="footer">
                 <div class="thank-you">THANK YOU!</div>
                 <div>Visit Again</div>
+                
+                <div class="qr-container">
+                    <div class="qr-label">Scan to Pay via UPI</div>
+                    <div id="qrcode"></div>
+                    <div style="font-size: 8px; color: #666;">${MERCHANT_UPI_ID}</div>
+                </div>
             </div>
             
             <script>
                 window.onload = function() {
-                    window.print();
-                    // setTimeout(function() { window.close(); }, 500);
+                    try {
+                        // Generate QR Code
+                        var typeNumber = 0;
+                        var errorCorrectionLevel = 'H';
+                        var qr = qrcode(typeNumber, errorCorrectionLevel);
+                        qr.addData('${upiUrl}');
+                        qr.make();
+                        document.getElementById('qrcode').innerHTML = qr.createImgTag(4);
+                    } catch (e) {
+                        console.error('QR Generation failed:', e);
+                    }
+
+                    setTimeout(function() {
+                        window.print();
+                        // window.close();
+                    }, 500);
                 }
             </script>
         </body>

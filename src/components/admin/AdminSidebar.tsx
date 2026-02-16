@@ -13,6 +13,7 @@ import {
     X
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface AdminSidebarProps {
     activeTab: string;
@@ -50,7 +51,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
             `}>
                 {/* Header */}
                 <div className="p-3 md:p-4 flex items-center justify-between border-b border-[#14b84b]/5">
-                    <div className="flex items-center gap-3 mx-auto">
+                    <Link href="/" className="flex items-center gap-3 mx-auto cursor-pointer">
                         <div className="relative w-32 h-12 rounded-lg overflow-hidden">
                             <Image
                                 src="/final-logo.png"
@@ -59,7 +60,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                 className="object-contain"
                             />
                         </div>
-                    </div>
+                    </Link>
                     {/* Mobile Close Button */}
                     <button
                         onClick={onClose}
