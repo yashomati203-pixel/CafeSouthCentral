@@ -1,0 +1,344 @@
+﻿{
+    "id":  1,
+    "jsonrpc":  "2.0",
+    "result":  {
+                   "tools":  [
+                                 {
+                                     "annotations":  {
+                                                         "destructiveHint":  true,
+                                                         "idempotentHint":  false,
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  false
+                                                     },
+                                     "description":  "Creates a new Stitch project. A project is a container for UI designs and frontend code.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for CreateProject.",
+                                                         "properties":  {
+                                                                            "title":  "@{description=Optional. The title of the project.; type=string}"
+                                                                        },
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "create_project",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "ProjectMetadata":  "@{description=Metadata relating to the project.; properties=; type=object}",
+                                                                        "ScreenInstance":  "@{description=An instance of a screen on the project. Next ID: 15; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "A project is a single app.",
+                                                          "properties":  {
+                                                                             "backgroundTheme":  "@{description=Optional. The background theme of the project.; type=string}",
+                                                                             "createTime":  "@{description=Output only. The time when the project was created.; format=date-time; readOnly=True; type=string}",
+                                                                             "designTheme":  "@{$ref=#/$defs/DesignTheme; description=Output only. The theme used to generate the first design in the project.; readOnly=True}",
+                                                                             "deviceType":  "@{description=Output only. The device type of the project.; enum=System.Object[]; readOnly=True; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "metadata":  "@{$ref=#/$defs/ProjectMetadata; description=Metadata of the project.}",
+                                                                             "name":  "@{description=Identifier. The resource name of the project. Format: projects/{project}; type=string; x-google-identifier=True}",
+                                                                             "origin":  "@{description=Output only. The origin of the project.; enum=System.Object[]; readOnly=True; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "projectType":  "@{description=Optional. The type of the project. If not specified, the project is a text to UI project.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "readTime":  "@{description=Output only. The time the project was last read. Populated only when listing recently viewed projects.; format=date-time; readOnly=True; type=string}",
+                                                                             "screenInstances":  "@{description=Output only. The screen instances on this project.; items=; readOnly=True; type=array}",
+                                                                             "thumbnailScreenshot":  "@{$ref=#/$defs/File; description=Optional. The screenshot to be used as the thumbnail for the project. Same as normal design screenshots, this contains the FIFE serving_base_url which requires additional FIFE URL options to be set for sizing.}",
+                                                                             "title":  "@{description=Optional. The title of the project.; type=string}",
+                                                                             "updateTime":  "@{description=Output only. The time when the project was last updated.; format=date-time; readOnly=True; type=string}",
+                                                                             "visibility":  "@{description=Optional. The visibility setting of the project.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "destructiveHint":  false,
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  true
+                                                     },
+                                     "description":  "Retrieves the details of a specific Stitch project using its project name.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for GetProject.",
+                                                         "properties":  {
+                                                                            "name":  "@{description=Required. Identifier. The resource name of the project to retrieve. Format: `projects/{project}` Example: `projects/4044680601076201931`; type=string; x-google-identifier=True}"
+                                                                        },
+                                                         "required":  [
+                                                                          "name"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "get_project",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "ProjectMetadata":  "@{description=Metadata relating to the project.; properties=; type=object}",
+                                                                        "ScreenInstance":  "@{description=An instance of a screen on the project. Next ID: 15; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "A project is a single app.",
+                                                          "properties":  {
+                                                                             "backgroundTheme":  "@{description=Optional. The background theme of the project.; type=string}",
+                                                                             "createTime":  "@{description=Output only. The time when the project was created.; format=date-time; readOnly=True; type=string}",
+                                                                             "designTheme":  "@{$ref=#/$defs/DesignTheme; description=Output only. The theme used to generate the first design in the project.; readOnly=True}",
+                                                                             "deviceType":  "@{description=Output only. The device type of the project.; enum=System.Object[]; readOnly=True; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "metadata":  "@{$ref=#/$defs/ProjectMetadata; description=Metadata of the project.}",
+                                                                             "name":  "@{description=Identifier. The resource name of the project. Format: projects/{project}; type=string; x-google-identifier=True}",
+                                                                             "origin":  "@{description=Output only. The origin of the project.; enum=System.Object[]; readOnly=True; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "projectType":  "@{description=Optional. The type of the project. If not specified, the project is a text to UI project.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "readTime":  "@{description=Output only. The time the project was last read. Populated only when listing recently viewed projects.; format=date-time; readOnly=True; type=string}",
+                                                                             "screenInstances":  "@{description=Output only. The screen instances on this project.; items=; readOnly=True; type=array}",
+                                                                             "thumbnailScreenshot":  "@{$ref=#/$defs/File; description=Optional. The screenshot to be used as the thumbnail for the project. Same as normal design screenshots, this contains the FIFE serving_base_url which requires additional FIFE URL options to be set for sizing.}",
+                                                                             "title":  "@{description=Optional. The title of the project.; type=string}",
+                                                                             "updateTime":  "@{description=Output only. The time when the project was last updated.; format=date-time; readOnly=True; type=string}",
+                                                                             "visibility":  "@{description=Optional. The visibility setting of the project.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  true
+                                                     },
+                                     "description":  "Lists all Stitch projects accessible to the user. By default, it lists projects owned by the user.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for ListProjects.",
+                                                         "properties":  {
+                                                                            "filter":  "@{description=Optional. A filter to apply to the list of projects, following a subset of AIP-160. This service supports filtering on the `view` field. Supported filters: * `view=owned`: Lists only projects owned by the user. This is the default behavior if no filter is specified. * `view=shared`: Lists only projects shared with the user. Example: `view=owned`; type=string}"
+                                                                        },
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "list_projects",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "Project":  "@{description=A project is a single app.; properties=; type=object}",
+                                                                        "ProjectMetadata":  "@{description=Metadata relating to the project.; properties=; type=object}",
+                                                                        "ScreenInstance":  "@{description=An instance of a screen on the project. Next ID: 15; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "Response message for ListProjects.",
+                                                          "properties":  {
+                                                                             "projects":  "@{description=The projects for the given user, sorted by update time from the most recent to the least recent. Adding a new session to an existing project is considered as an update to the project.; items=; type=array}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  true
+                                                     },
+                                     "description":  "Lists all screens within a given Stitch project.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for ListScreens.",
+                                                         "properties":  {
+                                                                            "projectId":  "@{description=Required. Identifier. The project ID to list screens for, example: \u00274044680601076201931\u0027, without the `projects/` prefix.; type=string; x-google-identifier=True}"
+                                                                        },
+                                                         "required":  [
+                                                                          "projectId"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "list_screens",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "Screen":  "@{description=A screen generated by the agent.; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "Response message for ListScreens.",
+                                                          "properties":  {
+                                                                             "screens":  "@{description=The screens for the given project.; items=; type=array}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  true
+                                                     },
+                                     "description":  "Retrieves the details of a specific screen within a project.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for GetScreen.",
+                                                         "properties":  {
+                                                                            "name":  "@{description=Required. Identifier. The resource name of the screen to retrieve. Format: `projects/{project}/screens/{screen}` Example: `projects/4044680601076201931/screens/98b50e2ddc9943efb387052637738f61`; type=string; x-google-identifier=True}",
+                                                                            "projectId":  "@{deprecated=True; description=Required. The project ID of screen to retrieve. Example: `4044680601076201931`, without the `projects/` prefix.; type=string}",
+                                                                            "screenId":  "@{deprecated=True; description=Required. The screen ID of screen to retrieve. Example: `98b50e2ddc9943efb387052637738f61`, without the `screens/` prefix.; type=string}"
+                                                                        },
+                                                         "required":  [
+                                                                          "name",
+                                                                          "projectId",
+                                                                          "screenId"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "get_screen",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "A screen generated by the agent.",
+                                                          "properties":  {
+                                                                             "deviceType":  "@{description=Output only. The device type of the screen.; enum=System.Object[]; readOnly=True; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                             "height":  "@{description=The height of the screen.; type=string}",
+                                                                             "htmlCode":  "@{$ref=#/$defs/File; description=The HTML code of the screen.}",
+                                                                             "name":  "@{description=Identifier. The name of the screen. Format: projects/{project}/screens/{screen}; type=string; x-google-identifier=True}",
+                                                                             "screenshot":  "@{$ref=#/$defs/File; description=The screenshot of the screen.}",
+                                                                             "title":  "@{description=Output only. The title of the screen.; readOnly=True; type=string}",
+                                                                             "width":  "@{description=The width of the screen.; type=string}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "destructiveHint":  true,
+                                                         "idempotentHint":  false,
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  false
+                                                     },
+                                     "description":  "Generates a new screen within a project from a text prompt.\n\n**Instructions for Tool Call:**\n*  This action can take a few minutes to complete. Please be patient. DO NOT RETRY.\n*  If the tool call fails due to connection error, the generation process may still succeed. Please try to get the screen with `get_screen` method later.\n\n**Output:**\n*  **`output_components`**: If `output_components` contains text, return it to the user. If `output_components` contains suggestions (e.g. \"Yes, make them all\"), present these suggestions to the user. If the user accepts one of the suggestions, call `generate_screen_from_text` again with `prompt` set to the accepted suggestion.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for GenerateScreenFromText.",
+                                                         "properties":  {
+                                                                            "deviceType":  "@{description=The type of device that captured the screenshot, e.g., mobile or desktop.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "modelId":  "@{description=Optional. The model to use for generation.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "projectId":  "@{description=Required. The project ID to generate the screen for, example: \u00274044680601076201931\u0027, without the `projects/` prefix.; type=string}",
+                                                                            "prompt":  "@{description=Required. The input text to generate the screen from.; type=string}"
+                                                                        },
+                                                         "required":  [
+                                                                          "projectId",
+                                                                          "prompt"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "generate_screen_from_text",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "Asset":  "@{description=An Asset resource.; properties=; type=object}",
+                                                                        "BoundingBox":  "@{description=The bounding box of a component.; properties=; type=object}",
+                                                                        "ComponentRegion":  "@{description=The region of a component region.; properties=; type=object}",
+                                                                        "Design":  "@{description=A generated design, which is a collection of multiple screens. Note: do not add new fields to this message or rely on it for any logic. For any Screen property, add it to Screen message instead. Design is a deprecated hierarchical container for screens and is only used for backward compatibility.; properties=; type=object}",
+                                                                        "DesignSystem":  "@{description=Represents a collection of guidelines, design tokens, and reusable components that define the visual and functional characteristics of a product\u0027s design. This is used to guide the generation of consistent and branded designs.; properties=; type=object}",
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "Screen":  "@{description=A generated screen.; properties=; type=object}",
+                                                                        "ScreenMetadata":  "@{description=The metadata of a screen.; properties=; type=object}",
+                                                                        "SessionOutputComponent":  "@{description=A partial output of the session.; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "Response message for GenerateScreenFromText.",
+                                                          "properties":  {
+                                                                             "outputComponents":  "@{description=The generated output components.; items=; type=array}",
+                                                                             "projectId":  "@{description=The project ID of the generated screen. This is the same as the input project ID.; type=string}",
+                                                                             "sessionId":  "@{description=The session ID of the generated screen.; type=string}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "destructiveHint":  true,
+                                                         "idempotentHint":  false,
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  false
+                                                     },
+                                     "description":  "Edits existing screens within a project using a text prompt.\n\n**Instructions for Tool Call:**\n*  This action can take a few minutes to complete. Please be patient. DO NOT RETRY.\n*  If the tool call fails due to connection error, the process may still succeed.\n",
+                                     "inputSchema":  {
+                                                         "description":  "Request message for EditScreens.",
+                                                         "properties":  {
+                                                                            "deviceType":  "@{description=Optional. The type of device that captured the screenshot, e.g., mobile or desktop.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "modelId":  "@{description=Optional. The model to use for generation.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "projectId":  "@{description=Required. The project ID of screens to edit, example: \u00274044680601076201931\u0027, without the `projects/` prefix.; type=string}",
+                                                                            "prompt":  "@{description=Required. The input text to generate the screen from.; type=string}",
+                                                                            "selectedScreenIds":  "@{description=Required. The screen IDs of screens to edit, example: [\u002798b50e2ddc9943efb387052637738f61\u0027, \u002798b50e2ddc9943efb387052637738f62\u0027], without the `screens/` prefix.; items=; type=array}"
+                                                                        },
+                                                         "required":  [
+                                                                          "projectId",
+                                                                          "selectedScreenIds",
+                                                                          "prompt"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "edit_screens",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "Asset":  "@{description=An Asset resource.; properties=; type=object}",
+                                                                        "BoundingBox":  "@{description=The bounding box of a component.; properties=; type=object}",
+                                                                        "ComponentRegion":  "@{description=The region of a component region.; properties=; type=object}",
+                                                                        "Design":  "@{description=A generated design, which is a collection of multiple screens. Note: do not add new fields to this message or rely on it for any logic. For any Screen property, add it to Screen message instead. Design is a deprecated hierarchical container for screens and is only used for backward compatibility.; properties=; type=object}",
+                                                                        "DesignSystem":  "@{description=Represents a collection of guidelines, design tokens, and reusable components that define the visual and functional characteristics of a product\u0027s design. This is used to guide the generation of consistent and branded designs.; properties=; type=object}",
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "Screen":  "@{description=A generated screen.; properties=; type=object}",
+                                                                        "ScreenMetadata":  "@{description=The metadata of a screen.; properties=; type=object}",
+                                                                        "SessionOutputComponent":  "@{description=A partial output of the session.; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "The output design generated by the agent.",
+                                                          "properties":  {
+                                                                             "outputComponents":  "@{description=The generated output components.; items=; type=array}",
+                                                                             "projectId":  "@{description=The project ID of the generated screen. This is the same as the input project ID.; type=string}",
+                                                                             "sessionId":  "@{description=The session ID of the generated screen.; type=string}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 },
+                                 {
+                                     "annotations":  {
+                                                         "destructiveHint":  true,
+                                                         "idempotentHint":  false,
+                                                         "openWorldHint":  false,
+                                                         "readOnlyHint":  false
+                                                     },
+                                     "description":  "Generates variants of existing screens within a project using a text prompt.\n",
+                                     "inputSchema":  {
+                                                         "$defs":  {
+                                                                       "VariantOptions":  "@{description=Configuration options for design variant generation. This message captures all parameters used to generate variants, allowing the configuration to be stored, replayed, or analyzed.; properties=; type=object}"
+                                                                   },
+                                                         "description":  "Request message for GenerateVariants.",
+                                                         "properties":  {
+                                                                            "deviceType":  "@{description=Optional. The type of device that captured the screenshot, e.g., mobile or desktop.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "modelId":  "@{description=Optional. The model to use for generation.; enum=System.Object[]; type=string; x-google-enum-descriptions=System.Object[]}",
+                                                                            "projectId":  "@{description=Required. The project ID of screens to generate variants for, example: \u00274044680601076201931\u0027, without the `projects/` prefix.; type=string}",
+                                                                            "prompt":  "@{description=Required. The input text used to generate the variants.; type=string}",
+                                                                            "selectedScreenIds":  "@{description=Required. The screen ids of screen to generate variants for, example: [\u002798b50e2ddc9943efb387052637738f61\u0027, \u002798b50e2ddc9943efb387052637738f62\u0027], without the `screens/` prefix.; items=; type=array}",
+                                                                            "variantOptions":  "@{$ref=#/$defs/VariantOptions; description=Required. The variant options for generation, including the number of variants, creative range, and aspects to focus on.}"
+                                                                        },
+                                                         "required":  [
+                                                                          "projectId",
+                                                                          "selectedScreenIds",
+                                                                          "prompt",
+                                                                          "variantOptions"
+                                                                      ],
+                                                         "type":  "object"
+                                                     },
+                                     "name":  "generate_variants",
+                                     "outputSchema":  {
+                                                          "$defs":  {
+                                                                        "Asset":  "@{description=An Asset resource.; properties=; type=object}",
+                                                                        "BoundingBox":  "@{description=The bounding box of a component.; properties=; type=object}",
+                                                                        "ComponentRegion":  "@{description=The region of a component region.; properties=; type=object}",
+                                                                        "Design":  "@{description=A generated design, which is a collection of multiple screens. Note: do not add new fields to this message or rely on it for any logic. For any Screen property, add it to Screen message instead. Design is a deprecated hierarchical container for screens and is only used for backward compatibility.; properties=; type=object}",
+                                                                        "DesignSystem":  "@{description=Represents a collection of guidelines, design tokens, and reusable components that define the visual and functional characteristics of a product\u0027s design. This is used to guide the generation of consistent and branded designs.; properties=; type=object}",
+                                                                        "DesignTheme":  "@{description=The theme of the design.; properties=; type=object}",
+                                                                        "File":  "@{description=A File resource.; properties=; type=object}",
+                                                                        "Screen":  "@{description=A generated screen.; properties=; type=object}",
+                                                                        "ScreenMetadata":  "@{description=The metadata of a screen.; properties=; type=object}",
+                                                                        "SessionOutputComponent":  "@{description=A partial output of the session.; properties=; type=object}",
+                                                                        "UserFeedback":  "@{description=User feedback for a given interaction.; properties=; type=object}"
+                                                                    },
+                                                          "description":  "The output design generated by the agent.",
+                                                          "properties":  {
+                                                                             "outputComponents":  "@{description=The generated output components.; items=; type=array}",
+                                                                             "projectId":  "@{description=The project ID of the generated screen. This is the same as the input project ID.; type=string}",
+                                                                             "sessionId":  "@{description=The session ID of the generated screen.; type=string}"
+                                                                         },
+                                                          "type":  "object"
+                                                      }
+                                 }
+                             ]
+               }
+}

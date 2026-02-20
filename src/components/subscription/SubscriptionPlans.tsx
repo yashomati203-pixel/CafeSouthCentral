@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { CheckCircle, Ticket, Megaphone } from 'lucide-react';
 
 export default function SubscriptionPlans() {
     const router = useRouter();
@@ -12,7 +13,7 @@ export default function SubscriptionPlans() {
                 <div className="bg-[#DFFFD6] border border-[#B8E6B0] rounded-xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex items-start gap-4">
                         <div className="bg-[#2E8B57] text-white rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
-                            <span className="material-symbols-outlined">campaign</span>
+                            <Megaphone className="w-6 h-6" />
                         </div>
                         <div>
                             <h3 className="font-bold text-[#1A4D2E] text-lg">FIRST-TIMER OFFER: 1-Week Trial just <span className="font-sans">₹</span>1299! + 1 day free snacks</h3>
@@ -58,11 +59,11 @@ export default function SubscriptionPlans() {
                         </div>
                         <ul className="space-y-4 mb-8 flex-grow">
                             <li className="flex items-start">
-                                <div className="mt-1 mr-3 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-lg">check_circle</span></div>
+                                <div className="mt-1 mr-3 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-5 h-5" /></div>
                                 <span className="text-sm font-medium text-gray-700">Unlimited meals + Sips + snacks</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-3 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-lg">check_circle</span></div>
+                                <div className="mt-1 mr-3 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-5 h-5" /></div>
                                 <span className="text-sm font-medium text-gray-700">Priority Everything</span>
                             </li>
                         </ul>
@@ -83,20 +84,20 @@ export default function SubscriptionPlans() {
                                 <span className="text-xs text-gray-400">(was <span className="font-sans">₹</span>6,000, save 25%)</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-500 mt-1">
-                                <span className="material-symbols-outlined text-sm mr-1">confirmation_number</span> 60 Coupons
+                                <Ticket className="w-4 h-4 mr-1" /> 60 Coupons
                             </div>
                         </div>
                         <ul className="space-y-3 mb-8 flex-grow">
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Full Monthly Meal Plan</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">No Delivery Fees</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Priority Pickup</span>
                             </li>
                         </ul>
@@ -117,20 +118,20 @@ export default function SubscriptionPlans() {
                                 <span className="text-xs text-gray-400">(was <span className="font-sans">₹</span>9,000, save 33%)</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-500 mt-1">
-                                <span className="material-symbols-outlined text-sm mr-1">confirmation_number</span> 90 Coupons
+                                <Ticket className="w-4 h-4 mr-1" /> 90 Coupons
                             </div>
                         </div>
                         <ul className="space-y-3 mb-8 flex-grow">
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">All Meals + Snacks</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Nutritionist Consultation</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Ultra-Fast Delivery</span>
                             </li>
                         </ul>
@@ -151,20 +152,20 @@ export default function SubscriptionPlans() {
                                 <span className="text-xs text-gray-400">(was <span className="font-sans">₹</span>3,000, save 15%)</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-500 mt-1">
-                                <span className="material-symbols-outlined text-sm mr-1">confirmation_number</span> 30 Coupons
+                                <Ticket className="w-4 h-4 mr-1" /> 30 Coupons
                             </div>
                         </div>
                         <ul className="space-y-3 mb-8 flex-grow">
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">15 Daily Meals per month</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Priority Pickup</span>
                             </li>
                             <li className="flex items-start">
-                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><span className="material-symbols-outlined text-sm">check_circle</span></div>
+                                <div className="mt-1 mr-2 flex-shrink-0 text-[#2E8B57]"><CheckCircle className="w-4 h-4" /></div>
                                 <span className="text-sm text-gray-600">Standard Delivery</span>
                             </li>
                         </ul>
@@ -188,7 +189,7 @@ export default function SubscriptionPlans() {
                             <div className="flex items-baseline mt-1 gap-2">
                                 <span className="text-3xl font-bold text-[#1A4D2E]"><span className="font-sans">₹</span>1,299</span>
                                 <span className="text-xs text-gray-500">(was <span className="font-sans">₹</span>1,999, save 35%)</span>
-                                <span className="text-xs text-gray-500 ml-4 flex items-center"><span className="material-symbols-outlined text-sm mr-1">confirmation_number</span> 30 Coupons</span>
+                                <span className="text-xs text-gray-500 ml-4 flex items-center"><Ticket className="w-4 h-4 mr-1" /> 30 Coupons</span>
                             </div>
                         </div>
                         <button

@@ -60,7 +60,7 @@ export default function SubscriptionInvitation({ isOpen, onClose }: Subscription
                             padding: '2rem',
                             zIndex: 1002,
                             boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
-                            maxHeight: '90vh',
+                            maxHeight: '80vh',
                             overflowY: 'auto'
                         }}
                     >

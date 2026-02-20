@@ -92,7 +92,7 @@ export default function SubscriptionDiscovery() {
             {/* 2. Subscription Selection Modal */}
             <AnimatePresence>
                 {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -108,7 +108,7 @@ export default function SubscriptionDiscovery() {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            className="relative w-full max-w-md bg-[#FAF9F6] border-[3px] border-black p-5 md:p-8 rounded-2xl shadow-2xl flex flex-col gap-4 md:gap-6"
+                            className="relative w-full max-w-md bg-[#FAF9F6] border-[3px] border-black p-5 md:p-8 rounded-2xl shadow-2xl flex flex-col gap-4 md:gap-6 max-h-[85vh] overflow-y-auto"
                         >
                             {/* Close Button */}
                             <button

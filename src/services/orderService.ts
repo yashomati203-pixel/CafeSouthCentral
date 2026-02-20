@@ -126,7 +126,7 @@ export async function createNormalOrder(
         }
 
         // 4. Initiate Payment (ONLY IF ONLINE & > 0)
-        let razorpayOrder = null;
+        let razorpayOrder: any = null;
         if (totalAmount > 0 && paymentMethod !== 'CASH') {
             try {
                 razorpayOrder = await createRazorpayOrder(totalAmount, newOrder.displayId || newOrder.id);

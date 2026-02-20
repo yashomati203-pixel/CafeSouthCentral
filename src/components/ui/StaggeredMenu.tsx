@@ -40,7 +40,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     displaySocials = true,
     displayItemNumbering = true,
     className,
-    logoUrl = '/logo.png',
+    logoUrl = '/Cropped_Updated_logo.png',
     menuButtonColor = '#5C3A1A',
     openMenuButtonColor = '#fff',
     changeMenuColorOnOpen = true,
@@ -386,7 +386,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         <img
                             src={logoUrl}
                             alt="Logo"
-                            className="sm-logo-img block h-8 w-auto object-contain"
+                            className="sm-logo-img block h-9 w-auto object-contain"
                             draggable={false}
                             width={110}
                             height={24}

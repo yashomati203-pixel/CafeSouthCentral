@@ -52,9 +52,9 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                 {/* Header */}
                 <div className="p-3 md:p-4 flex items-center justify-between border-b border-[#14b84b]/5">
                     <Link href="/" className="flex items-center gap-3 mx-auto cursor-pointer">
-                        <div className="relative w-32 h-12 rounded-lg overflow-hidden">
+                        <div className="relative w-36 h-14 rounded-lg overflow-hidden">
                             <Image
-                                src="/final-logo.png"
+                                src="/Cropped_Updated_logo.png"
                                 alt="Logo"
                                 fill
                                 className="object-contain"

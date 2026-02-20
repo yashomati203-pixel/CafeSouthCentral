@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
                 type: 'order_delay',
                 severity: isCritical ? 'critical' : 'warning',
                 title: isCritical ? 'Critical Order Delay' : 'Order Delayed',
-                message: `Order #${order.displayId || order.id.slice(0, 8)} - ${delayMinutes} minutes (${order.user.name})`,
+                message: `Order #${order.displayId || order.id.slice(0, 8)} - ${delayMinutes} minutes (${order.user?.name || 'Unknown User'})`,
                 actionUrl: '/admin/dashboard?tab=active',
                 itemId: order.id,
                 createdAt: order.createdAt

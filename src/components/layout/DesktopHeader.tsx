@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { DecorativeBorderLogo } from '@/components/ui/DecorativeBorder';
+
 import { User as UserIcon, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -25,10 +26,11 @@ export default function DesktopHeader({
             <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
                 <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto">
                     <DecorativeBorderLogo size="md">
-                        <Image src="/Final-logo.png" alt="Cafe South Central" width={350} height={105} className="h-24 w-auto object-contain" priority />
+                        <Image src="/Cropped_Updated_logo.png" alt="Cafe South Central" width={525} height={158} className="h-24 w-auto object-contain" priority />
                     </DecorativeBorderLogo>
                 </Link>
 
+                {/* Centered Desktop Tabs */}
                 {/* Centered Desktop Tabs */}
                 <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
                     <Link

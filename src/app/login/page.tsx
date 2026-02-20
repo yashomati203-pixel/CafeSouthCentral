@@ -165,10 +165,10 @@ export default function LoginPage() {
                     style={{ cursor: 'pointer' }}
                 >
                     <Image
-                        src="/logo.png"
+                        src="/Cropped_Updated_logo.png"
                         alt="Cafe South Central"
-                        width={200}
-                        height={60}
+                        width={190}
+                        height={57}
                         style={{ objectFit: 'contain' }}
                         priority
                     />

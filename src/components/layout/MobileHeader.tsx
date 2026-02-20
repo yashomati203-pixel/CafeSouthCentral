@@ -39,7 +39,7 @@ export default function MobileHeader({
                         {/* Increased Logo Size */}
                         <div className="relative w-52 h-14">
                             <Image
-                                src="/Final-logo.png"
+                                src="/Cropped_Updated_logo.png"
                                 alt="Cafe South Central"
                                 fill
                                 className="object-contain"

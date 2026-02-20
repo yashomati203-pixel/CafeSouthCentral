@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     description: 'Premium Food Ordering Experience',
     manifest: '/manifest.json',
     icons: {
-        icon: '/Final-logo.png',
-        shortcut: '/Final-logo.png',
-        apple: '/Final-logo.png',
+        icon: '/Cropped_Updated_logo.png',
+        shortcut: '/Cropped_Updated_logo.png',
+        apple: '/Cropped_Updated_logo.png',
     },
 };
 

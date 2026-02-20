@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
         // 4. Process Refund (if paid)
         let refundStatus = 'NOT_APPLICABLE';
-        let refundId = null;
+        let refundId: string | null = null;
 
         if (order.paymentId && (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.PREPARING)) {
             try {
