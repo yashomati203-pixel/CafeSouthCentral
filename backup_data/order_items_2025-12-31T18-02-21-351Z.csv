@@ -1,0 +1,43 @@
+id,orderId,menuItemId,name,price,quantity
+"c03fddcd-f565-4d88-9d9a-698912e25483","a5fa3acb-124f-4619-8db6-7ae84feabd51","3","Thatte Idli",49,1
+"c18a4c33-64e3-4b76-9bb2-c65658a6aadb","a6913bd6-0125-4355-af27-c50839d9307c","3","Thatte Idli",49,1
+"ddcf6457-0f30-48b2-b75b-8434f938033c","a6913bd6-0125-4355-af27-c50839d9307c","2","Ghee Podi Idli",69,1
+"1c552ec9-8f3c-4d49-a1d1-20fdffbd893f","9006ae86-0f62-4cd3-bd0b-c616fed341ab","20","Filter Coffee",29,1
+"d97e937a-e3e2-47dd-af5b-7950ccd1f194","9006ae86-0f62-4cd3-bd0b-c616fed341ab","23","Pani Puri",20,1
+"36461533-a322-4b40-8cf7-ca3684dbc8f6","15938f31-9717-435c-8287-5e36bd6441a1","3","Thatte Idli",49,1
+"3ea72771-889c-4da1-83c3-686748b1d06a","15938f31-9717-435c-8287-5e36bd6441a1","2","Ghee Podi Idli",69,1
+"c939db31-6dee-44b0-a815-d52ef8289de9","c1269713-c2d9-4771-bb69-40afb8c10f58","21","Tea",19,1
+"7f0ab009-d3bd-4927-a0d8-9503361284a5","0900ce0d-aef2-4930-a3a5-45e6a10615b3","21","Tea",19,1
+"c6f03c88-3bb0-4094-a27f-9cd2026c70df","09a89b07-4f9c-41a8-9863-1e68e7717a69","20","Filter Coffee",29,1
+"5e293622-73d6-4c36-9727-929c88557e8b","8cd3f8cc-fd40-4be5-a152-9bebc0ccd4cd","19","Punugulu",49,1
+"ff4cfee9-b53f-4aad-97ea-269ef0f46a2f","f5bd778e-873b-49fe-b825-33c0fc3ba168","20","Filter Coffee",29,1
+"663d24a9-0981-4003-be18-0e4ab9b677ef","ca93aff5-83ea-418d-a8d6-6669a2707e21","7","Mysore Bonda",49,1
+"7e95cad9-55db-4b2f-b040-e968d52ecd26","5d207758-c8e8-4cde-9a70-644357dbd618","20","Filter Coffee",29,1
+"defecc22-20c1-4bac-851e-0c66636b2dba","2655e5d8-c9d7-4a41-ac03-eeea0295fffc","4","Idli Sambar",59,1
+"3f0bfd95-ae8a-4324-8768-e392a63f31a9","358c66f7-d069-47ab-abbc-a2d253991ff2","9","Masala Dosa",69,1
+"908248c8-9689-4198-982e-a0f66df0878f","2f803f17-9b11-406f-aec1-5566a815b975","2","Ghee Podi Idli",69,1
+"596f9837-88b3-4043-9925-8ac1a25c345e","5b48b3f7-3cb6-416b-8e8e-0f84b46426bc","20","Filter Coffee",29,1
+"50199740-e13d-4683-88d0-069505d9af2f","dd61800a-8d50-4b26-9033-25e76d6b0a11","4","Idli Sambar",59,1
+"d9c2f0f7-2e8a-4ab9-8f04-1b0d2daefd43","43e5cca1-9b62-4e94-9463-6d27d126e452","7","Mysore Bonda",49,1
+"c6681ac2-5edd-4964-a004-658a44343738","860db313-f5a5-4769-8b3c-ea7e1b0d2160","7","Mysore Bonda",49,1
+"45870440-bd14-491b-ac71-aa2ace8965d7","b8876e7a-eb8d-47cb-b94e-d6cb3cec1416","7","Mysore Bonda",49,1
+"9e79aa16-fbf9-4673-94e2-3928f50a131f","b0895369-8f9f-4f34-a08f-86410f5943d3","7","Mysore Bonda",49,1
+"68ecd517-afbc-40b2-ba35-7c593a230f0a","c864a975-7da0-4c0d-af37-79df15bd9b76","7","Mysore Bonda",49,1
+"c8fb9af1-d2c2-4416-a6b4-4a75b0eab8d0","9efb2b4d-9fed-4aab-8fdf-d1f72b8bdf58","4","Idli Sambar",59,1
+"fe88be6b-8370-4e05-bdab-5cf08769ae68","3140bbd3-dc10-4e70-8e5e-ee5aa1eaed5b","7","Mysore Bonda",49,1
+"5e906120-f3e8-4044-874d-6bf2424d0448","fc98200a-3a01-4798-a1cb-d30cc5506ffe","1","Idli",49,1
+"5a00aa31-66db-4131-82d0-84febf9e00c1","01711083-d370-430f-beea-ba80aad772c7","4","Idli Sambar",59,1
+"ae590847-05ab-4759-8f7a-7a8816a67db1","5bd2c045-071e-49bd-a038-a2781031e727","2","Ghee Podi Idli",69,1
+"71f583f3-a5cd-41c4-a209-c64e512f8c37","d45ed24f-8eed-453e-a0e4-a9dda661033b","1","Idli",49,1
+"ccf8a098-8a9f-4835-b0d4-1b3824454fbf","05abf47f-ae94-4e04-8e55-9534e77f9abf","4","Idli Sambar",59,1
+"e84b82ec-e33f-45de-91cd-d1259627d53e","e7ea3bce-622b-42e9-8ebc-3ba3548e7c9d","2","Ghee Podi Idli",69,1
+"e2eab7f7-3292-4ede-bb43-8941a3e96f46","2fa6cee9-3b7a-43b5-b52f-a3fc9f325a03","5","Sambar Vada",59,1
+"afbaf9c1-7eec-446d-9df2-23de18ffdb3a","60bceb39-cd86-41c6-9558-cdc8de9beb31","7","Mysore Bonda",49,1
+"834c66a2-01cd-4544-8bf9-c28b831a0d62","77785b7f-ddec-4fbf-a001-ea03e7dc4454","7","Mysore Bonda",49,1
+"5eb3f37a-be69-40d6-8ab0-5f8134222a39","50c524d1-caeb-4ee6-badc-83d792773a5a","7","Mysore Bonda",49,1
+"e3e6314c-02a7-4478-956d-139add00388d","8b1d79c3-2a32-43a5-bdc5-9261795bf0f7","26","Waffles",0,1
+"c7da03f8-1cda-4fc6-b16e-1bdd39ae8814","57e0cd26-a7c3-4f5b-8159-4ee347792490","5","Sambar Vada",59,1
+"47e7aaac-e50d-4b29-bd72-9664bb9c4d4a","72d4f790-0758-433d-bf61-305e7fd34748","7","Mysore Bonda",49,1
+"443777a3-902c-49b1-b5ef-a772544c1962","75a06466-e4bd-451a-a082-7ce86135f5ca","4","Idli Sambar",59,1
+"c285e9d7-e298-4f6f-80ce-37236480f123","de5cd709-f0e0-4d6f-b5b1-ecf2a88d8326","7","Mysore Bonda",0,1
+"c5236bfe-43e5-4e3b-b6b5-f6df8297ff56","2e2897b9-214d-4ffe-abb5-c417a4677f2c","20","Filter Coffee",29,1
