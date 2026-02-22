@@ -165,7 +165,7 @@ export default function LoginPage() {
                     style={{ cursor: 'pointer' }}
                 >
                     <Image
-                        src="/Cropped_Updated_logo.png"
+                        src="/logo without border.png"
                         alt="Cafe South Central"
                         width={190}
                         height={57}

@@ -2,7 +2,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Send } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0e1b12] py-16 px-6 lg:px-12 text-white">
+        <footer className="bg-gradient-to-br from-[#0a0a0a] to-[#041a06] border-t border-white/10 py-16 px-6 lg:px-12 text-white mt-12">
             <div className="mx-auto max-w-[1440px] grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div className="col-span-1 md:col-span-2">
                     <h2 className="font-serif-heading text-2xl font-black mb-4">Cafe South Central</h2>

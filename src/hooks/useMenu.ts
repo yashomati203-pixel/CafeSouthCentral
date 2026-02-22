@@ -30,15 +30,12 @@ const MOCK_MENU: MenuItem[] = [
     { id: '20', name: 'Filter Coffee', description: 'Classic South Indian coffee', price: 29, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, stock: 100, reservedStock: 0, isSubscriptionEligible: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
     { id: '21', name: 'Tea', description: 'Masala Chai', price: 19, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, stock: 100, reservedStock: 0, isSubscriptionEligible: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
     { id: '22', name: 'Lassi', description: 'Sweet yogurt drink', price: 59, type: MenuItemType.BOTH, category: 'Beverages', isVeg: true, isAvailable: true, stock: 50, reservedStock: 0, isSubscriptionEligible: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
-    // Chaat
-    { id: '23', name: 'Pani Puri', description: 'Hollow balls with spicy water', price: 20, type: MenuItemType.BOTH, category: 'Chaat', isVeg: true, isAvailable: true, stock: 100, reservedStock: 0, isSubscriptionEligible: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
-    { id: '24', name: 'Dahi Puri', description: 'Puri filled with yogurt', price: 30, type: MenuItemType.BOTH, category: 'Chaat', isVeg: true, isAvailable: true, stock: 50, reservedStock: 0, isSubscriptionEligible: true, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
     // Desserts
     { id: '25', name: 'Gulab Jamun', description: 'Sweet syrup dumplings', price: 59, type: MenuItemType.NORMAL, category: 'Dessert', isVeg: true, isAvailable: true, stock: 40, reservedStock: 0, isSubscriptionEligible: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' },
     { id: '26', name: 'Waffles', description: 'Freshly baked waffles', price: 120, type: MenuItemType.NORMAL, category: 'Dessert', isVeg: true, isAvailable: true, stock: 20, reservedStock: 0, isSubscriptionEligible: false, createdAt: new Date(), updatedAt: new Date(), imageUrl: '' }
 ];
 
-export const CATEGORY_ORDER = ['South Indian', 'Dosa', 'Rice', 'North Indian', 'Snacks', 'Beverages', 'Chaat', 'Dessert'];
+export const CATEGORY_ORDER = ['South Indian', 'Dosa', 'Rice', 'North Indian', 'Snacks', 'Beverages', 'Dessert'];
 
 export function useMenu() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);

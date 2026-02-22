@@ -29,7 +29,7 @@ export default function CheckoutHeader({ user, onLoginClick }: CheckoutHeaderPro
                 >
                     <DecorativeBorderLogo size="md">
                         <Image
-                            src="/Cropped_Updated_logo.png"
+                            src="/logo without border.png"
                             alt="Cafe South Central"
                             width={240}
                             height={70}

@@ -24,7 +24,6 @@ const defaultCategories: Category[] = [
   { name: 'North Indian', dataCategory: 'North Indian', iconImage: '/images/categories/north-indian.png', color: '#e0e7ff' },
   { name: 'Snacks', dataCategory: 'Snacks', iconImage: '/images/categories/snacks.png', color: '#fef9c3' },
   { name: 'Beverages', dataCategory: 'Beverages', iconImage: '/images/categories/beverages.png', color: '#fae8ff' },
-  { name: 'Chaat', dataCategory: 'Chaat', iconImage: '/images/categories/chaat.png', color: '#f3f4f6' },
   { name: 'Desserts', dataCategory: 'Dessert', iconImage: '/images/categories/desserts.png', color: '#ffe4e6' },
 ];
 

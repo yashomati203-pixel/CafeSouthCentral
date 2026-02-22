@@ -50,10 +50,11 @@
 }
 
 body {
-  background-color: var(--color-pure-white);
+  background: linear-gradient(to bottom right, #0a0a0a, #1a2f1c); 
+  background-attachment: fixed;
+  color: #f0f5f1;
   font-family: 'Inter', sans-serif;
-  /* Assumes Inter is available or fallback */
-  overflow: hidden; /* Prevent body scroll, use inner wrapper */
+  overflow: hidden; 
   width: 100%;
   height: 100vh;
 }

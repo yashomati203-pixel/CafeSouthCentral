@@ -16,7 +16,6 @@ const CATEGORIES: Category[] = [
     { name: 'North Indian', dataCategory: 'North Indian', image: '/images/categories/north-indian.png' },
     { name: 'Snacks', dataCategory: 'Snacks', image: '/images/categories/snacks.png' },
     { name: 'Beverages', dataCategory: 'Beverages', image: '/images/categories/beverages.png' },
-    { name: 'Chaat', dataCategory: 'Chaat', image: '/images/categories/chaat.png' },
     { name: 'Desserts', dataCategory: 'Dessert', image: '/images/categories/desserts.png' },
 ];
 

@@ -197,15 +197,15 @@ export default function AdminDashboard() {
     );
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-[#f8fbf7] text-[#0e2a1a] font-serif animate-pulse">Loading Admin Dashboard...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-transparent text-white font-serif animate-pulse">Loading Admin Dashboard...</div>;
     }
 
     return (
-        <div className="min-h-screen bg-[#f3f4f6]">
+        <div className="min-h-screen bg-transparent text-white">
             {/* Quick Access Scanner */}
             <QuickScannerButton />
 
-            <div className="flex h-screen bg-[#f8fbf7] overflow-hidden font-sans text-gray-900">
+            <div className="flex h-screen bg-transparent overflow-hidden font-sans text-gray-100">
                 {/* Sidebar */}
                 <AdminSidebar
                     activeTab={activeTab}
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
                         notificationsCount={activeOrders.length}
                     />
 
-                    <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth bg-gray-50/50">
+                    <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth bg-transparent">
                         <div className="max-w-7xl mx-auto">
 
 
@@ -287,10 +287,10 @@ export default function AdminDashboard() {
                             {/* VIEW: HISTORY */}
                             {activeTab === 'sold' && (
                                 <div className="space-y-6">
-                                    <h2 className="text-2xl font-serif font-bold text-[#0e2a1a]">Order History</h2>
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <h2 className="text-2xl font-serif font-bold text-white">Order History</h2>
+                                    <div className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/10 overflow-hidden">
                                         <table className="w-full text-left">
-                                            <thead className="bg-gray-50 border-b border-gray-100">
+                                            <thead className="bg-black/40 border-b border-white/10">
                                                 <tr>
                                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Order ID</th>
                                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Customer</th>
@@ -300,18 +300,18 @@ export default function AdminDashboard() {
                                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-gray-50">
+                                            <tbody className="divide-y divide-white/5">
                                                 {historyOrders.map((order: any) => (
-                                                    <tr key={order.id} className="hover:bg-gray-50">
-                                                        <td className="px-6 py-4 font-bold text-[#0e2a1a]">#{order.displayId || order.id.slice(0, 5)}</td>
-                                                        <td className="px-6 py-4 text-sm">{order.user.name}</td>
+                                                    <tr key={order.id} className="hover:bg-white/5 border-white/5">
+                                                        <td className="px-6 py-4 font-bold text-white">#{order.displayId || order.id.slice(0, 5)}</td>
+                                                        <td className="px-6 py-4 text-sm text-gray-200">{order.user.name}</td>
                                                         <td className="px-6 py-4 text-sm text-gray-500">
                                                             {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </td>
-                                                        <td className="px-6 py-4 font-bold">₹{order.totalAmount}</td>
+                                                        <td className="px-6 py-4 font-bold text-gray-200">₹{order.totalAmount}</td>
                                                         <td className="px-6 py-4">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                                order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-500/20 text-green-300' :
+                                                                order.status.includes('CANCEL') ? 'bg-red-500/20 text-red-300' : 'bg-gray-500/20 text-gray-300'
                                                                 }`}>
                                                                 {order.status}
                                                             </span>
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                                                         <td className="px-6 py-4 text-right">
                                                             <button
                                                                 onClick={() => printBill(order)}
-                                                                className="text-indigo-600 hover:text-indigo-900 text-xs font-bold"
+                                                                className="text-[#14b84b] hover:text-white text-xs font-bold transition-colors"
                                                             >
                                                                 Reprint Bill
                                                             </button>

@@ -18,6 +18,15 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
+} from 'recharts';
 
 interface NewCustomer {
     id: string;
@@ -76,19 +85,26 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange, onDateRangeCha
     const avgValue = data?.kpi?.avgOrderValue || 0;
     const newCust = data?.kpi?.newCustomers || 0;
 
-    // Chart Data Mock or Real
-    const chartData = data?.salesChart?.data || [0, 0, 0, 0, 0, 0, 0];
-    const maxVal = Math.max(...chartData, 1);
+    // Transform the backend salesChart data into what Recharts expects
+    const currentGraphData = (data?.salesChart?.labels || []).map((label: string, idx: number) => ({
+        name: label,
+        revenue: data?.salesChart?.data[idx] || 0
+    }));
 
-    // Simple SVG Path Generation
-    const points = chartData.map((val, idx) => {
-        const x = (idx / (chartData.length - 1)) * 100;
-        const y = 100 - (val / maxVal) * 80; // Scale to fit 100x100 box
-        return `${x},${y}`;
-    }).join(' ');
-
-    const svgPath = `M0,100 L${points} L100,100 Z`;
-    const linePath = `M${points}`;
+    const CustomTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-[#0e2a1a] text-white p-3 rounded-lg shadow-xl border border-[#14b84b]/20">
+                    <p className="text-xs font-medium text-gray-300 mb-1">{label}</p>
+                    <p className="text-sm font-bold flex items-center gap-1">
+                        <IndianRupee className="w-3 h-3" />
+                        {payload[0].value.toLocaleString()}
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
 
     const handleExport = () => {
         // Generate CSV content from analytics data
@@ -317,43 +333,61 @@ const AnalyticsDashboard = ({ data, timeframe, onTimeframeChange, onDateRangeCha
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Revenue Trends */}
-                <div className="bg-white p-6 rounded-2xl border border-[#14b84b]/10 shadow-sm">
+                <div className="bg-white p-6 rounded-2xl border border-[#14b84b]/10 shadow-sm flex flex-col h-full">
                     <div className="mb-6 flex items-center justify-between">
                         <div>
                             <h4 className="text-lg font-bold text-[#0e2a1a]">Revenue Trends</h4>
                             <p className="text-xs text-gray-500">Daily financial performance overview</p>
                         </div>
                         <div className="bg-gray-100 flex p-1 rounded-lg">
-                            {(['Daily', 'Weekly', 'Monthly'] as const).map(t => (
-                                <button key={t} className={`px-3 py-1 text-[10px] font-bold rounded-md ${t === 'Daily' ? 'bg-white shadow text-[#0e2a1a]' : 'text-gray-400'}`}>{t}</button>
+                            {[
+                                { label: 'Daily', value: 'today' },
+                                { label: 'Weekly', value: 'week' },
+                                { label: 'Monthly', value: 'month' }
+                            ].map(t => (
+                                <button
+                                    key={t.value}
+                                    onClick={() => onTimeframeChange(t.value as any)}
+                                    className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${timeframe === t.value ? 'bg-white shadow-sm text-[#0e2a1a]' : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    {t.label}
+                                </button>
                             ))}
                         </div>
                     </div>
-                    <div className="h-64 w-full relative group">
-                        {/* Tooltip Mock */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-[#0e2a1a] text-white text-xs font-bold px-2 py-1 rounded shadow-lg transform -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            ₹2,140
-                        </div>
 
-                        <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <defs>
-                                <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                                    <stop offset="0%" stopColor="#14b84b" stopOpacity="0.2"></stop>
-                                    <stop offset="100%" stopColor="#14b84b" stopOpacity="0"></stop>
-                                </linearGradient>
-                            </defs>
-                            <path d={svgPath} fill="url(#chartGradient)" />
-                            <path d={linePath} fill="none" stroke="#14b84b" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
-
-                            {/* Grid Lines */}
-                            {[20, 40, 60, 80].map(y => (
-                                <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#f0f0f0" strokeWidth="0.5" vectorEffect="non-scaling-stroke" />
-                            ))}
-                        </svg>
-                        {/* Labels - Simplified */}
-                        <div className="flex justify-between mt-2 text-[10px] uppercase font-bold text-gray-400">
-                            {data?.salesChart?.labels.map((l, i) => <span key={i}>{l.slice(0, 3)}</span>)}
-                        </div>
+                    <div className="flex-grow w-full h-[300px] min-h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart
+                                data={currentGraphData}
+                                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0fdf4" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 600 }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 600 }}
+                                    tickFormatter={(value) => `₹${value.toLocaleString()}`}
+                                    dx={-10}
+                                />
+                                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#14b84b', strokeWidth: 1, strokeDasharray: '3 3' }} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#14b84b"
+                                    strokeWidth={3}
+                                    dot={{ r: 4, fill: '#14b84b', strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 6, fill: '#0e2a1a', strokeWidth: 2, stroke: '#14b84b' }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 

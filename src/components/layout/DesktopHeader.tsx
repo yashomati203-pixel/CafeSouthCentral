@@ -22,38 +22,39 @@ export default function DesktopHeader({
     const { openCart, subTotalCount, totalItemsCount } = useCart();
 
     return (
-        <header className="sticky top-0 z-[100] w-full bg-[#f8fbf7]/90 backdrop-blur-md hidden md:block">
-            <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
-                <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto">
+        <header className="sticky top-0 z-[100] w-full bg-[#f8fbf7]/90 backdrop-blur-md hidden lg:block">
+            <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
+                {/* Logo Section */}
+                <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto -ml-4 xl:-ml-6">
                     <DecorativeBorderLogo size="md">
-                        <Image src="/Cropped_Updated_logo.png" alt="Cafe South Central" width={525} height={158} className="h-24 w-auto object-contain" priority />
+                        <Image src="/logo without border.png" alt="Cafe South Central" width={525} height={158} className="h-24 w-auto object-contain" priority />
                     </DecorativeBorderLogo>
                 </Link>
 
-                {/* Centered Desktop Tabs */}
-                {/* Centered Desktop Tabs */}
-                <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+                {/* Centered Desktop Tabs - Only show on large screens */}
+                <div className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
                     <Link
                         href="/?show_landing=true"
-                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
+                        className={`text-lg xl:text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
                     >
                         Home
                     </Link>
                     <Link
                         href="/menu"
-                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/menu' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
+                        className={`text-lg xl:text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/menu' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
                     >
                         Menu
                     </Link>
                     <Link
                         href="/subscription"
-                        className={`text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/subscription' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
+                        className={`text-lg xl:text-xl font-serif font-bold transition-colors pb-1 border-b-2 ${pathname === '/subscription' ? 'border-[#166534] text-[#0d1c11]' : 'border-transparent text-[#166534] hover:text-[#0d1c11] hover:border-[#166534]'}`}
                     >
                         Subscriptions
                     </Link>
                 </div>
 
-                <div className="hidden items-center gap-8 lg:flex">
+                {/* Right Actions Section - Always show alongside logo */}
+                <div className="flex items-center gap-4 lg:gap-8">
                     {/* Cart Button */}
                     <button
                         onClick={openCart}
@@ -69,8 +70,8 @@ export default function DesktopHeader({
                     </button>
 
                     {user ? (
-                        <div className={`flex items-center gap-6 pb-1 border-b-2 ${pathname === '/account' ? 'border-[#DAA520]' : 'border-transparent'}`}>
-                            <span className="font-bold text-[#166534]">Welcome, {user.name?.split(' ')[0] || 'User'}</span>
+                        <div className={`flex items-center gap-4 lg:gap-6 pb-1 border-b-2 ${pathname === '/account' ? 'border-[#DAA520]' : 'border-transparent'}`}>
+                            <span className="hidden lg:block font-bold text-[#166534]">Welcome, {user.name?.split(' ')[0] || 'User'}</span>
                             <button
                                 onClick={() => router.push('/account')}
                                 className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e7f3eb] text-[#166534] transition-colors hover:bg-[#d1fae5]"
@@ -81,13 +82,13 @@ export default function DesktopHeader({
                     ) : (
                         <button
                             onClick={() => onLoginClick?.()}
-                            className="rounded-full bg-[#0e1b12] px-8 py-3 text-sm font-bold text-white transition-transform hover:scale-105 hover:shadow-lg"
+                            className="rounded-full bg-[#0e1b12] px-6 py-2 lg:px-8 lg:py-3 text-sm font-bold text-white transition-transform hover:scale-105 hover:shadow-lg"
                         >
                             Login / Sign Up
                         </button>
                     )}
                 </div>
             </div>
-        </header >
+        </header>
     );
 }

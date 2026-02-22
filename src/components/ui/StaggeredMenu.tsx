@@ -40,7 +40,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     displaySocials = true,
     displayItemNumbering = true,
     className,
-    logoUrl = '/Cropped_Updated_logo.png',
+    logoUrl = '/logo without border.png',
     menuButtonColor = '#5C3A1A',
     openMenuButtonColor = '#fff',
     changeMenuColorOnOpen = true,
@@ -377,7 +377,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         WebkitBackdropFilter: 'blur(12px)',
                         width: isCompact ? 'clamp(250px, 30vw, 380px)' : 'clamp(300px, 40vw, 450px)',
                         padding: isCompact ? '5em 1.5em 2em 1.5em' : '6em 2em 2em 2em',
-                        backgroundColor: '#fef9ee'
+                        backgroundColor: '#102214' // Reverted to V1 Dark Forest
                     }}
                     aria-hidden={!open}
                 >
@@ -413,7 +413,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                                             <li className="sm-panel-itemWrap relative overflow-hidden leading-none" key={it.label + idx}>
                                                 <button
                                                     className="sm-panel-item relative font-bold text-left cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em] bg-transparent border-none p-0"
-                                                    style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#5C3A1A' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#5C3A1A' }}
+                                                    style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#f0f5f1' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#f0f5f1' }}
                                                     onClick={() => {
                                                         it.action?.();
                                                         closeMenu();
@@ -431,7 +431,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                                         <li className="sm-panel-itemWrap relative overflow-hidden leading-none" key={it.label + idx}>
                                             <a
                                                 className="sm-panel-item relative font-bold cursor-pointer leading-none transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
-                                                style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#5C3A1A' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#5C3A1A' }}
+                                                style={isCompact ? { fontSize: '1.25rem', textTransform: 'capitalize', letterSpacing: '0', color: '#f0f5f1' } : { fontSize: '3rem', textTransform: 'uppercase', letterSpacing: '-2px', color: '#f0f5f1' }}
                                                 href={it.link}
                                                 aria-label={it.ariaLabel}
                                                 data-index={idx + 1}
@@ -443,7 +443,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                                 })
                             ) : (
                                 <li className="sm-panel-itemWrap relative overflow-hidden leading-none" aria-hidden="true">
-                                    <span className="sm-panel-item relative text-black font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]">
+                                    <span className="sm-panel-item relative text-white font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]">
                                         <span className="sm-panel-itemLabel inline-block [transform-origin:50%_100%] will-change-transform">
                                             No items
                                         </span>

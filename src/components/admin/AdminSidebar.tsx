@@ -46,15 +46,15 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
             {/* Sidebar Container */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-72 bg-[#f8fbf7] border-r border-[#14b84b]/10 shadow-xl transition-transform duration-300 md:translate-x-0 md:static md:shadow-none flex flex-col
+                fixed inset-y-0 left-0 z-50 w-72 bg-[#1a1a1a]/80 backdrop-blur-md border-r border-white/10 shadow-xl transition-transform duration-300 md:translate-x-0 md:static md:shadow-none flex flex-col
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 {/* Header */}
-                <div className="p-3 md:p-4 flex items-center justify-between border-b border-[#14b84b]/5">
+                <div className="p-3 md:p-4 flex items-center justify-between border-b border-white/10">
                     <Link href="/" className="flex items-center gap-3 mx-auto cursor-pointer">
                         <div className="relative w-36 h-14 rounded-lg overflow-hidden">
                             <Image
-                                src="/Cropped_Updated_logo.png"
+                                src="/logo without border.png"
                                 alt="Logo"
                                 fill
                                 className="object-contain"
@@ -72,7 +72,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
                 {/* Navigation */}
                 <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto custom-scrollbar">
-                    <p className="px-4 text-[10px] font-bold text-[#0e2a1a]/40 uppercase tracking-widest mb-1 mt-0">
+                    <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 mt-0">
                         Management
                     </p>
                     {NAV_ITEMS.map((item) => {
@@ -87,12 +87,12 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                 className={`
                                     w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 group relative
                                     ${isActive
-                                        ? 'bg-[#0e2a1a] text-white shadow-lg shadow-[#0e2a1a]/20'
-                                        : 'text-[#0e2a1a]/60 hover:bg-[#0e2a1a]/5 hover:text-[#0e2a1a]'
+                                        ? 'bg-[#14b84b] text-white shadow-lg shadow-[#14b84b]/20'
+                                        : 'text-gray-400 hover:bg-white/10 hover:text-white'
                                     }
                                 `}
                             >
-                                <item.icon className={`w-5 h-5 ${isActive ? 'text-[#f59e0b]' : 'text-current opacity-70 group-hover:opacity-100'}`} />
+                                <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-current opacity-70 group-hover:opacity-100'}`} />
                                 <span>{item.label}</span>
 
                                 {/* Badge for Live Orders */}
@@ -100,7 +100,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                     <span className={`
                                         ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full
                                         ${isActive
-                                            ? 'bg-[#f59e0b] text-[#0e2a1a]'
+                                            ? 'bg-white text-[#14b84b]'
                                             : 'bg-red-500 text-white shadow-sm shadow-red-500/30 animate-pulse'
                                         }
                                     `}>
@@ -110,7 +110,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
                                 {/* Active Indicator Strip */}
                                 {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-[#f59e0b] rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-white rounded-r-full" />
                                 )}
                             </button>
                         );
@@ -118,10 +118,10 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                 </nav>
 
                 {/* Footer / Logout */}
-                <div className="p-3 pb-16 mt-auto border-t border-[#14b84b]/5">
+                <div className="p-3 pb-16 mt-auto border-t border-white/10">
                     <button
                         onClick={onLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 hover:shadow-sm transition-all group"
+                        className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold text-red-500 hover:bg-red-500/10 hover:shadow-sm transition-all group"
                     >
                         <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         Sign Out

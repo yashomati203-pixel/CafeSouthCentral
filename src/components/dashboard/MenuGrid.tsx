@@ -80,7 +80,7 @@ export default function MenuGrid({
     const filteredItems = activeMenu.filter(item => {
         const matchesSearch = searchQuery === '' ||
             item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.description.toLowerCase().includes(searchQuery.toLowerCase());
+            item.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
 
@@ -115,36 +115,36 @@ export default function MenuGrid({
                     </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="mb-8 max-w-2xl">
-                    <div className="relative">
+                {/* Navigation Bar (Categories + Search) */}
+                <div className="mb-8 flex flex-col-reverse md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-[#14b84b]/10 backdrop-blur-md border border-white/10 shadow-sm sticky top-[4.5rem] md:top-24 z-40">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide flex-1">
+                        {['All', ...CATEGORY_ORDER.filter(c => mockMenu.some(i => i.category === c))].map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap uppercase ${selectedCategory === cat
+                                    ? 'bg-[#14b84b] text-black shadow-lg shadow-[#14b84b]/30 scale-105'
+                                    : 'bg-white/10 text-black shadow-inner hover:border-[#14b84b] hover:text-black hover:scale-105 border border-white/20'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search Bar next to categories */}
+                    <div className="w-full md:w-64 shrink-0 relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="w-5 h-5 text-primary/40" />
+                            <Search className="w-4 h-4 text-gray-400" />
                         </div>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="block w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border-none rounded-2xl shadow-sm ring-1 ring-primary/5 focus:ring-2 focus:ring-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                            placeholder="Search for ghee idli, filter coffee, or crispy dosas..."
+                            className="block w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/20 rounded-full shadow-inner ring-1 ring-white/5 focus:ring-1 focus:ring-[#14b84b] transition-all text-sm text-white placeholder-gray-400 focus:outline-none"
+                            placeholder="Find a dish..."
                         />
                     </div>
-                </div>
-
-                {/* Category Chips */}
-                <div className="mb-8 flex flex-wrap gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                    {['All', ...CATEGORY_ORDER.filter(c => mockMenu.some(i => i.category === c))].map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setSelectedCategory(cat)}
-                            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
-                                ? 'bg-[#5C3A1A] text-white shadow-lg shadow-stone-400/50 scale-105'
-                                : 'bg-stone-200 dark:bg-slate-700 text-stone-700 dark:text-slate-300 hover:bg-stone-300 dark:hover:bg-slate-600 hover:scale-105'
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
                 </div>
 
                 <div className="mb-8">
@@ -224,7 +224,7 @@ export default function MenuGrid({
 
                                 return (
                                     <AnimatedItem key={item.id} index={idx} delay={idx * 0.03}>
-                                        <div className="group menu-card bg-white dark:bg-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                        <div className="group menu-card bg-[#102214] border-[#0d4d22] border hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                                             <MenuItemCard
                                                 item={item}
                                                 cartItem={cartItem}
@@ -315,7 +315,7 @@ function MenuItemCard({
     return (
         <div className={`flex flex-col h-full ${item.stock === 0 ? 'opacity-60' : ''}`}>
             {/* Image */}
-            <div className="relative w-full overflow-hidden bg-slate-100 dark:bg-slate-700" style={{ aspectRatio: '4/3' }}>
+            <div className="relative w-full overflow-hidden bg-[#0d4d22]" style={{ aspectRatio: '4/3' }}>
                 {!isBestseller && isPopular && (
                     <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full px-3 py-1 text-xs font-bold text-[#5C3A1A] shadow-sm">
                         Bestseller
@@ -331,7 +331,7 @@ function MenuItemCard({
             {/* Content */}
             <div className="p-4 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-white flex-1">
+                    <h3 className="text-lg font-bold text-white flex-1">
                         {item.name}
                     </h3>
                     <div className="flex flex-col items-end gap-1 ml-2">
@@ -350,7 +350,7 @@ function MenuItemCard({
                     </div>
                 </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-3 line-clamp-2">
+                <p className="text-sm text-[#e7f3eb]/80 leading-relaxed mb-3 line-clamp-2">
                     {item.description}
                 </p>
 
@@ -360,14 +360,14 @@ function MenuItemCard({
                     </p>
 
                     {cartItem ? (
-                        <div className="flex items-center justify-between bg-stone-100 dark:bg-slate-700 rounded-xl p-1">
+                        <div className="flex items-center justify-between bg-[#0d4d22] rounded-xl p-1">
                             <button
                                 onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
                                 className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
                             >
                                 <Minus className="w-5 h-5" />
                             </button>
-                            <span className="font-bold text-[#5C3A1A] dark:text-white px-2">{cartItem.qty}</span>
+                            <span className="font-bold text-white px-2">{cartItem.qty}</span>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
                                 className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
@@ -379,7 +379,7 @@ function MenuItemCard({
                         <button
                             onClick={() => onAddToCart(item)}
                             disabled={item.stock === 0}
-                            className="w-full flex items-center justify-center gap-2 py-3 bg-stone-100 hover:bg-[#5C3A1A] text-[#5C3A1A] hover:text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-[#0d4d22] hover:bg-[#5C3A1A] text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                         >
                             <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                             {item.stock === 0 ? 'Sold Out' : 'Add to Cart'}

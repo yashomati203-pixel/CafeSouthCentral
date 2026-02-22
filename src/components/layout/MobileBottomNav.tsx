@@ -20,6 +20,11 @@ export default function MobileBottomNav({ user, onCartClick, onProfileClick }: M
     const pathname = usePathname();
     const { items } = useCart();
 
+    // Hide bottom nav on admin pages
+    if (pathname?.startsWith('/admin')) {
+        return null;
+    }
+
     // Calculate total items
     const cartCount = items.reduce((acc, item) => acc + item.qty, 0);
 
