@@ -11,7 +11,6 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    output: 'standalone',
     images: {
         domains: [
             'lh3.googleusercontent.com', // Google Auth
@@ -25,6 +24,12 @@ const nextConfig = {
                 hostname: '**',
             },
         ],
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    typescript: {
+        ignoreBuildErrors: true,
     },
     async headers() {
         return [

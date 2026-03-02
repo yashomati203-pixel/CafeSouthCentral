@@ -45,7 +45,7 @@ export async function GET(req: Request) {
 
         console.log(`[Cron] Found ${expiringSubscriptions.length} subscriptions expiring soon.`);
 
-        const results = [];
+        const results: any[] = [];
 
         for (const sub of expiringSubscriptions) {
             if (!sub.user.fcmToken) continue;

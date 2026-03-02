@@ -1,0 +1,322 @@
+﻿
+> iim-nagpur-food-outlet@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 234ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+   Γû▓ Next.js 14.1.0
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: C:\Users\yasho\OneDrive\Desktop\Cafe South Central\Web App v1\node_modules\next-pwa\register.js
+> [PWA] Service worker: C:\Users\yasho\OneDrive\Desktop\Cafe South Central\Web App v1\public\firebase-messaging-sw.js
+> [PWA]   url: /firebase-messaging-sw.js
+> [PWA]   scope: /
+node.exe : <w> [webpack.cache.Pack
+FileCacheStrategy] Serializing 
+big strings (158kiB) impacts 
+deserialization performance 
+(consider using Buffer instead 
+and decode when needed)
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Users\yasho\AppData\Roaming\ 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : Not 
+   Specified: (<w> [webpack.ca..  
+  .de when needed):String) [],    
+ RemoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+ ΓÜá Compiled with warnings
+
+./node_modules/@upstash/redis/node
+js.mjs
+A Node.js API is used 
+(process.version at line: 58) 
+which is not supported in the 
+Edge Runtime.
+Learn more: https://nextjs.org/doc
+s/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/@upstash/redis/node
+js.mjs
+./src/lib/redis.ts
+
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+   Generating static pages (0/36) ...
+System Alerts Failed: ex [Error]: 
+Dynamic server usage: Page 
+couldn't be rendered statically 
+because it used `headers`. See 
+more info here: https://nextjs.org
+/docs/messages/dynamic-server-erro
+r
+    at eP (C:\Users\yasho\OneDrive
+\Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\comp
+iled\next-server\app-route.runtime
+.prod.js:6:29358)
+    at Module.eE (C:\Users\yasho\O
+neDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\next-server\app-r
+oute.runtime.prod.js:6:29694)
+    at i (C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\comp
+iled\next-server\app-route.runtime
+.prod.js:6:34572)
+    at Object.get (C:\Users\yasho\
+OneDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\next-server\app-r
+oute.runtime.prod.js:6:34788)
+    at d (C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\.next\server\app\api\admin\
+system-alerts\route.js:1:542)
+    at C:\Users\yasho\OneDrive\Des
+ktop\Cafe South Central\Web App v1
+\node_modules\next\dist\compiled\n
+ext-server\app-route.runtime.prod.
+js:6:42490
+    at C:\Users\yasho\OneDrive\Des
+ktop\Cafe South Central\Web App v1
+\node_modules\next\dist\server\lib
+\trace\tracer.js:133:36
+    at NoopContextManager.with (C:
+\Users\yasho\OneDrive\Desktop\Cafe
+ South Central\Web App v1\node_mod
+ules\next\dist\compiled\@opentelem
+etry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\y
+asho\OneDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\@opentelemetry\ap
+i\index.js:1:518)
+    at NoopTracer.startActiveSpan 
+(C:\Users\yasho\OneDrive\Desktop\C
+afe South Central\Web App v1\node_
+modules\next\dist\compiled\@opente
+lemetry\api\index.js:1:18093) {
+  description: "Page couldn't be 
+rendered statically because it 
+used `headers`. See more info 
+here: https://nextjs.org/docs/mess
+ages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+
+   Generating static pages (9/36) 
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/404". Read more: https://ne
+xtjs.org/docs/messages/missing-sus
+pense-with-csr-bailout
+
+Error occurred prerendering page 
+"/_not-found". Read more: https://
+nextjs.org/docs/messages/prerender
+-error
+
+
+
+   Generating static pages (18/36) 
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/account". Read more: https:
+//nextjs.org/docs/messages/missing
+-suspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/account". Read more: https://nex
+tjs.org/docs/messages/prerender-er
+ror
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/checkout". Read more: https
+://nextjs.org/docs/messages/missin
+g-suspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/checkout". Read more: https://ne
+xtjs.org/docs/messages/prerender-e
+rror
+
+
+   Generating static pages (27/36) 
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/manage-subscription". Read 
+more: https://nextjs.org/docs/mess
+ages/missing-suspense-with-csr-bai
+lout
+
+Error occurred prerendering page 
+"/manage-subscription". Read 
+more: https://nextjs.org/docs/mess
+ages/prerender-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/menu". Read more: https://n
+extjs.org/docs/messages/missing-su
+spense-with-csr-bailout
+
+Error occurred prerendering page 
+"/menu". Read more: https://nextjs
+.org/docs/messages/prerender-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/". Read more: https://nextj
+s.org/docs/messages/missing-suspen
+se-with-csr-bailout
+
+Error occurred prerendering page 
+"/". Read more: https://nextjs.org
+/docs/messages/prerender-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/subscription/payment". 
+Read more: https://nextjs.org/docs
+/messages/missing-suspense-with-cs
+r-bailout
+
+Error occurred prerendering page 
+"/subscription/payment". Read 
+more: https://nextjs.org/docs/mess
+ages/prerender-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/admin-scan". Read more: htt
+ps://nextjs.org/docs/messages/miss
+ing-suspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/admin-scan". Read more: https://
+nextjs.org/docs/messages/prerender
+-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/login". Read more: https://
+nextjs.org/docs/messages/missing-s
+uspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/login". Read more: https://nextj
+s.org/docs/messages/prerender-erro
+r
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/admin/dashboard". Read 
+more: https://nextjs.org/docs/mess
+ages/missing-suspense-with-csr-bai
+lout
+
+Error occurred prerendering page 
+"/admin/dashboard". Read more: htt
+ps://nextjs.org/docs/messages/prer
+ender-error
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/orders". Read more: https:/
+/nextjs.org/docs/messages/missing-
+suspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/orders". Read more: https://next
+js.org/docs/messages/prerender-err
+or
+
+
+ Γ¿» useSearchParams() should be 
+wrapped in a suspense boundary at 
+page "/subscription". Read more: h
+ttps://nextjs.org/docs/messages/mi
+ssing-suspense-with-csr-bailout
+
+Error occurred prerendering page 
+"/subscription". Read more: https:
+//nextjs.org/docs/messages/prerend
+er-error
+
+
+ Γ£ô Generating static pages (36/36) 
+
+> Export encountered errors on 
+following paths:
+	/_not-found
+	/account/page: /account
+	/admin-scan/page: /admin-scan
+	/admin/dashboard/page: 
+/admin/dashboard
+	/checkout/page: /checkout
+	/login/page: /login
+	/manage-subscription/page: 
+/manage-subscription
+	/menu/page: /menu
+	/orders/page: /orders
+	/page: /
+	/subscription/page: /subscription
+	/subscription/payment/page: 
+/subscription/payment

@@ -466,7 +466,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
 
     if (items.length === 0) {
         return (
-            <div className="min-h-screen bg-[#f8fbf7] flex flex-col items-center justify-center p-8">
+            <div className="min-h-screen bg-[#e8f5e9] flex flex-col items-center justify-center p-8">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-[#0e1b12] mb-4">Your Cart is Empty</h2>
                     <p className="text-[#14b84b] mb-8">Add some delicious items to get started!</p>
@@ -479,7 +479,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
     }
 
     return (
-        <div className="bg-[#f8fbf7] font-sans text-[#0e1b12] min-h-screen">
+        <div className="bg-[#e8f5e9] font-sans text-[#0e1b12] min-h-screen">
             <main className="max-w-7xl mx-auto w-full px-4 md:px-10 py-4">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-2 mb-4">
@@ -543,7 +543,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
                             <div className="mt-10 pt-8 border-t border-dashed border-[#e7f3eb]">
                                 <label className="block text-sm font-bold text-[#0e1b12] mb-3">Special Instructions</label>
                                 <textarea
-                                    className="w-full bg-[#f8fbf7] border border-[#e7f3eb] rounded-lg p-4 text-sm focus:ring-[#166534] focus:border-[#166534] outline-none transition-all"
+                                    className="w-full bg-[#e8f5e9] border border-[#e7f3eb] rounded-lg p-4 text-sm focus:ring-[#166534] focus:border-[#166534] outline-none transition-all"
                                     placeholder="Add a note (e.g., extra spicy, no onion...)"
                                     rows={3}
                                     value={specialInstructions}
@@ -614,7 +614,7 @@ function FoodCheckoutContent({ user }: { user: any }) {
 
                             {pickupType === 'SCHEDULE' && (
                                 <select
-                                    className="w-full bg-[#f8fbf7] border border-[#e7f3eb] rounded-lg p-3 text-sm focus:ring-[#166534] focus:border-[#166534] outline-none"
+                                    className="w-full bg-[#e8f5e9] border border-[#e7f3eb] rounded-lg p-3 text-sm focus:ring-[#166534] focus:border-[#166534] outline-none"
                                     value={scheduleSlot}
                                     onChange={(e) => setScheduleSlot(e.target.value)}
                                 >
@@ -720,7 +720,7 @@ function CheckoutContent() {
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center">
+            <div className="min-h-screen bg-[#e8f5e9] flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-3xl mb-4">⏳</div>
                     <p className="text-gray-500">Loading checkout...</p>

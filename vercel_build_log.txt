@@ -1,0 +1,18 @@
+﻿node.exe : Vercel CLI 48.2.9
+At C:\Users\yasho\AppData\Roaming\
+npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node
+_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : Not 
+   Specified: (Vercel CLI 48.2.9  
+  :String) [], RemoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+? No Project Settings found 
+locally. Run `vercel pull` for 
+retrieving them?
+(Y/n)[1A[83G[1B
+[?25h

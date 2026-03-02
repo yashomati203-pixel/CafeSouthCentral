@@ -42,7 +42,7 @@ export default function ManageSubscriptionPage() {
 
     if (loading) {
         return (
-            <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ minHeight: '100vh', backgroundColor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <p>Loading...</p>
             </div>
         );
@@ -50,7 +50,7 @@ export default function ManageSubscriptionPage() {
 
     if (!currentSub) {
         return (
-            <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F0', fontFamily: 'sans-serif' }}>
+            <div style={{ minHeight: '100vh', backgroundColor: '#e8f5e9', fontFamily: 'sans-serif' }}>
                 <DesktopHeader
                     user={user}
                     onLoginClick={() => router.push('/?login=true')}
@@ -85,7 +85,7 @@ export default function ManageSubscriptionPage() {
     }
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FFF8F0', fontFamily: 'sans-serif' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: '#e8f5e9', fontFamily: 'sans-serif' }}>
             <DesktopHeader
                 user={user}
                 onLoginClick={() => router.push('/?login=true')}

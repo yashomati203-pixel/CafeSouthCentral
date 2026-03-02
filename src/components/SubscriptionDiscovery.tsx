@@ -108,7 +108,7 @@ export default function SubscriptionDiscovery() {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            className="relative w-full max-w-md bg-[#FAF9F6] border-[3px] border-black p-5 md:p-8 rounded-2xl shadow-2xl flex flex-col gap-4 md:gap-6 max-h-[85vh] overflow-y-auto"
+                            className="relative w-full max-w-md bg-[#FAF9F6] border-[3px] border-black p-4 md:p-6 rounded-[2rem] shadow-2xl flex flex-col gap-3 md:gap-4 max-h-[85vh] overflow-y-auto"
                         >
                             {/* Close Button */}
                             <button
@@ -120,8 +120,8 @@ export default function SubscriptionDiscovery() {
 
                             {/* Header */}
                             <div className="text-center">
-                                <h2 className="font-serif-display text-2xl md:text-3xl font-bold mb-1 md:mb-2">Pick Your Daily Meal.</h2>
-                                <p className="text-gray-600 font-medium text-xs md:text-sm leading-relaxed mb-2 md:mb-4">
+                                <h2 className="font-serif-display text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-slate-900">Pick Your Daily Meal.</h2>
+                                <p className="text-slate-700 font-medium text-xs md:text-sm leading-relaxed mb-2 md:mb-4">
                                     Join the club to reduce your prices by unlocking exclusive savings.
                                 </p>
                             </div>
@@ -151,41 +151,41 @@ export default function SubscriptionDiscovery() {
                             <div className="space-y-2 md:space-y-3">
                                 <button
                                     onClick={() => handlePlanSelect('LIGHT_BITE')}
-                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-xl flex items-center justify-between group hover:bg-black transition-all"
+                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-2xl flex items-center justify-between group hover:bg-black transition-all"
                                 >
                                     <div className="text-left">
-                                        <div className="font-bold text-sm md:text-base group-hover:text-white flex items-center gap-2">
+                                        <div className="font-bold text-sm md:text-base text-slate-900 group-hover:text-white flex items-center gap-2">
                                             Light Bite
                                             <span className="bg-[#D9F99D] text-[10px] px-2 py-0.5 rounded-full border border-black text-black group-hover:border-white">Basic</span>
                                         </div>
                                     </div>
-                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:text-white transition-opacity" />
+                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-slate-900 group-hover:text-white transition-opacity" />
                                 </button>
 
                                 <button
                                     onClick={() => handlePlanSelect('FEAST_FUEL')}
-                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-xl flex items-center justify-between group hover:bg-black transition-all"
+                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-2xl flex items-center justify-between group hover:bg-black transition-all"
                                 >
                                     <div className="text-left">
-                                        <div className="font-bold text-sm md:text-base group-hover:text-white flex items-center gap-2">
+                                        <div className="font-bold text-sm md:text-base text-slate-900 group-hover:text-white flex items-center gap-2">
                                             Feast & Fuel
                                             <Wifi className="w-3 h-3 text-blue-500" />
                                         </div>
                                     </div>
-                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:text-white transition-opacity" />
+                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-slate-900 group-hover:text-white transition-opacity" />
                                 </button>
 
                                 <button
                                     onClick={() => handlePlanSelect('ULTIMATE')}
-                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-xl flex items-center justify-between group hover:bg-black transition-all"
+                                    className="w-full bg-white border-2 border-black p-3 md:p-4 rounded-2xl flex items-center justify-between group hover:bg-black transition-all"
                                 >
                                     <div className="text-left">
-                                        <div className="font-bold text-sm md:text-base group-hover:text-white flex items-center gap-2">
+                                        <div className="font-bold text-sm md:text-base text-slate-900 group-hover:text-white flex items-center gap-2">
                                             Ultimate
                                             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                                         </div>
                                     </div>
-                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:text-white transition-opacity" />
+                                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-slate-900 group-hover:text-white transition-opacity" />
                                 </button>
 
                                 <button
@@ -194,7 +194,7 @@ export default function SubscriptionDiscovery() {
                                         router.push('/subscription');
                                         setShowModal(false);
                                     }}
-                                    className="w-full py-2 md:py-3 text-center text-xs md:text-sm font-bold underline decoration-2 underline-offset-4 hover:text-gray-600"
+                                    className="w-full py-2 md:py-3 text-center text-xs md:text-sm font-bold text-slate-800 underline decoration-2 underline-offset-4 hover:text-gray-600"
                                 >
                                     Explore All Benefits
                                 </button>

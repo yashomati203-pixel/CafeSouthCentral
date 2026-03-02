@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     try {
         const period = req.nextUrl.searchParams.get('period') || 'day';
@@ -101,7 +103,7 @@ export async function GET(req: NextRequest) {
                 date: o.createdAt,
                 amount: o.totalAmount,
                 items: o.items.length,
-                customer: o.user.name
+                customer: o.user?.name || 'Unknown'
             }))
         });
 

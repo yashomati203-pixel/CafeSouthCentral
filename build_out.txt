@@ -1,0 +1,66 @@
+﻿   Γû▓ Next.js 14.1.0
+   - Environments: .env.local, .env
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Users\yasho\AppData\Roaming\ 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : Not 
+   Specified: (:String) [], Remo  
+  teException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+> Build error occurred
+Error: EINVAL: invalid argument, 
+readlink 'C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\.next\export\404.html'
+    at async Object.readlink 
+(node:internal/fs/promises:975:10)
+    at async C:\Users\yasho\OneDri
+ve\Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\lib\
+recursive-delete.js:58:30
+    at async Promise.all (index 0)
+    at async recursiveDelete (C:\U
+sers\yasho\OneDrive\Desktop\Cafe 
+South Central\Web App v1\node_modu
+les\next\dist\lib\recursive-delete
+.js:51:5)
+    at async C:\Users\yasho\OneDri
+ve\Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\lib\
+recursive-delete.js:68:17
+    at async Promise.all (index 5)
+    at async recursiveDelete (C:\U
+sers\yasho\OneDrive\Desktop\Cafe 
+South Central\Web App v1\node_modu
+les\next\dist\lib\recursive-delete
+.js:51:5)
+    at async C:\Users\yasho\OneDri
+ve\Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\buil
+d\index.js:690:17
+    at async Span.traceAsyncFn (C:
+\Users\yasho\OneDrive\Desktop\Cafe
+ South Central\Web App v1\node_mod
+ules\next\dist\trace\trace.js:151:
+20)
+    at async build (C:\Users\yasho
+\OneDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\build\index.js:374:9) {
+  errno: -4071,
+  code: 'EINVAL',
+  syscall: 'readlink',
+  path: 'C:\\Users\\yasho\\OneDriv
+e\\Desktop\\Cafe South 
+Central\\Web App 
+v1\\.next\\export\\404.html'
+}

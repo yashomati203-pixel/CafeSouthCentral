@@ -32,8 +32,12 @@ export default function MobileBottomNav({ user, onCartClick, onProfileClick }: M
         {
             label: 'Menu',
             icon: Utensils,
-            path: '/',
-            action: () => router.push('/')
+            path: '/menu',
+            action: () => {
+                if (pathname !== '/menu' && pathname !== '/') {
+                    router.push('/menu');
+                }
+            }
         },
         {
             label: 'Orders',
@@ -61,8 +65,8 @@ export default function MobileBottomNav({ user, onCartClick, onProfileClick }: M
             <div className="flex justify-between items-center px-6 py-2">
                 {navItems.map((item) => {
                     // Active state logic
-                    const isActive = item.path === '/'
-                        ? pathname === '/'
+                    const isActive = item.label === 'Menu'
+                        ? (pathname === '/' || pathname === '/menu')
                         : pathname?.startsWith(item.path);
 
                     const Icon = item.icon;
@@ -71,11 +75,15 @@ export default function MobileBottomNav({ user, onCartClick, onProfileClick }: M
                         <button
                             key={item.label}
                             onClick={item.action}
-                            className={`flex flex-col items-center gap-1 transition-colors ${isActive
-                                ? 'text-[#5C3A1A] dark:text-white'
-                                : 'text-gray-400 hover:text-[#5C3A1A] dark:hover:text-gray-200'
+                            className={`flex flex-col items-center gap-1 transition-colors relative pt-1 ${isActive
+                                ? 'text-[#14b84b]'
+                                : 'text-gray-400 hover:text-[#14b84b]'
                                 }`}
                         >
+                            {/* Active top indicator bar */}
+                            {isActive && (
+                                <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#14b84b] rounded-full" />
+                            )}
                             <div className="relative">
                                 <Icon
                                     className={`w-6 h-6 ${isActive ? 'fill-current' : ''}`}

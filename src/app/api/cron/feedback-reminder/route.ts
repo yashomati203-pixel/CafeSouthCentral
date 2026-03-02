@@ -41,7 +41,7 @@ export async function GET(req: Request) {
 
         console.log(`[Cron] Found ${pendingOrders.length} orders pending feedback notification.`);
 
-        const results = [];
+        const results: any[] = [];
 
         for (const order of pendingOrders as any[]) {
             if (!order.user.fcmToken) continue;

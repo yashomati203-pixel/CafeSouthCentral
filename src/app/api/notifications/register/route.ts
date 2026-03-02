@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma"; // Assuming this exists, I should check. Usually in src/lib/prisma.ts
 

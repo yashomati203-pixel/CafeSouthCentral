@@ -47,7 +47,7 @@ export async function GET(req: Request) {
             }
         });
 
-        const results = [];
+        const results: any[] = [];
 
         // 4. Send Notification to all Admins
         for (const admin of admins) {

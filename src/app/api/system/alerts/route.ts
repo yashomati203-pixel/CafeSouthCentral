@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 // Simple in-memory storage for V1 (reset on server restart is acceptable for now)

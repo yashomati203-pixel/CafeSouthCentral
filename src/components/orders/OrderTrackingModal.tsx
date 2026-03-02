@@ -94,7 +94,7 @@ export default function OrderTrackingModal({ order, onClose }: OrderTrackingModa
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-[#f8fbf7] dark:bg-[#112116] w-full max-w-3xl rounded-3xl shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+            <div className="bg-[#e8f5e9] dark:bg-[#112116] w-full max-w-3xl rounded-3xl shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden my-auto animate-in zoom-in-95 duration-200">
 
                 {/* Header / Close Button */}
                 <button

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Manrope, Playfair_Display, Work_Sans } from 'next/font/google';
+import Script from 'next/script';
+import { Suspense } from 'react';
 import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import ClickSpark from '@/components/ui/ClickSpark';
@@ -41,10 +43,23 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <head>
-                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
-            </head>
+            <head />
             <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh', overflow: 'hidden' }}>
+                {/* Material Symbols injected via Script to bypass webpack CSS processing */}
+                <Script
+                    id="material-symbols"
+                    strategy="beforeInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                var link = document.createElement('link');
+                                link.rel = 'stylesheet';
+                                link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap';
+                                document.head.appendChild(link);
+                            })();
+                        `
+                    }}
+                />
                 <CartProvider>
                     <SystemAlertBanner />
                     <div className="min-h-screen w-full relative">
@@ -54,12 +69,16 @@ export default function RootLayout({
                         <div
                             className="relative z-10 mx-[5px] md:mx-[15px] mt-[15px] mb-[15px] md:mb-[15px] h-[calc(100dvh-30px)] md:h-[calc(100vh-30px)] overflow-y-auto overflow-x-hidden shadow-2xl no-scrollbar pb-0 bg-sand-beige"
                         >
-                            <MainLayout>
-                                {children}
-                                <SubscriptionDiscovery />
-                            </MainLayout>
+                            <Suspense fallback={null}>
+                                <MainLayout>
+                                    {children}
+                                    <SubscriptionDiscovery />
+                                </MainLayout>
+                            </Suspense>
                         </div>
-                        <GlobalLayoutClient />
+                        <Suspense fallback={null}>
+                            <GlobalLayoutClient />
+                        </Suspense>
                         <Toaster richColors position="top-center" />
                         <CookieBanner />
                     </div>

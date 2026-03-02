@@ -133,15 +133,15 @@ export default function MenuGrid({
                     </div>
 
                     {/* Search Bar next to categories */}
-                    <div className="w-full md:w-64 shrink-0 relative">
+                    <div className="w-full md:w-72 shrink-0 relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="w-4 h-4 text-gray-400" />
+                            <Search className="w-5 h-5 text-[#14b84b]" />
                         </div>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="block w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/20 rounded-full shadow-inner ring-1 ring-white/5 focus:ring-1 focus:ring-[#14b84b] transition-all text-sm text-white placeholder-gray-400 focus:outline-none"
+                            className="block w-full pl-11 pr-4 py-3 bg-white/80 dark:bg-[#102214]/80 border-2 border-[#14b84b]/40 rounded-full shadow-sm focus:border-[#14b84b] focus:ring-1 focus:ring-[#14b84b] transition-all text-sm text-[#0d4d22] dark:text-white font-medium placeholder-[#14b84b]/60 focus:outline-none backdrop-blur-sm"
                             placeholder="Find a dish..."
                         />
                     </div>
@@ -224,7 +224,7 @@ export default function MenuGrid({
 
                                 return (
                                     <AnimatedItem key={item.id} index={idx} delay={idx * 0.03}>
-                                        <div className="group menu-card bg-[#102214] border-[#0d4d22] border hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                                        <div className="group menu-card bg-[#e8f5e9] border border-[#14b84b]/20 hover:border-[#14b84b]/50 hover:shadow-2xl hover:shadow-[#14b84b]/10 hover:-translate-y-2 transition-all duration-300">
                                             <MenuItemCard
                                                 item={item}
                                                 cartItem={cartItem}
@@ -315,7 +315,11 @@ function MenuItemCard({
     return (
         <div className={`flex flex-col h-full ${item.stock === 0 ? 'opacity-60' : ''}`}>
             {/* Image */}
-            <div className="relative w-full overflow-hidden bg-[#0d4d22]" style={{ aspectRatio: '4/3' }}>
+            <div className="relative w-full overflow-hidden bg-gray-100" style={{ aspectRatio: '4/3' }}>
+                {/* FSSAI Veg Indicator */}
+                <div className="absolute top-2 left-2 z-10 w-5 h-5 border-2 border-green-600 bg-white/90 rounded-sm flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-600"></div>
+                </div>
                 {!isBestseller && isPopular && (
                     <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full px-3 py-1 text-xs font-bold text-[#5C3A1A] shadow-sm">
                         Bestseller
@@ -329,15 +333,12 @@ function MenuItemCard({
             </div>
 
             {/* Content */}
-            <div className="p-4 flex-1 flex flex-col">
+            <div className="p-4 flex-1 flex flex-col bg-white">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-white flex-1">
+                    <h3 className="text-lg font-bold text-[#0e2a1a] flex-1">
                         {item.name}
                     </h3>
                     <div className="flex flex-col items-end gap-1 ml-2">
-                        <span className="text-xs px-2 py-0.5 rounded border border-green-500 text-green-600 dark:text-green-400">
-                            PURE VEG
-                        </span>
                         {item.stock === 0 ? (
                             <span className="text-xs font-bold text-red-600 border border-red-600 px-2 py-0.5 rounded">
                                 SOLD OUT
@@ -350,27 +351,27 @@ function MenuItemCard({
                     </div>
                 </div>
 
-                <p className="text-sm text-[#e7f3eb]/80 leading-relaxed mb-3 line-clamp-2">
+                <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-2">
                     {item.description}
                 </p>
 
                 <div className="mt-auto">
-                    <p className="text-lg font-extrabold mb-2 text-[#5C3A1A] dark:text-amber-500">
+                    <p className="text-lg font-extrabold mb-2 text-[#14b84b]">
                         {mode === 'NORMAL' ? `₹${item.price}` : 'Included in Plan'}
                     </p>
 
                     {cartItem ? (
-                        <div className="flex items-center justify-between bg-[#0d4d22] rounded-xl p-1">
+                        <div className="flex items-center justify-between bg-[#f0f9f4] border border-[#14b84b]/30 rounded-xl p-1">
                             <button
                                 onClick={(e) => { e.stopPropagation(); onDecreaseQty(item.id); }}
-                                className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
+                                className="w-10 h-10 flex items-center justify-center bg-[#14b84b] hover:bg-[#11a342] text-white rounded-lg transition-colors shadow-sm"
                             >
                                 <Minus className="w-5 h-5" />
                             </button>
-                            <span className="font-bold text-white px-2">{cartItem.qty}</span>
+                            <span className="font-bold text-[#0e2a1a] px-2">{cartItem.qty}</span>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onAddToCart(item); }}
-                                className="w-10 h-10 flex items-center justify-center bg-[#5C3A1A] hover:bg-[#4a2e15] text-white rounded-lg transition-colors shadow-sm"
+                                className="w-10 h-10 flex items-center justify-center bg-[#14b84b] hover:bg-[#11a342] text-white rounded-lg transition-colors shadow-sm"
                             >
                                 <Plus className="w-5 h-5" />
                             </button>
@@ -379,7 +380,7 @@ function MenuItemCard({
                         <button
                             onClick={() => onAddToCart(item)}
                             disabled={item.stock === 0}
-                            className="w-full flex items-center justify-center gap-2 py-3 bg-[#0d4d22] hover:bg-[#5C3A1A] text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-[#14b84b] hover:bg-[#11a342] text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                         >
                             <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
                             {item.stock === 0 ? 'Sold Out' : 'Add to Cart'}

@@ -1,0 +1,237 @@
+﻿
+> iim-nagpur-food-outlet@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 229ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+   Γû▓ Next.js 14.1.0
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: C:\Users\yasho\OneDrive\Desktop\Cafe South Central\Web App v1\node_modules\next-pwa\register.js
+> [PWA] Service worker: C:\Users\yasho\OneDrive\Desktop\Cafe South Central\Web App v1\public\firebase-messaging-sw.js
+> [PWA]   url: /firebase-messaging-sw.js
+> [PWA]   scope: /
+node.exe : <w> [webpack.cache.Pack
+FileCacheStrategy] Serializing 
+big strings (158kiB) impacts 
+deserialization performance 
+(consider using Buffer instead 
+and decode when needed)
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Users\yasho\AppData\Roaming\ 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : Not 
+   Specified: (<w> [webpack.ca..  
+  .de when needed):String) [],    
+ RemoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+ ΓÜá Compiled with warnings
+
+./node_modules/@upstash/redis/node
+js.mjs
+A Node.js API is used 
+(process.version at line: 58) 
+which is not supported in the 
+Edge Runtime.
+Learn more: https://nextjs.org/doc
+s/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/@upstash/redis/node
+js.mjs
+./src/lib/redis.ts
+
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+   Generating static pages (0/36) ...
+System Alerts Failed: ex [Error]: 
+Dynamic server usage: Page 
+couldn't be rendered statically 
+because it used `headers`. See 
+more info here: https://nextjs.org
+/docs/messages/dynamic-server-erro
+r
+    at eP (C:\Users\yasho\OneDrive
+\Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\comp
+iled\next-server\app-route.runtime
+.prod.js:6:29358)
+    at Module.eE (C:\Users\yasho\O
+neDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\next-server\app-r
+oute.runtime.prod.js:6:29694)
+    at i (C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\node_modules\next\dist\comp
+iled\next-server\app-route.runtime
+.prod.js:6:34572)
+    at Object.get (C:\Users\yasho\
+OneDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\next-server\app-r
+oute.runtime.prod.js:6:34788)
+    at d (C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\.next\server\app\api\admin\
+system-alerts\route.js:1:542)
+    at C:\Users\yasho\OneDrive\Des
+ktop\Cafe South Central\Web App v1
+\node_modules\next\dist\compiled\n
+ext-server\app-route.runtime.prod.
+js:6:42490
+    at C:\Users\yasho\OneDrive\Des
+ktop\Cafe South Central\Web App v1
+\node_modules\next\dist\server\lib
+\trace\tracer.js:133:36
+    at NoopContextManager.with (C:
+\Users\yasho\OneDrive\Desktop\Cafe
+ South Central\Web App v1\node_mod
+ules\next\dist\compiled\@opentelem
+etry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\y
+asho\OneDrive\Desktop\Cafe South 
+Central\Web App v1\node_modules\ne
+xt\dist\compiled\@opentelemetry\ap
+i\index.js:1:518)
+    at NoopTracer.startActiveSpan 
+(C:\Users\yasho\OneDrive\Desktop\C
+afe South Central\Web App v1\node_
+modules\next\dist\compiled\@opente
+lemetry\api\index.js:1:18093) {
+  description: "Page couldn't be 
+rendered statically because it 
+used `headers`. See more info 
+here: https://nextjs.org/docs/mess
+ages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+
+   Generating static pages (9/36) 
+ΓÜá∩╕Å  Redis credentials not 
+found. Using In-Memory Mock Redis 
+(Data will be lost on restart).
+
+   Generating static pages (18/36) 
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+ΓÜá∩╕Å Razorpay keys missing. 
+Payment operations will be mocked 
+or fail.
+
+   Generating static pages (27/36) 
+
+ Γ£ô Generating static pages (36/36) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Γöî Γùï /                                    2.81 kB        87.5 kB
+Γö£ Γùï /_not-found                          0 B                0 B
+Γö£ Γùï /account                             7.76 kB        99.2 kB
+Γö£ Γùï /admin-scan                          111 kB          196 kB
+Γö£ Γùï /admin/dashboard                     131 kB          238 kB
+Γö£ ╬╗ /api/admin/analytics                 0 B                0 B
+Γö£ ╬╗ /api/admin/broadcast                 0 B                0 B
+Γö£ ╬╗ /api/admin/feedback                  0 B                0 B
+Γö£ ╬╗ /api/admin/inventory                 0 B                0 B
+Γö£ ╬╗ /api/admin/orders                    0 B                0 B
+Γö£ ╬╗ /api/admin/orders/[id]               0 B                0 B
+Γö£ ╬╗ /api/admin/orders/create             0 B                0 B
+Γö£ ╬╗ /api/admin/orders/pos                0 B                0 B
+Γö£ ╬╗ /api/admin/reports                   0 B                0 B
+Γö£ ╬╗ /api/admin/system-alerts             0 B                0 B
+Γö£ ╬╗ /api/admin/users                     0 B                0 B
+Γö£ ╬╗ /api/auth/admin/login                0 B                0 B
+Γö£ ╬╗ /api/auth/admin/verify-2fa           0 B                0 B
+Γö£ ╬╗ /api/auth/send-otp                   0 B                0 B
+Γö£ ╬╗ /api/auth/verify-otp                 0 B                0 B
+Γö£ ╬╗ /api/cron/feedback-reminder          0 B                0 B
+Γö£ ╬╗ /api/cron/low-stock                  0 B                0 B
+Γö£ ╬╗ /api/cron/renew                      0 B                0 B
+Γö£ ╬╗ /api/cron/subscription-expiry        0 B                0 B
+Γö£ ╬╗ /api/feedback                        0 B                0 B
+Γö£ ╬╗ /api/feedback/pending                0 B                0 B
+Γö£ ╬╗ /api/menu                            0 B                0 B
+Γö£ ╬╗ /api/notifications/register          0 B                0 B
+Γö£ ╬╗ /api/orders/[id]                     0 B                0 B
+Γö£ ╬╗ /api/orders/cancel                   0 B                0 B
+Γö£ ╬╗ /api/orders/create                   0 B                0 B
+Γö£ ╬╗ /api/orders/status                   0 B                0 B
+Γö£ ╬╗ /api/orders/update-status            0 B                0 B
+Γö£ ╬╗ /api/subscription/cancel             0 B                0 B
+Γö£ ╬╗ /api/system/alerts                   0 B                0 B
+Γö£ ╬╗ /api/upload                          0 B                0 B
+Γö£ ╬╗ /api/user/addresses                  0 B                0 B
+Γö£ ╬╗ /api/user/addresses/[id]             0 B                0 B
+Γö£ ╬╗ /api/user/addresses/primary          0 B                0 B
+Γö£ ╬╗ /api/user/delete                     0 B                0 B
+Γö£ ╬╗ /api/user/loyalty                    0 B                0 B
+Γö£ ╬╗ /api/user/orders                     0 B                0 B
+Γö£ ╬╗ /api/user/orders/cancel              0 B                0 B
+Γö£ ╬╗ /api/user/payment-methods            0 B                0 B
+Γö£ ╬╗ /api/user/payment-methods/[id]       0 B                0 B
+Γö£ ╬╗ /api/user/payment-methods/primary    0 B                0 B
+Γö£ ╬╗ /api/user/pending-feedback           0 B                0 B
+Γö£ ╬╗ /api/user/subscription               0 B                0 B
+Γö£ ╬╗ /api/user/subscription-status        0 B                0 B
+Γö£ ╬╗ /api/user/subscription/payment       0 B                0 B
+Γö£ ╬╗ /api/user/update                     0 B                0 B
+Γö£ ╬╗ /api/webhooks/razorpay               0 B                0 B
+Γö£ Γùï /checkout                            8.07 kB         118 kB
+Γö£ Γùï /login                               2.65 kB        92.3 kB
+Γö£ Γùï /manage-subscription                 4.77 kB         118 kB
+Γö£ Γùï /menu                                11 kB           171 kB
+Γö£ Γùï /orders                              15.2 kB         124 kB
+Γö£ ╬╗ /receipt/[id]                        5.21 kB        89.9 kB
+Γö£ Γùï /subscription                        7.93 kB        92.6 kB
+Γöö Γùï /subscription/payment                3.12 kB        90.5 kB
++ First Load JS shared by all            84.7 kB
+  Γö£ chunks/69-3a292d67c3ee1a7a.js        29 kB
+  Γö£ chunks/fd9d1056-7ec88369d7993455.js  53.4 kB
+  Γöö other shared chunks (total)          2.27 kB
+
+
+╞Æ Middleware                             65.1 kB
+
+Γùï  (Static)   prerendered as static content
+╬╗  (Dynamic)  server-rendered on demand using Node.js
+

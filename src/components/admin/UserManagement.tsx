@@ -60,7 +60,7 @@ export default function UserManagement({ users }: UserManagementProps) {
             <div className="bg-white rounded-xl shadow-sm border border-[#14b84b]/10 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-[#f8fbf7] border-b border-[#14b84b]/5">
+                        <thead className="bg-[#e8f5e9] border-b border-[#14b84b]/5">
                             <tr>
                                 <th className="px-6 py-4 text-xs font-bold text-[#0e2a1a]/60 uppercase tracking-wider">Customer</th>
                                 <th className="px-6 py-4 text-xs font-bold text-[#0e2a1a]/60 uppercase tracking-wider">Status</th>

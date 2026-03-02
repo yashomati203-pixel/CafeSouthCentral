@@ -162,10 +162,10 @@ export default function OrderHistoryPage() {
         ? new Date(orders[orders.length - 1].createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         : new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f8fbf7] dark:bg-[#102214]">Loading...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#e8f5e9] dark:bg-[#102214]">Loading...</div>;
 
     return (
-        <div className="flex min-h-screen bg-[#f8fbf7] dark:bg-[#102214]">
+        <div className="flex min-h-screen bg-[#e8f5e9] dark:bg-[#102214]">
             {/* Sidebar */}
             <ProfileSidebar user={user} onLogout={handleLogout} />
 

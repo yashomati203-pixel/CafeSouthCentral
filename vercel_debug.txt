@@ -1,0 +1,417 @@
+﻿node.exe : > [debug] 
+[2026-03-02T09:36:14.873Z] Found 
+config in file "C:\Users\yasho\One
+Drive\Desktop\Cafe South 
+Central\Web App v1\vercel.json"
+At C:\Users\yasho\AppData\Roaming\
+npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node
+_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : Not 
+   Specified: (> [debug] [2026..  
+  .v1\vercel.json":String) [],    
+ RemoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+Vercel CLI 48.2.9
+> [debug] 
+[2026-03-02T09:36:14.893Z] user 
+supplied a possible target for 
+deployment or an extension
+> [debug] 
+[2026-03-02T09:36:14.935Z] failed 
+to find extension command with 
+name "vercel---prod"
+> [debug] 
+[2026-03-02T09:36:15.033Z] 
+Setting target to production
+> [debug] 
+[2026-03-02T09:36:15.513Z] Found 
+".git\config" - detected "C:\Users
+\yasho\OneDrive\Desktop\Cafe 
+South Central\Web App v1" as repo 
+root
+> [debug] 
+[2026-03-02T09:36:15.605Z] 
+Spinner invoked (Retrieving 
+projectΓÇª) with a 1000ms delay
+> [debug] 
+[2026-03-02T09:36:15.608Z] Valid 
+access token, skipping token 
+refresh.
+> [debug] 
+[2026-03-02T09:36:15.609Z] Valid 
+access token, skipping token 
+refresh.
+> [debug] 
+[2026-03-02T09:36:15.650Z] #1 ΓåÆ 
+GET https://api.vercel.com/teams/t
+eam_y3NgU8h9LhzOmXL9JRAGPbth?teamI
+d=team_y3NgU8h9LhzOmXL9JRAGPbth
+> [debug] 
+[2026-03-02T09:36:15.654Z] #2 ΓåÆ 
+GET https://api.vercel.com/v9/proj
+ects/prj_gUNPiJQsInDSKqYgl9e2IZAiA
+sMB?teamId=team_y3NgU8h9LhzOmXL9JR
+AGPbth
+> [debug] 
+[2026-03-02T09:36:16.628Z] #1 ΓåÉ 
+200 OK: sfo1::5hj98-1772444176729-
+6b3b5fa1a6ba [978ms]
+> [debug] 
+[2026-03-02T09:36:16.667Z] #2 ΓåÉ 
+200 OK: sfo1::gdqxs-1772444176755-
+568fdf8cbd01 [1.01s]
+> [debug] 
+[2026-03-02T09:36:17.536Z] 
+Spinner invoked (Deploying yashoma
+ti-patras-projects-311a2994/cafe-s
+outh-central-v1) with a 0ms delay
+[client-debug] 
+2026-03-02T09:36:17.537Z Creating 
+deployment...
+[client-debug] 
+2026-03-02T09:36:17.537Z Provided 
+'path' is a directory.
+[client-debug] 
+2026-03-02T09:36:17.541Z Found 26 
+rules in .vercelignore
+[client-debug] 
+2026-03-02T09:36:17.541Z Building 
+file tree...
+[client-debug] 
+2026-03-02T09:36:17.614Z Found 
+326 files in the specified 
+directory
+[client-debug] 
+2026-03-02T09:36:17.811Z Yielding 
+a 'hashes-calculated' event with 
+321 hashes
+> [debug] 
+[2026-03-02T09:36:17.812Z] Valid 
+access token, skipping token 
+refresh.
+> [debug] 
+[2026-03-02T09:36:17.814Z] #3 ΓåÆ 
+GET https://api.vercel.com/v9/proj
+ects/cafe-south-central-v1?teamId=
+team_y3NgU8h9LhzOmXL9JRAGPbth
+> [debug] 
+[2026-03-02T09:36:18.112Z] #3 ΓåÉ 
+200 OK: sfo1::w9z4p-1772444178201-
+2ca5a814c87a [298ms]
+[client-debug] 
+2026-03-02T09:36:18.115Z Using 
+provided API URL: 
+https://api.vercel.com
+[client-debug] 
+2026-03-02T09:36:18.115Z Using 
+provided user agent: vercel 
+48.2.9 node-v22.20.0 win32 (x64)
+[client-debug] 
+2026-03-02T09:36:18.115Z Setting 
+platform version to harcoded 
+value 2
+[client-debug] 
+2026-03-02T09:36:18.115Z Creating 
+the deployment and starting 
+upload...
+[client-debug] 
+2026-03-02T09:36:18.116Z 
+Determining necessary files for 
+upload...
+[client-debug] 
+2026-03-02T09:36:18.116Z Creating 
+deployment
+[client-debug] 
+2026-03-02T09:36:18.121Z Sending 
+deployment creation API request
+[client-debug] 
+2026-03-02T09:36:18.704Z 
+Deployment response: {"error":{"co
+de":"missing_files","message":"Mis
+sing files","missing":["fd508c0ec1
+f9f3719b31d0d549f27a6cdc050f54"]}}
+[client-debug] 
+2026-03-02T09:36:18.704Z Error: 
+Deployment request status is 400
+[client-debug] 
+2026-03-02T09:36:18.704Z 1 files 
+are required to upload
+[client-debug] 
+2026-03-02T09:36:18.705Z Yielding 
+a 'file-count' event
+> [debug] 
+[2026-03-02T09:36:18.705Z] Total 
+files 321, 1 changed
+> [debug] 
+[2026-03-02T09:36:18.705Z] 
+Spinner invoked (Uploading 
+[--------------------] 
+(0.0B/2.3KB)) with a 0ms delay
+[client-debug] 
+2026-03-02T09:36:18.705Z Building 
+an upload list...
+[client-debug] 
+2026-03-02T09:36:18.706Z Starting 
+upload
+[client-debug] 
+2026-03-02T09:36:18.707Z POST http
+s://api.vercel.com/v2/files?teamId
+=team_y3NgU8h9LhzOmXL9JRAGPbth
+> [debug] 
+[2026-03-02T09:36:18.710Z] 
+Spinner invoked (Uploading 
+[====================] 
+(2.3KB/2.3KB)) with a 0ms delay
+[client-debug] 
+2026-03-02T09:36:19.077Z DONE in 
+370ms: POST https://api.vercel.com
+/v2/files?teamId=team_y3NgU8h9LhzO
+mXL9JRAGPbth
+[client-debug] 
+2026-03-02T09:36:19.077Z File fd50
+8c0ec1f9f3719b31d0d549f27a6cdc050f
+54 (C:\Users\yasho\OneDrive\Deskto
+p\Cafe South Central\Web App 
+v1\vercel_debug.txt) uploaded
+[client-debug] 
+2026-03-02T09:36:19.077Z Yielding 
+a 'file-uploaded' event
+> [debug] 
+[2026-03-02T09:36:19.077Z] 
+Uploaded: C:\Users\yasho\OneDrive\
+Desktop\Cafe South Central\Web 
+App v1\vercel_debug.txt (2.3KB)
+[client-debug] 
+2026-03-02T09:36:19.077Z All 
+files uploaded
+[client-debug] 
+2026-03-02T09:36:19.077Z Yielding 
+a 'all-files-uploaded' event
+[client-debug] 
+2026-03-02T09:36:19.077Z Starting 
+deployment creation
+[client-debug] 
+2026-03-02T09:36:19.077Z Creating 
+deployment
+[client-debug] 
+2026-03-02T09:36:19.081Z Sending 
+deployment creation API request
+[client-debug] 
+2026-03-02T09:36:20.841Z 
+Deployment response: {"alias":["ca
+fe-south-central-v1-yashomati-patr
+as-projects-311a2994.vercel.app"],
+"aliasAssigned":false,"automaticAl
+iases":["cafe-south-central-v1-yas
+homati-patras-projects-311a2994.ve
+rcel.app"],"bootedAt":177244417984
+7,"buildingAt":1772444179847,"buil
+dSkipped":false,"createdAt":177244
+4179847,"creator":{"uid":"EvRQFl2l
+eJon3PbpEr1c19Gz","username":"yash
+omatipatra1-2491"},"id":"dpl_3zoJP
+j1dW4kAHjEzw7nUcL9BQHnd","name":"c
+afe-south-central-v1","meta":{"git
+hubCommitAuthorName":"Yashomati","
+githubCommitAuthorEmail":"yashomat
+i203@gmail.com","githubCommitMessa
+ge":"UI tweak: Change category 
+button text to black","githubCommi
+tOrg":"yashomati203-pixel","github
+CommitRef":"master","githubCommitR
+epo":"CafeSouthCental","githubComm
+itSha":"8429201c3746875b7c1b4429b7
+0eaae5fd89abbb","githubDeployment"
+:"1","githubOrg":"yashomati203-pix
+el","githubRepo":"CafeSouthCental"
+,"gitDirty":"1"},"originCacheRegio
+n":"iad1","project":{"id":"prj_gUN
+PiJQsInDSKqYgl9e2IZAiAsMB","name":
+"cafe-south-central-v1","framework
+":"nextjs"},"public":false,"readyS
+tate":"INITIALIZING","regions":["i
+ad1"],"source":"cli","status":"INI
+TIALIZING","target":"production","
+team":{"id":"team_y3NgU8h9LhzOmXL9
+JRAGPbth","name":"Yashomati 
+Patra's projects","slug":"yashomat
+i-patras-projects-311a2994"},"type
+":"LAMBDAS","url":"cafe-south-cent
+ral-v1-mc7ddidl4.vercel.app","vers
+ion":2,"previewCommentsEnabled":tr
+ue,"oidcTokenClaims":{"sub":"owner
+:yashomati-patras-projects-311a299
+4:project:cafe-south-central-v1:en
+vironment:production","iss":"https
+://oidc.vercel.com/yashomati-patra
+s-projects-311a2994","scope":"owne
+r:yashomati-patras-projects-311a29
+94:project:cafe-south-central-v1:e
+nvironment:production","aud":"http
+s://vercel.com/yashomati-patras-pr
+ojects-311a2994","owner":"yashomat
+i-patras-projects-311a2994","owner
+_id":"team_y3NgU8h9LhzOmXL9JRAGPbt
+h","project":"cafe-south-central-v
+1","project_id":"prj_gUNPiJQsInDSK
+qYgl9e2IZAiAsMB","environment":"pr
+oduction","plan":"hobby"},"lambdas
+":[{"id":"bld_eixphgmny","createdA
+t":1772444180629,"entrypoint":".",
+"readyState":"READY","readyStateAt
+":1772444180629,"output":[]}],"ali
+asAssignedAt":null,"build":{"env":
+[]},"builds":[],"createdIn":"sfo1"
+,"env":[],"functions":null,"inspec
+torUrl":"https://vercel.com/yashom
+ati-patras-projects-311a2994/cafe-
+south-central-v1/3zoJPj1dW4kAHjEzw
+7nUcL9BQHnd","isInConcurrentBuilds
+Queue":false,"isInSystemBuildsQueu
+e":true,"ownerId":"team_y3NgU8h9Lh
+zOmXL9JRAGPbth","plan":"hobby","pr
+ojectId":"prj_gUNPiJQsInDSKqYgl9e2
+IZAiAsMB","projectSettings":{"buil
+dCommand":null,"devCommand":null,"
+framework":"nextjs","commandForIgn
+oringBuildStep":null,"installComma
+nd":null,"outputDirectory":null,"s
+peedInsights":{"id":"yqKIX038OERDj
+k1NUcykhovdeDU","hasData":false,"e
+nabledAt":1767979671145},"webAnaly
+tics":{"id":"Qz6gbncL0hofmJB8m8eOF
+SgCQ","enabledAt":1772354280385},"
+nodeVersion":"24.x"},"routes":null
+,"config":{"version":1,"secureComp
+utePrimaryRegion":null,"secureComp
+uteFallbackRegion":null,"functionT
+imeout":300,"functionType":"fluid"
+,"functionMemoryType":"standard","
+isUsingActiveCPU":true,"resourceCo
+nfig":{"buildQueue":{"configuratio
+n":"SKIP_NAMESPACE_QUEUE"}}}}
+[client-debug] 
+2026-03-02T09:36:20.841Z 
+Deployment created
+[client-debug] 
+2026-03-02T09:36:20.841Z Yielding 
+a 'created' event
+Inspect: https://vercel.com/yashom
+ati-patras-projects-311a2994/cafe-
+south-central-v1/3zoJPj1dW4kAHjEzw
+7nUcL9BQHnd [3s]
+Production: https://cafe-south-cen
+tral-v1-mc7ddidl4.vercel.app [3s]
+> [debug] 
+[2026-03-02T09:36:20.842Z] 
+Spinner invoked (Building) with a 
+0ms delay
+[client-debug] 
+2026-03-02T09:36:20.842Z Waiting 
+for deployment to be ready...
+[client-debug] 
+2026-03-02T09:36:20.843Z Waiting 
+for builds and the deployment to 
+complete...
+[client-debug] 
+2026-03-02T09:36:22.753Z 
+Deployment state changed to 
+BUILDING
+[client-debug] 
+2026-03-02T09:36:22.753Z Yielding 
+a 'building' event
+> [debug] 
+[2026-03-02T09:36:22.753Z] 
+Spinner invoked (Building) with a 
+0ms delay
+[client-debug] 
+2026-03-02T09:38:12.386Z Yielding 
+a 'error' event
+> [debug] 
+[2026-03-02T09:38:12.397Z] Error: 
+Error: We encountered an internal 
+error. Please try again.
+Error: We encountered an internal 
+error. Please try again.
+    at Now.handleDeploymentError (
+C:\Users\yasho\AppData\Roaming\npm
+\node_modules\vercel\dist\index.js
+:150197:16)
+    at processDeployment (C:\Users
+\yasho\AppData\Roaming\npm\node_mo
+dules\vercel\dist\index.js:149948:
+34)
+    at 
+process.processTicksAndRejections 
+(node:internal/process/task_queues
+:105:5)
+    at async Now.create (C:\Users\
+yasho\AppData\Roaming\npm\node_mod
+ules\vercel\dist\index.js:150092:2
+8)
+    at async createDeploy (C:\User
+s\yasho\AppData\Roaming\npm\node_m
+odules\vercel\dist\index.js:150332
+:12)
+    at async deploy_default (C:\Us
+ers\yasho\AppData\Roaming\npm\node
+_modules\vercel\dist\index.js:1512
+40:22)
+    at async main17 (C:\Users\yash
+o\AppData\Roaming\npm\node_modules
+\vercel\dist\index.js:186750:19)
+> [debug] 
+[2026-03-02T09:38:12.397Z] 
+handling error: Error: We 
+encountered an internal error. 
+Please try again.
+    at Now.handleDeploymentError (
+C:\Users\yasho\AppData\Roaming\npm
+\node_modules\vercel\dist\index.js
+:150197:16)
+    at processDeployment (C:\Users
+\yasho\AppData\Roaming\npm\node_mo
+dules\vercel\dist\index.js:149948:
+34)
+    at 
+process.processTicksAndRejections 
+(node:internal/process/task_queues
+:105:5)
+    at async Now.create (C:\Users\
+yasho\AppData\Roaming\npm\node_mod
+ules\vercel\dist\index.js:150092:2
+8)
+    at async createDeploy (C:\User
+s\yasho\AppData\Roaming\npm\node_m
+odules\vercel\dist\index.js:150332
+:12)
+    at async deploy_default (C:\Us
+ers\yasho\AppData\Roaming\npm\node
+_modules\vercel\dist\index.js:1512
+40:22)
+    at async main17 (C:\Users\yash
+o\AppData\Roaming\npm\node_modules
+\vercel\dist\index.js:186750:19)
+Error: We encountered an internal 
+error. Please try again.
+> [debug] 
+[2026-03-02T09:38:13.207Z] Vercel 
+CLI 48.2.9
+
+> [debug] 
+[2026-03-02T09:38:13.910Z] 
+Telemetry event tracked
+> [debug] 
+[2026-03-02T09:38:14.427Z] 
+Telemetry subprocess exited with 
+code 0
+> [debug] 
+[2026-03-02T09:38:14.457Z] 
+Telemetry subprocess killed due 
+to timeout
+https://cafe-south-central-v1-mc7ddidl4.vercel.app

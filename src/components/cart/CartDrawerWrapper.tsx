@@ -19,7 +19,7 @@ export default function CartDrawerWrapper() {
             isOpen={isCartOpen}
             onClose={closeCart}
             items={items}
-            subTotalCount={items.length}
+            subtotal={normalTotalAmount}
             onCheckout={handleCheckout}
         />
     );

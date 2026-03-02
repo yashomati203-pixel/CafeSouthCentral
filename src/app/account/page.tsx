@@ -265,10 +265,10 @@ export default function AccountPage() {
     // Logic for "Save All Changes" bottom bar:
     // It will save the profile info.
 
-    if (loading && !user) return <div className="min-h-screen flex items-center justify-center bg-[#f8fbf7] dark:bg-[#121212] pt-20">Loading Account...</div>;
+    if (loading && !user) return <div className="min-h-screen flex items-center justify-center bg-[#e8f5e9] dark:bg-[#121212] pt-20">Loading Account...</div>;
 
     return (
-        <div className="min-h-screen bg-[#f8fbf7] dark:bg-[#121212] pb-32 md:pb-0">
+        <div className="min-h-screen bg-[#e8f5e9] dark:bg-[#121212] pb-32 md:pb-0">
 
 
             <div className="flex max-w-[1400px] mx-auto md:px-6 md:py-8 gap-8">
@@ -279,7 +279,7 @@ export default function AccountPage() {
                 <main className="flex-1 w-full max-w-5xl mx-auto">
 
                     {/* Mobile Sub-Header: Customer Settings */}
-                    <div className="md:hidden px-6 pt-4 pb-4 sticky top-0 bg-[#f8fbf7]/80 dark:bg-[#121212]/80 backdrop-blur-md z-30 flex items-center justify-between">
+                    <div className="md:hidden px-6 pt-4 pb-4 sticky top-0 bg-[#e8f5e9]/80 dark:bg-[#121212]/80 backdrop-blur-md z-30 flex items-center justify-between">
                         <button
                             onClick={() => router.back()}
                             className="w-10 h-10 flex items-center justify-start text-[#0d1c11] dark:text-white"
@@ -332,7 +332,7 @@ export default function AccountPage() {
                                 <div className="hidden md:flex items-center gap-10 mb-8">
                                     <div className="relative group">
                                         <div
-                                            className="w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover border-4 border-[#f8fbf7] dark:border-gray-800 shadow-sm"
+                                            className="w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover border-4 border-[#e8f5e9] dark:border-gray-800 shadow-sm"
                                             style={{ backgroundImage: `url(${editForm.profilePicture || user?.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}`})` }}
                                         />
                                         <button
@@ -350,7 +350,7 @@ export default function AccountPage() {
                                         <div>
                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Full Name</label>
                                             <input
-                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
+                                                className="w-full bg-[#e8f5e9] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
                                                 type="text"
                                                 value={editForm.name}
                                                 onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -360,7 +360,7 @@ export default function AccountPage() {
                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Phone Number</label>
                                             <div className="flex items-center gap-2">
                                                 <input
-                                                    className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
+                                                    className="w-full bg-[#e8f5e9] dark:bg-gray-800 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-1 focus:ring-[#0ac238] text-[#0d1c11] dark:text-white"
                                                     type="text"
                                                     value={editForm.phone}
                                                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
@@ -379,7 +379,7 @@ export default function AccountPage() {
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name</label>
                                         <div className="relative">
                                             <input
-                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
+                                                className="w-full bg-[#e8f5e9] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
                                                 type="text"
                                                 value={editForm.name}
                                                 onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -390,7 +390,7 @@ export default function AccountPage() {
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Phone Number</label>
                                         <div className="relative">
                                             <input
-                                                className="w-full bg-[#f8fbf7] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
+                                                className="w-full bg-[#e8f5e9] dark:bg-gray-800 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-[#0ac238]/20 text-[#0d1c11] dark:text-white"
                                                 type="text"
                                                 value={editForm.phone}
                                                 onChange={e => setEditForm({ ...editForm, phone: e.target.value })}

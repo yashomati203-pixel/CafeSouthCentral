@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { createSubscriptionOrder, createNormalOrder } from '@/services/orderService';
 import { NextRequest, NextResponse } from 'next/server';
 

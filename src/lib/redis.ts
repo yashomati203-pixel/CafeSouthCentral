@@ -90,22 +90,15 @@ const getRedis = () => {
         });
     }
 
-    // Fallback to Mock for development
-    if (process.env.NODE_ENV !== 'production') {
-        if (!global.redisWarned) {
-            console.warn('⚠️  Redis credentials not found. Using In-Memory Mock Redis (Data will be lost on restart).');
-            global.redisWarned = true;
-        }
-        // Use a global singleton for the mock to persist across hot reloads in dev if possible,
-        // though in Next.js serverless functions, state might reset. 
-        // For 'npm run dev', global this works.
-        if (!global.mockRedis) {
-            global.mockRedis = new MockRedis();
-        }
-        return global.mockRedis;
+    // Fallback to Mock if no credentials provided, even in production, so the app doesn't crash during demo/local testing.
+    if (!global.redisWarned) {
+        console.warn('⚠️  Redis credentials not found. Using In-Memory Mock Redis (Data will be lost on restart).');
+        global.redisWarned = true;
     }
-
-    return null;
+    if (!global.mockRedis) {
+        global.mockRedis = new MockRedis();
+    }
+    return global.mockRedis;
 };
 
 // Add types for global

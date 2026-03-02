@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { OrderStatus } from '@prisma/client';
@@ -46,11 +47,11 @@ export async function PATCH(
         }
 
         // WhatsApp Notification if Ready
-        if (status === 'READY') {
+        if (status === 'READY' && updatedOrder.user?.phone) {
             import('@/services/whatsappService').then(({ whatsappNotifications }) => {
                 whatsappNotifications.sendOrderReady(
-                    updatedOrder.user.phone,
-                    updatedOrder.user.name || 'Customer',
+                    updatedOrder.user!.phone,
+                    updatedOrder.user!.name || 'Customer',
                     updatedOrder.displayId || updatedOrder.id
                 ).catch(e => console.error('WhatsApp Error:', e));
             });
