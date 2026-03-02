@@ -54,3 +54,6 @@ Adobe Premiere Pro Captured Audio/
 .vercel
 
 .vercel
+
+# Local Netlify folder
+.netlify

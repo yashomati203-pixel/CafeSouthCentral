@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { prisma } from '@/lib/prisma';
 import { createSession } from '@/lib/session';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
     try {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 3. Verify OTP
-        const isValid = await argon2.verify(record.hashedOTP, otp);
+        const isValid = await bcrypt.compare(otp, record.hashedOTP);
 
         if (!isValid) {
             // Increment attempts

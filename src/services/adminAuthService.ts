@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { User, UserRole } from '@prisma/client';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcryptjs';
 import * as speakeasy from 'speakeasy';
 import * as qrcode from 'qrcode';
 import * as crypto from 'crypto';
@@ -59,7 +59,7 @@ export class AdminAuthService {
         role: UserRole = 'MANAGER'
     ) {
         // 1. Hash Password
-        const passwordHash = await argon2.hash(password);
+        const passwordHash = await bcrypt.hash(password, 10);
 
         // 2. Generate TOTP Secret
         const secret = speakeasy.generateSecret({
@@ -109,7 +109,7 @@ export class AdminAuthService {
             throw new Error('Invalid credentials');
         }
 
-        const validPassword = await argon2.verify(admin.passwordHash, password);
+        const validPassword = await bcrypt.compare(password, admin.passwordHash);
         console.log('[AuthService] Password Verify:', validPassword);
 
         if (!validPassword) {

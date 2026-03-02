@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { notificationService } from '@/services/notificationService';
 import crypto from 'crypto';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
     try {
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         const otp = crypto.randomInt(100000, 999999).toString();
 
         // 5. Hash OTP (Security best practice: never store plaintext OTPs)
-        const hashedOTP = await argon2.hash(otp);
+        const hashedOTP = await bcrypt.hash(otp, 10);
 
         // 6. Store in Redis (TTL: 5 minutes)
         const otpRecord = {

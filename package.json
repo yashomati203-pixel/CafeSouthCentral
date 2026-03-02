@@ -18,7 +18,7 @@
         "@types/qrcode.react": "^1.0.5",
         "@types/react-qr-reader": "^2.1.7",
         "@upstash/redis": "^1.36.1",
-        "argon2": "^0.44.0",
+        "bcryptjs": "^3.0.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cookie": "^1.1.1",
@@ -52,6 +52,7 @@
         "three": "^0.167.1"
     },
     "devDependencies": {
+        "@types/bcryptjs": "^2.4.6",
         "@types/cookie": "^0.6.0",
         "@types/node": "^20",
         "@types/qrcode": "^1.5.6",
