@@ -91,14 +91,14 @@ const getRedis = () => {
     }
 
     // Fallback to Mock if no credentials provided, even in production, so the app doesn't crash during demo/local testing.
-    if (!global.redisWarned) {
+    if (!(globalThis as any).redisWarned) {
         console.warn('⚠️  Redis credentials not found. Using In-Memory Mock Redis (Data will be lost on restart).');
-        global.redisWarned = true;
+        (globalThis as any).redisWarned = true;
     }
-    if (!global.mockRedis) {
-        global.mockRedis = new MockRedis();
+    if (!(globalThis as any).mockRedis) {
+        (globalThis as any).mockRedis = new MockRedis();
     }
-    return global.mockRedis;
+    return (globalThis as any).mockRedis;
 };
 
 // Add types for global
