@@ -11,13 +11,10 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    // Prevent Next.js from bundling Prisma — it must use the runtime engine binary
-    serverExternalPackages: ['@prisma/client', 'prisma'],
-    webpack: (config, { isServer }) => {
-        if (isServer) {
-            config.externals = [...(config.externals || []), '@prisma/client'];
-        }
-        return config;
+    experimental: {
+        // Next.js 14 correct key — tells the bundler NOT to inline Prisma,
+        // so Netlify can find the engine binary from node_modules at runtime
+        serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
     },
 
     images: {
