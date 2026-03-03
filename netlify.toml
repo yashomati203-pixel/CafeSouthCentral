@@ -1,8 +1,12 @@
 [build]
   command = "npm run build"
 
+[build.environment]
+  NODE_VERSION = "20"
+  PRISMA_CLI_BINARY_TARGETS = "rhel-openssl-3.0.x"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [functions]
-  included_files = ["node_modules/.prisma/client/*.node", "prisma/schema.prisma"]
+  included_files = ["node_modules/.prisma/client/*.node", "node_modules/@prisma/engines/**", "prisma/schema.prisma"]
