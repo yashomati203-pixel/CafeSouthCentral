@@ -11,6 +11,15 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    // Prevent Next.js from bundling Prisma — it must use the runtime engine binary
+    serverExternalPackages: ['@prisma/client', 'prisma'],
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            config.externals = [...(config.externals || []), '@prisma/client'];
+        }
+        return config;
+    },
+
     images: {
         domains: [
             'lh3.googleusercontent.com', // Google Auth
