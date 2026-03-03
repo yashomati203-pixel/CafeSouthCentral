@@ -7,7 +7,8 @@
         "build": "prisma generate && next build",
         "start": "next start",
         "lint": "next lint",
-        "seed": "ts-node scripts/seed.ts"
+        "seed": "ts-node scripts/seed.ts",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@fingerprintjs/fingerprintjs": "^5.0.1",
@@ -52,6 +53,7 @@
         "three": "^0.167.1"
     },
     "devDependencies": {
+        "@netlify/plugin-nextjs": "^5.15.8",
         "@types/bcryptjs": "^2.4.6",
         "@types/cookie": "^0.6.0",
         "@types/node": "^20",
