@@ -88,7 +88,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                     w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 group relative
                                     ${isActive
                                         ? 'bg-[#14b84b] text-white shadow-lg shadow-[#14b84b]/20'
-                                        : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                                        : 'bg-[#edece3] text-gray-700 hover:bg-[#e4e2d5] hover:text-black shadow-sm'
                                     }
                                 `}
                             >
