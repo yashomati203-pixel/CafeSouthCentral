@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         console.error('Order Creation Failed:', error);
         return NextResponse.json(
-            { error: error.message || 'Internal Server Error' },
+            { error: error.message || 'Internal Server Error', stack: error.stack },
             { status: 500 }
         );
     }
