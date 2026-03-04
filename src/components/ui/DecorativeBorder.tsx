@@ -9,8 +9,9 @@ export function DecorativeBorderOverlay() {
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
                     backgroundPosition: 'left top',
-                    width: '0', // Fail-safe (Tailwind will override)
-                    height: '0' // Fail-safe
+                    display: 'none', // Ultimate Fail-safe: Only visible via Tailwind
+                    width: '60px',
+                    height: '100%'
                 }}
             />
             {/* Right Side Border - Flipped */}
@@ -22,8 +23,9 @@ export function DecorativeBorderOverlay() {
                     backgroundSize: '100% 100%',
                     backgroundPosition: 'left top',
                     transform: 'scaleX(-1)',
-                    width: '0', // Fail-safe
-                    height: '0' // Fail-safe
+                    display: 'none', // Ultimate Fail-safe
+                    width: '60px',
+                    height: '100%'
                 }}
             />
 
@@ -33,8 +35,9 @@ export function DecorativeBorderOverlay() {
                     backgroundImage: "url('/line3@1.5x.png')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
-                    width: '0', // Fail-safe
-                    height: '0' // Fail-safe
+                    display: 'none', // Ultimate Fail-safe
+                    width: '100%',
+                    height: '45px'
                 }}
             />
 
@@ -45,8 +48,9 @@ export function DecorativeBorderOverlay() {
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
                     transform: 'scaleY(-1)',
-                    width: '0', // Fail-safe
-                    height: '0' // Fail-safe
+                    display: 'none', // Ultimate Fail-safe
+                    width: '100%',
+                    height: '45px'
                 }}
             />
         </>

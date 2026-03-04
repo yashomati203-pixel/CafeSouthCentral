@@ -100,13 +100,16 @@ function DashboardContent() {
     }
 
     return (
-        <LandingPage
-            onExplore={() => router.push('/menu')}
-            onViewPlans={() => router.push('/subscription')}
-            onCategorySelect={(c) => router.push(`/menu?category=${encodeURIComponent(c)}`)}
-            onLogin={() => setShowLoginModal(true)}
-            user={user}
-        />
+        <>
+            <div id="deploy-version-v4" style={{ display: 'none' }}>2026-03-04-FORCE-FIX</div>
+            <LandingPage
+                onExplore={() => router.push('/menu')}
+                onViewPlans={() => router.push('/subscription')}
+                onCategorySelect={(c) => router.push(`/menu?category=${encodeURIComponent(c)}`)}
+                onLogin={() => setShowLoginModal(true)}
+                user={user}
+            />
+        </>
     );
 }
 

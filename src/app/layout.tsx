@@ -43,7 +43,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <head />
+            <head>
+                <meta name="version-indicator" content="v4-2026-03-04-21-45" />
+            </head>
             <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh' }}>
                 {/* Material Symbols injected via Script to bypass webpack CSS processing */}
                 <Script
