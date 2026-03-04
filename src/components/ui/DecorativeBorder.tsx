@@ -3,7 +3,7 @@ export function DecorativeBorderOverlay() {
         <>
             {/* Left Side Border */}
             <div
-                className="fixed top-0 left-0 h-full w-[24px] md:w-[60px] z-[52] pointer-events-none"
+                className="hidden md:block fixed top-0 left-0 h-full w-[60px] z-[52] pointer-events-none"
                 style={{
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
@@ -13,7 +13,7 @@ export function DecorativeBorderOverlay() {
             />
             {/* Right Side Border - Flipped */}
             <div
-                className="fixed top-0 right-0 h-full w-[24px] md:w-[60px] z-[52] pointer-events-none"
+                className="hidden md:block fixed top-0 right-0 h-full w-[60px] z-[52] pointer-events-none"
                 style={{
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
@@ -24,7 +24,7 @@ export function DecorativeBorderOverlay() {
             />
 
             {/* Top Border */}
-            <div className="fixed top-0 md:top-2 left-[20px] md:left-[58px] right-[20px] md:right-[58px] h-[24px] md:h-[45px] z-[51] pointer-events-none flex justify-center items-start overflow-hidden">
+            <div className="hidden md:flex fixed top-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-start overflow-hidden">
                 <img
                     src="/line3@1.5x.png"
                     alt="Top Border"
@@ -33,7 +33,7 @@ export function DecorativeBorderOverlay() {
             </div>
 
             {/* Bottom Border */}
-            <div className="fixed bottom-0 md:bottom-2 left-[20px] md:left-[58px] right-[20px] md:right-[58px] h-[24px] md:h-[45px] z-[51] pointer-events-none flex justify-center items-end overflow-hidden">
+            <div className="hidden md:flex fixed bottom-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-end overflow-hidden">
                 <img
                     src="/line3@1.5x.png"
                     alt="Bottom Border"
