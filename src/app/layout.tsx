@@ -44,7 +44,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head />
-            <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh', overflow: 'hidden' }}>
+            <body className={`${inter.variable} ${manrope.variable} ${playfair.variable} ${workSans.variable} font-sans`} style={{ minHeight: '100vh' }}>
                 {/* Material Symbols injected via Script to bypass webpack CSS processing */}
                 <Script
                     id="material-symbols"
@@ -62,12 +62,12 @@ export default function RootLayout({
                 />
                 <CartProvider>
                     <SystemAlertBanner />
-                    <div className="min-h-screen w-full relative">
+                    <div className="min-h-screen w-full relative bg-sand-beige">
                         <DecorativeBorderOverlay />
 
-                        {/* Main Content Wrapper - Inset from borders */}
+                        {/* Main Content Wrapper - Inset from borders on Desktop */}
                         <div
-                            className="relative z-10 mx-[5px] md:mx-[15px] mt-[15px] mb-[15px] md:mb-[15px] h-[calc(100dvh-30px)] md:h-[calc(100vh-30px)] overflow-y-auto overflow-x-hidden shadow-2xl no-scrollbar pb-0 bg-sand-beige"
+                            className="relative z-10 md:mx-[15px] md:my-[15px] min-h-screen md:min-h-[calc(100vh-30px)] overflow-x-hidden md:shadow-2xl no-scrollbar pb-0"
                         >
                             <Suspense fallback={null}>
                                 <MainLayout>
