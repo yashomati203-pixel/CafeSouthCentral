@@ -1,4 +1,8 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
 const FAQS = [
     {
@@ -21,6 +25,8 @@ const FAQS = [
 ];
 
 export default function FAQSection() {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     return (
         <section style={{
             padding: '6rem 2rem 8rem 2rem',
@@ -47,39 +53,69 @@ export default function FAQSection() {
                     }}></div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {FAQS.map((faq, index) => (
                         <div
                             key={index}
+                            onClick={() => setOpenIndex(openIndex === index ? null : index)}
                             style={{
-                                position: 'sticky',
-                                top: `calc(150px + ${index * 20}px)`, // Stacking effect with slight offset
                                 backgroundColor: '#ffffff',
-                                padding: '2.5rem',
-                                borderRadius: '24px',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                                border: '1px solid rgba(60, 42, 33, 0.1)',
-                                zIndex: index + 1,
-                                marginBottom: index === FAQS.length - 1 ? '0' : '2rem' // Spacing for natural flow, but sticky takes over on scroll
+                                padding: '1.5rem 2rem',
+                                borderRadius: '16px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                                border: '1px solid rgba(60, 42, 33, 0.08)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease-in-out'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.06)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)';
                             }}
                         >
-                            <h3 style={{
-                                fontFamily: '"Playfair Display", serif',
-                                fontSize: '1.5rem',
-                                fontWeight: 700,
-                                color: '#102214',
-                                marginBottom: '1rem'
-                            }}>
-                                {faq.question}
-                            </h3>
-                            <p style={{
-                                fontFamily: 'sans-serif',
-                                color: '#4a5d50',
-                                lineHeight: 1.6,
-                                fontSize: '1rem'
-                            }}>
-                                {faq.answer}
-                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h3 style={{
+                                    fontFamily: '"Playfair Display", serif',
+                                    fontSize: '1.25rem',
+                                    fontWeight: 700,
+                                    color: '#102214',
+                                    margin: 0
+                                }}>
+                                    {faq.question}
+                                </h3>
+                                <motion.div
+                                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <ChevronDown size={24} color="#3C2A21" />
+                                </motion.div>
+                            </div>
+
+                            <AnimatePresence>
+                                {openIndex === index && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        style={{ overflow: 'hidden' }}
+                                    >
+                                        <p style={{
+                                            fontFamily: 'sans-serif',
+                                            color: '#4a5d50',
+                                            lineHeight: 1.6,
+                                            fontSize: '1rem',
+                                            paddingTop: '1rem',
+                                            margin: 0
+                                        }}>
+                                            {faq.answer}
+                                        </p>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     ))}
                 </div>
