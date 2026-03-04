@@ -57,7 +57,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                 </p>
 
                 {/* Static Collage - Mobile (Replaces Grid) */}
-                <div className="relative h-[380px] w-full mb-8 overflow-visible">
+                <div className="relative h-[380px] w-full mb-8 overflow-hidden">
                     {/* Fresh Badge - Moving further below Idli and to the right */}
                     <div className="absolute top-[33%] right-[-10%] z-30 transform rotate-12">
                         <RotatingBadge />
@@ -78,7 +78,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                     </div>
 
                     {/* Dosa Plate - Center/Left (Large) */}
-                    <div className="absolute w-[80%] max-w-[300px] z-20 left-[-5%] top-[25%]">
+                    <div className="absolute w-[65%] max-w-[260px] z-20 left-[0%] top-[25%]">
                         <div className="relative w-full pb-[100%] overflow-hidden bg-white shadow-2xl"
                             style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }}>
                             <Image
@@ -86,7 +86,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                                 alt="Dosa Plate"
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
-                                style={{ objectFit: 'cover', scale: '1.1' }}
+                                style={{ objectFit: 'cover' }}
                             />
                         </div>
                     </div>
@@ -195,7 +195,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                                     alt="Dosa Plate"
                                     fill
                                     sizes="(max-width: 768px) 100vw, 50vw"
-                                    style={{ objectFit: 'cover', transform: 'scale(1.1)' }}
+                                    style={{ objectFit: 'cover' }}
                                 />
                             </div>
                         </div>
