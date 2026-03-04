@@ -197,15 +197,15 @@ export default function AdminDashboard() {
     );
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-transparent text-white font-serif animate-pulse">Loading Admin Dashboard...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-transparent text-[#102214] font-serif animate-pulse">Loading Admin Dashboard...</div>;
     }
 
     return (
-        <div className="min-h-screen bg-transparent text-white">
+        <div className="min-h-screen bg-[#e8f5e9] text-[#102214]">
             {/* Quick Access Scanner */}
             <QuickScannerButton />
 
-            <div className="flex h-screen bg-transparent overflow-hidden font-sans text-gray-100">
+            <div className="flex h-screen bg-transparent overflow-hidden font-sans text-[#102214]">
                 {/* Sidebar */}
                 <AdminSidebar
                     activeTab={activeTab}
@@ -287,31 +287,31 @@ export default function AdminDashboard() {
                             {/* VIEW: HISTORY */}
                             {activeTab === 'sold' && (
                                 <div className="space-y-6">
-                                    <h2 className="text-2xl font-serif font-bold text-white">Order History</h2>
-                                    <div className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/10 overflow-hidden">
+                                    <h2 className="text-2xl font-serif font-bold text-[#102214]">Order History</h2>
+                                    <div className="bg-white rounded-xl shadow-sm border border-[#102214]/10 overflow-hidden">
                                         <table className="w-full text-left">
-                                            <thead className="bg-black/40 border-b border-white/10">
+                                            <thead className="bg-[#102214]/5 border-b border-[#102214]/10">
                                                 <tr>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Order ID</th>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Customer</th>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Date</th>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Total</th>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
-                                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase">Order ID</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase">Customer</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase">Date</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase">Total</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase">Status</th>
+                                                    <th className="px-6 py-4 text-xs font-bold text-[#102214]/70 uppercase text-right">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-white/5">
+                                            <tbody className="divide-y divide-[#102214]/5">
                                                 {historyOrders.map((order: any) => (
-                                                    <tr key={order.id} className="hover:bg-white/5 border-white/5">
-                                                        <td className="px-6 py-4 font-bold text-white">#{order.displayId || order.id.slice(0, 5)}</td>
-                                                        <td className="px-6 py-4 text-sm text-gray-200">{order.user.name}</td>
-                                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                                    <tr key={order.id} className="hover:bg-[#102214]/5 border-[#102214]/5">
+                                                        <td className="px-6 py-4 font-bold text-[#102214]">#{order.displayId || order.id.slice(0, 5)}</td>
+                                                        <td className="px-6 py-4 text-sm text-[#102214]/80">{order.user.name}</td>
+                                                        <td className="px-6 py-4 text-sm text-[#102214]/60">
                                                             {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </td>
-                                                        <td className="px-6 py-4 font-bold text-gray-200">₹{order.totalAmount}</td>
+                                                        <td className="px-6 py-4 font-bold text-[#102214]/80">₹{order.totalAmount}</td>
                                                         <td className="px-6 py-4">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-500/20 text-green-300' :
-                                                                order.status.includes('CANCEL') ? 'bg-red-500/20 text-red-300' : 'bg-gray-500/20 text-gray-300'
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                                                                order.status.includes('CANCEL') ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-700'
                                                                 }`}>
                                                                 {order.status}
                                                             </span>
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                                                         <td className="px-6 py-4 text-right">
                                                             <button
                                                                 onClick={() => printBill(order)}
-                                                                className="text-[#14b84b] hover:text-white text-xs font-bold transition-colors"
+                                                                className="text-[#14b84b] hover:text-[#102214] text-xs font-bold transition-colors"
                                                             >
                                                                 Reprint Bill
                                                             </button>
