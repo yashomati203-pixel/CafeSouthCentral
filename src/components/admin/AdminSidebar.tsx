@@ -46,11 +46,11 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
             {/* Sidebar Container */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-72 bg-[#1a1a1a]/80 backdrop-blur-md border-r border-white/10 shadow-xl transition-transform duration-300 md:translate-x-0 md:static md:shadow-none flex flex-col
+                fixed inset-y-0 left-0 z-50 w-72 bg-[#e8f5e9] border-r border-[#102214]/10 shadow-xl transition-transform duration-300 md:translate-x-0 md:static md:shadow-none flex flex-col
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 {/* Header */}
-                <div className="p-3 md:p-4 flex items-center justify-between border-b border-white/10">
+                <div className="p-3 md:p-4 flex items-center justify-between border-b border-[#102214]/10">
                     <Link href="/" className="flex items-center gap-3 mx-auto cursor-pointer">
                         <div className="relative w-36 h-14 rounded-lg overflow-hidden">
                             <Image
@@ -72,7 +72,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
 
                 {/* Navigation */}
                 <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto custom-scrollbar">
-                    <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 mt-0">
+                    <p className="px-4 text-[10px] font-bold text-[#102214]/50 uppercase tracking-widest mb-1 mt-0">
                         Management
                     </p>
                     {NAV_ITEMS.map((item) => {
@@ -88,7 +88,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                                     w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 group relative
                                     ${isActive
                                         ? 'bg-[#14b84b] text-white shadow-lg shadow-[#14b84b]/20'
-                                        : 'bg-[#edece3] text-gray-700 hover:bg-[#e4e2d5] hover:text-black shadow-sm'
+                                        : 'text-[#102214]/70 hover:bg-[#102214]/5 hover:text-[#102214]'
                                     }
                                 `}
                             >
@@ -118,7 +118,7 @@ export default function AdminSidebar({ activeTab, onTabChange, ordersCount = 0, 
                 </nav>
 
                 {/* Footer / Logout */}
-                <div className="p-3 pb-16 mt-auto border-t border-white/10">
+                <div className="p-3 pb-16 mt-auto border-t border-[#102214]/10">
                     <button
                         onClick={onLogout}
                         className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold text-red-500 hover:bg-red-500/10 hover:shadow-sm transition-all group"
