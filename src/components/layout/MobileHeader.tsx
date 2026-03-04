@@ -30,7 +30,7 @@ export default function MobileHeader({
 
     return (
         <>
-            <header className="lg:hidden flex justify-between items-center px-4 py-3 bg-[#e8f5e9]/95 backdrop-blur-sm sticky top-0 z-[100] border-b border-[#3C2A21]/10">
+            <header className="lg:hidden flex justify-between items-center px-4 py-3 bg-[#e8f5e9]/95 backdrop-blur-sm sticky top-0 z-[150] border-b border-[#3C2A21]/10">
                 <Link
                     href="/"
                     className="relative z-[60] flex items-center cursor-pointer pointer-events-auto"

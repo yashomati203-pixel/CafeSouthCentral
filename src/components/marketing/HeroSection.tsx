@@ -195,7 +195,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                                     alt="Dosa Plate"
                                     fill
                                     sizes="(max-width: 768px) 100vw, 50vw"
-                                    style={{ objectFit: 'cover' }}
+                                    style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
                                 />
                             </div>
                         </div>

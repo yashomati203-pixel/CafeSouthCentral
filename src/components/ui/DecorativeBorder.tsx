@@ -8,7 +8,9 @@ export function DecorativeBorderOverlay() {
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
-                    backgroundPosition: 'left top'
+                    backgroundPosition: 'left top',
+                    width: '0', // Fail-safe (Tailwind will override)
+                    height: '0' // Fail-safe
                 }}
             />
             {/* Right Side Border - Flipped */}
@@ -19,27 +21,34 @@ export function DecorativeBorderOverlay() {
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
                     backgroundPosition: 'left top',
-                    transform: 'scaleX(-1)'
+                    transform: 'scaleX(-1)',
+                    width: '0', // Fail-safe
+                    height: '0' // Fail-safe
                 }}
             />
 
             {/* Top Border */}
-            <div className="hidden md:flex fixed top-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-start overflow-hidden">
-                <img
-                    src="/line3@1.5x.png"
-                    alt="Top Border"
-                    className="w-full h-full object-fill pointer-events-none"
-                />
-            </div>
+            <div className="hidden md:flex fixed top-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-start overflow-hidden"
+                style={{
+                    backgroundImage: "url('/line3@1.5x.png')",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '100% 100%',
+                    width: '0', // Fail-safe
+                    height: '0' // Fail-safe
+                }}
+            />
 
             {/* Bottom Border */}
-            <div className="hidden md:flex fixed bottom-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-end overflow-hidden">
-                <img
-                    src="/line3@1.5x.png"
-                    alt="Bottom Border"
-                    className="w-full h-full object-fill transform scale-y-[-1] pointer-events-none"
-                />
-            </div>
+            <div className="hidden md:flex fixed bottom-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-end overflow-hidden"
+                style={{
+                    backgroundImage: "url('/line3@1.5x.png')",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '100% 100%',
+                    transform: 'scaleY(-1)',
+                    width: '0', // Fail-safe
+                    height: '0' // Fail-safe
+                }}
+            />
         </>
     );
 }
