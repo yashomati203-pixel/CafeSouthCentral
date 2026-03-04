@@ -8,10 +8,7 @@ export function DecorativeBorderOverlay() {
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
-                    backgroundPosition: 'left top',
-                    display: 'none', // Ultimate Fail-safe: Only visible via Tailwind
-                    width: '60px',
-                    height: '100%'
+                    backgroundPosition: 'left top'
                 }}
             />
             {/* Right Side Border - Flipped */}
@@ -22,10 +19,7 @@ export function DecorativeBorderOverlay() {
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
                     backgroundPosition: 'left top',
-                    transform: 'scaleX(-1)',
-                    display: 'none', // Ultimate Fail-safe
-                    width: '60px',
-                    height: '100%'
+                    transform: 'scaleX(-1)'
                 }}
             />
 
@@ -34,10 +28,7 @@ export function DecorativeBorderOverlay() {
                 style={{
                     backgroundImage: "url('/line3@1.5x.png')",
                     backgroundRepeat: 'no-repeat',
-                    backgroundSize: '100% 100%',
-                    display: 'none', // Ultimate Fail-safe
-                    width: '100%',
-                    height: '45px'
+                    backgroundSize: '100% 100%'
                 }}
             />
 
@@ -47,10 +38,7 @@ export function DecorativeBorderOverlay() {
                     backgroundImage: "url('/line3@1.5x.png')",
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '100% 100%',
-                    transform: 'scaleY(-1)',
-                    display: 'none', // Ultimate Fail-safe
-                    width: '100%',
-                    height: '45px'
+                    transform: 'scaleY(-1)'
                 }}
             />
         </>
