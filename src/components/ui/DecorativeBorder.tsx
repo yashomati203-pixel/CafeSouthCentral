@@ -3,7 +3,7 @@ export function DecorativeBorderOverlay() {
         <>
             {/* Left Side Border */}
             <div
-                className="hidden md:block fixed top-0 left-0 h-full w-[60px] z-[52] pointer-events-none"
+                className="fixed top-0 left-0 h-full w-[60px] z-[52] pointer-events-none"
                 style={{
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
@@ -13,7 +13,7 @@ export function DecorativeBorderOverlay() {
             />
             {/* Right Side Border - Flipped */}
             <div
-                className="hidden md:block fixed top-0 right-0 h-full w-[60px] z-[52] pointer-events-none"
+                className="fixed top-0 right-0 h-full w-[60px] z-[52] pointer-events-none"
                 style={{
                     backgroundImage: "url('/Layer 5.png')",
                     backgroundRepeat: 'no-repeat',
@@ -24,7 +24,7 @@ export function DecorativeBorderOverlay() {
             />
 
             {/* Top Border */}
-            <div className="hidden md:flex fixed top-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-start overflow-hidden"
+            <div className="fixed top-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none flex justify-center items-start overflow-hidden"
                 style={{
                     backgroundImage: "url('/line3@1.5x.png')",
                     backgroundRepeat: 'no-repeat',
@@ -33,7 +33,7 @@ export function DecorativeBorderOverlay() {
             />
 
             {/* Bottom Border */}
-            <div className="hidden md:flex fixed bottom-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none justify-center items-end overflow-hidden"
+            <div className="fixed bottom-2 left-[58px] right-[58px] h-[45px] z-[51] pointer-events-none flex justify-center items-end overflow-hidden"
                 style={{
                     backgroundImage: "url('/line3@1.5x.png')",
                     backgroundRepeat: 'no-repeat',
