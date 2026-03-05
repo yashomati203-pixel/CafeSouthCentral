@@ -67,9 +67,9 @@ export default function RootLayout({
                     <div className="min-h-screen w-full relative bg-sand-beige">
                         <DecorativeBorderOverlay />
 
-                        {/* Main Content Wrapper - Inset from borders on Desktop only */}
+                        {/* Main Content Wrapper - Framed inside the borders */}
                         <div
-                            className="relative z-10 md:mx-[15px] md:my-[15px] min-h-screen md:min-h-[calc(100vh-30px)] overflow-x-hidden md:shadow-2xl no-scrollbar pb-0"
+                            className="fixed top-[53px] bottom-[53px] left-[10px] right-[10px] md:left-[60px] md:right-[60px] z-10 overflow-y-auto overflow-x-hidden no-scrollbar bg-transparent md:shadow-2xl"
                         >
                             <Suspense fallback={null}>
                                 <MainLayout>
