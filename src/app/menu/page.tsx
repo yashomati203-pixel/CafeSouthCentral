@@ -151,14 +151,14 @@ export default function MenuPage() {
 
     if (showLoginModal && !user) {
         return (
-            <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-lg flex items-center justify-center p-4 animate-in fade-in duration-300">
+            <div className="fixed inset-0 z-[250] bg-black/40 backdrop-blur-lg flex items-center justify-center p-4 animate-in fade-in duration-300">
                 <button
                     onClick={() => setShowLoginModal(false)}
-                    className="absolute top-6 right-6 z-[110] p-2 bg-white/20 rounded-full hover:bg-white/30 transition-all text-white backdrop-blur-md border border-white/20 shadow-lg"
+                    className="absolute top-6 right-6 z-[260] p-2 bg-white/20 rounded-full hover:bg-white/30 transition-all text-white backdrop-blur-md border border-white/20 shadow-lg cursor-pointer pointer-events-auto"
                 >
                     <X className="w-6 h-6" />
                 </button>
-                <div className="w-full max-w-sm relative z-10">
+                <div className="w-full max-w-sm relative z-[255] pointer-events-auto">
                     <LoginPage onLogin={handleLogin} />
                 </div>
             </div>
@@ -310,18 +310,18 @@ export default function MenuPage() {
                     {/* Category Selector Modal */}
                     {showCategorySelector && (
                         <div
-                            className="md:hidden fixed inset-0 bg-black/80 z-50 flex items-end backdrop-blur-sm"
+                            className="md:hidden fixed inset-0 bg-black/60 z-[200] flex items-end backdrop-blur-sm"
                             onClick={() => setShowCategorySelector(false)}
                         >
                             <div
-                                className="bg-[#1a1a1a] border-t border-white/10 w-full rounded-t-3xl p-6 pb-24 animate-in slide-in-from-bottom duration-300 shadow-2xl"
+                                className="bg-white border-t border-gray-100 w-full rounded-t-3xl p-6 pb-24 animate-in slide-in-from-bottom duration-300 shadow-2xl"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-xl font-bold text-white">Select Category</h3>
+                                    <h3 className="text-xl font-bold text-[#0e2a1a]">Select Category</h3>
                                     <button
                                         onClick={() => setShowCategorySelector(false)}
-                                        className="p-2 hover:bg-white/10 text-white rounded-full transition-colors"
+                                        className="p-2 hover:bg-gray-100 text-gray-500 rounded-full transition-colors"
                                     >
                                         <X className="w-6 h-6" />
                                     </button>
@@ -333,9 +333,9 @@ export default function MenuPage() {
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                             setShowCategorySelector(false);
                                         }}
-                                        className={`p-4 rounded-xl text-sm font-bold transition-all ${selectedCategory === 'All'
-                                            ? 'bg-[#14b84b] text-white'
-                                            : 'bg-black/40 text-gray-300 border border-white/5 hover:border-white/20'
+                                        className={`p-4 rounded-xl text-sm font-bold transition-all shadow-sm ${selectedCategory === 'All'
+                                            ? 'bg-[#14b84b] text-white ring-2 ring-[#14b84b]/30'
+                                            : 'bg-white text-gray-600 border border-gray-100 hover:border-[#14b84b]/50 hover:bg-[#f0fdf4]'
                                             }`}
                                     >
                                         All Items
@@ -347,9 +347,9 @@ export default function MenuPage() {
                                                 handleScrollToCategory(cat);
                                                 setShowCategorySelector(false);
                                             }}
-                                            className={`p-4 rounded-xl text-sm font-bold transition-all ${selectedCategory === cat
-                                                ? 'bg-[#14b84b] text-white'
-                                                : 'bg-black/40 text-gray-300 border border-white/5 hover:border-white/20'
+                                            className={`p-4 rounded-xl text-sm font-bold transition-all shadow-sm ${selectedCategory === cat
+                                                ? 'bg-[#14b84b] text-white ring-2 ring-[#14b84b]/30'
+                                                : 'bg-white text-gray-600 border border-gray-100 hover:border-[#14b84b]/50 hover:bg-[#f0fdf4]'
                                                 }`}
                                         >
                                             {cat}

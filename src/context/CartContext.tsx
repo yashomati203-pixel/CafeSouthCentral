@@ -36,6 +36,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
 
+    const [isInitialized, setIsInitialized] = useState(false);
+
     // Load from LocalStorage on mount
     useEffect(() => {
         const stored = localStorage.getItem('cafe_cart');
@@ -46,12 +48,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 console.error('Failed to parse cart', e);
             }
         }
+        setIsInitialized(true);
     }, []);
 
     // Save to LocalStorage on change
     useEffect(() => {
-        localStorage.setItem('cafe_cart', JSON.stringify(items));
-    }, [items]);
+        if (isInitialized) {
+            localStorage.setItem('cafe_cart', JSON.stringify(items));
+        }
+    }, [items, isInitialized]);
 
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);

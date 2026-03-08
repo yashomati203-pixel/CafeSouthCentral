@@ -69,7 +69,7 @@ export default function RootLayout({
 
                         {/* Main Content Wrapper - Framed inside the borders with even tighter spacing */}
                         <div
-                            className="fixed top-[25px] bottom-[25px] left-0 right-0 md:top-[25px] md:bottom-[25px] md:left-[20px] md:right-[20px] z-10 overflow-y-auto overflow-x-hidden no-scrollbar bg-transparent"
+                            className="fixed top-[15px] bottom-[15px] left-[12px] right-[12px] md:top-[12px] md:bottom-[12px] md:left-[12px] md:right-[12px] z-10 overflow-y-auto overflow-x-hidden no-scrollbar bg-transparent"
                         >
                             <Suspense fallback={null}>
                                 <MainLayout>

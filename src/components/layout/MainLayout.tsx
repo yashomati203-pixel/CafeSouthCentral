@@ -160,14 +160,14 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             {!isCheckout && <Footer />}
 
             {showLoginModal && (
-                <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-lg flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[250] bg-black/40 backdrop-blur-lg flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <button
                         onClick={() => setShowLoginModal(false)}
-                        className="absolute top-6 right-6 z-[110] p-2 bg-white/20 rounded-full hover:bg-white/30 transition-all text-white backdrop-blur-md border border-white/20 shadow-lg"
+                        className="absolute top-6 right-6 z-[260] p-2 bg-white/20 rounded-full hover:bg-white/30 transition-all text-white backdrop-blur-md border border-white/20 shadow-lg cursor-pointer pointer-events-auto"
                     >
                         <X className="w-6 h-6" />
                     </button>
-                    <div className="w-full max-w-sm relative z-10">
+                    <div className="w-full max-w-sm relative z-[255] pointer-events-auto">
                         <LoginPage onLogin={handleLogin} />
                     </div>
                 </div>

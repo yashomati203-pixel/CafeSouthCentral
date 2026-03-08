@@ -145,20 +145,20 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
             {/* Main Login Card - Solid White */}
             <div className="w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 relative z-10">
-                <div className="p-5 pt-6">
+                <div className="p-4 pt-4">
 
                     {/* Brand */}
-                    <div className="text-center mb-3">
-                        <h2 className="text-coconut-brown font-serif-display font-bold text-lg tracking-wide">Cafe South Central</h2>
+                    <div className="text-center mb-2">
+                        <h2 className="text-coconut-brown font-serif-display font-bold text-base tracking-wide">Cafe South Central</h2>
                     </div>
 
                     {/* Smiley Animation - Compact */}
-                    <div className="mb-3 transform scale-90 origin-center">
+                    <div className="mb-2 transform scale-75 origin-center -mt-2">
                         <SmileyFace focusState={focusedField || (step === 'OTP' ? 'otp' : undefined)} />
                     </div>
 
-                    <div className="text-center mb-4">
-                        <h1 className="font-serif-display text-xl font-bold text-palm-green-dark mb-0.5">
+                    <div className="text-center mb-3">
+                        <h1 className="font-serif-display text-lg font-bold text-palm-green-dark mb-0.5">
                             {step === 'PHONE' ? 'Welcome Back!' : 'Verify OTP'}
                         </h1>
                         <p className="text-gray-500 text-[10px] uppercase tracking-wider font-medium">
@@ -186,7 +186,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                         </div>
                     )}
 
-                    <form onSubmit={step === 'PHONE' ? handleGetOtp : handleVerifyOtp} className="space-y-3">
+                    <form onSubmit={step === 'PHONE' ? handleGetOtp : handleVerifyOtp} className="space-y-2.5">
                         {step === 'PHONE' && (
                             <>
                                 {!isAdminLogin && (
@@ -202,7 +202,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                                 onFocus={() => setFocusedField('name')}
                                                 onBlur={() => setFocusedField(undefined)}
                                                 placeholder="Your Name (e.g. Ananya)"
-                                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
                                             />
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                             onFocus={() => setFocusedField('phone')}
                                             onBlur={() => setFocusedField(undefined)}
                                             placeholder={isAdminLogin ? "Admin ID" : "Phone Number (98765 43210)"}
-                                            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                            className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                 </div>
@@ -238,14 +238,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                                                 onFocus={() => setFocusedField('password')}
                                                 onBlur={() => setFocusedField(undefined)}
                                                 placeholder="Password"
-                                                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
+                                                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-palm-green-light focus:ring-0 transition-all outline-none font-medium text-gray-800 placeholder-gray-400 text-sm"
                                             />
                                         </div>
                                     </div>
                                 )}
 
                                 {!isAdminLogin && (
-                                    <div className="space-y-1.5 pt-1">
+                                    <div className="space-y-1 pt-0">
                                         <label className="flex items-start gap-2 cursor-pointer group">
                                             <div className="relative flex items-center mt-0.5">
                                                 <input
@@ -311,7 +311,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                             type="submit"
                             disabled={isLoading}
                             className={`
-                                w-full py-2.5 rounded-full font-bold text-sm shadow-md hover:shadow-lg active:scale-95 transition-all
+                                w-full py-2 rounded-full font-bold text-sm shadow-md hover:shadow-lg active:scale-95 transition-all
                                 flex items-center justify-center gap-2
                                 ${isLoading || (step === 'PHONE' && !isAdminLogin && (!termsAccepted || !name || !phone))
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'

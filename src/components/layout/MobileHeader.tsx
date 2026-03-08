@@ -30,7 +30,7 @@ export default function MobileHeader({
 
     return (
         <>
-            <header className="lg:hidden flex justify-between items-center px-4 py-3 bg-[#e8f5e9]/95 backdrop-blur-sm sticky top-0 z-[150] border-b border-[#3C2A21]/10">
+            <header className="lg:hidden flex justify-between items-center px-4 py-3 bg-[#e8f5e9] sticky top-0 z-[150] border-b border-[#3C2A21]/10">
                 <Link
                     href="/"
                     className="relative z-[60] flex items-center cursor-pointer pointer-events-auto"
@@ -42,6 +42,7 @@ export default function MobileHeader({
                                 src="/logo without border.png"
                                 alt="Cafe South Central"
                                 fill
+                                sizes="(max-width: 1024px) 240px, 100vw"
                                 className="object-contain"
                                 priority
                             />
@@ -68,8 +69,9 @@ export default function MobileHeader({
                         className="fixed top-[88px] left-0 w-full bg-[#e8f5e9] z-40 border-b border-[#3C2A21]/10 shadow-xl lg:hidden flex flex-col p-6 gap-4"
                     >
                         {user ? (
-                            <div
-                                onClick={() => handleMenuClick('/account')}
+                            <Link
+                                href="/account"
+                                onClick={() => setIsOpen(false)}
                                 className="flex items-center gap-3 p-4 bg-[#e7f3eb] rounded-xl cursor-pointer"
                             >
                                 <div className="w-10 h-10 bg-[#5C3A1A] rounded-full flex items-center justify-center text-[#F4D03F]">
@@ -79,7 +81,7 @@ export default function MobileHeader({
                                     <p className="font-bold text-[#102214] text-lg">My Account</p>
                                     <p className="text-xs text-[#4a5d50]">View Profile</p>
                                 </div>
-                            </div>
+                            </Link>
                         ) : (
                             <button
                                 onClick={() => { setIsOpen(false); onLoginClick(); }}
@@ -89,26 +91,29 @@ export default function MobileHeader({
                             </button>
                         )}
 
-                        <button
-                            onClick={() => handleMenuClick('/?show_landing=true')}
-                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        <Link
+                            href="/?show_landing=true"
+                            onClick={() => setIsOpen(false)}
+                            className="text-lg font-bold text-[#102214] py-2 text-left block"
                         >
                             Home
-                        </button>
+                        </Link>
 
-                        <button
-                            onClick={() => handleMenuClick('/menu')}
-                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        <Link
+                            href="/menu"
+                            onClick={() => setIsOpen(false)}
+                            className="text-lg font-bold text-[#102214] py-2 text-left block"
                         >
                             Menu
-                        </button>
+                        </Link>
 
-                        <button
-                            onClick={() => handleMenuClick('/subscription')}
-                            className="text-lg font-bold text-[#102214] py-2 text-left"
+                        <Link
+                            href="/subscription"
+                            onClick={() => setIsOpen(false)}
+                            className="text-lg font-bold text-[#102214] py-2 text-left block"
                         >
                             Subscriptions
-                        </button>
+                        </Link>
                     </motion.div>
                 )}
             </AnimatePresence>

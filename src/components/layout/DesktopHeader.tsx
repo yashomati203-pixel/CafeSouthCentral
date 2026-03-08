@@ -22,7 +22,7 @@ export default function DesktopHeader({
     const { openCart, subTotalCount, totalItemsCount } = useCart();
 
     return (
-        <header className="sticky top-0 z-[100] w-full bg-[#e8f5e9]/90 backdrop-blur-md hidden lg:block">
+        <header className="sticky top-0 z-[100] w-full bg-[#e8f5e9] hidden lg:block border-b border-[#3C2A21]/10">
             <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-0 lg:px-12">
                 {/* Logo Section */}
                 <Link href="/" className="relative z-[60] flex items-center gap-3 cursor-pointer pointer-events-auto -ml-4 xl:-ml-6">

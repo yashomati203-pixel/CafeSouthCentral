@@ -51,7 +51,7 @@ export default function ReadyToEatModal({ isOpen, onClose, menuItems }: ReadyToE
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-6"
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 20 }}
