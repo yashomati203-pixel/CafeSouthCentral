@@ -2,6 +2,18 @@
 
 All notable changes to the **Cafe South Central** project will be documented in this file.
 
+## [2026-03-08]
+### Core Development
+- **Deployment**: Successfully migrated deployment entirely to Netlify, resolving Prisma Client Query Engine resolution errors with serverless functions.
+- **Admin Dashboard**: Updated admin interface to a new light theme, replacing dark backgrounds across `AdminSidebar.tsx` and `AdminHeader.tsx`.
+
+### Bug Fixes
+- **UI & Navigation**:
+  - Fixed persistent "green block" rendering issue on the live homepage caused by asset loading errors.
+  - Stabilized the left navigation bar, resolving state race conditions and file not found errors.
+  - Fixed the login modal's "X" close button to correctly manage the modal state.
+- **Authentication**: Fixed issue with admin login and order checkout flows related to database connection in the cloud.
+
 ## [2026-02-12]
 ### Added
 - **System Alert System**: Real-time monitoring for operational issues (low stock, order delays).

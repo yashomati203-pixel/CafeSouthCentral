@@ -83,66 +83,66 @@ Located in `src/services/orderService.ts`, the application uses Prisma **Interac
 *   **Flow**: User enters phone -> Random OTP generated -> Hashed (Argon2) & Stored in Redis (5 min TTL) -> Sent via WhatsApp -> User verifies.
 *   **Session**: JWT (Signed with JOSE) in HTTP-only cookies.
 
-## 4. Deployment Tools & Free Strategy
+## 4. Deployment Tools & Architecture
 
 ### Required Tools for Deployment
 To deploy this application successfully, you will need the following tools/services:
 
-1.  **Source Code Management**: **GitHub** (Required for Vercel/Netlify integration).
-2.  **Hosting Platform**: **Vercel** (Recommended for Next.js) or Netlify.
-3.  **Database Provider**: **Supabase** (PostgreSQL).
+1.  **Source Code Management**: **GitHub** (Required for Netlify integration).
+2.  **Hosting Platform**: **Netlify** (Current production environment).
+3.  **Database Provider**: **Neon** (PostgreSQL).
 4.  **Cache/KV Store**: **Upstash Redis** (Required for OTPs & Rate Limiting).
 5.  **Package Manager**: **npm** or **yarn** (Local development).
 
 ### Free Deployment Strategy (1000+ Users Support)
 You can deploy this application completely for **FREE** while still supporting 1000+ concurrent users by leveraging the generous free tiers of the following services:
 
-#### 1. Database: Supabase or Neon (Free Tier)
+#### 1. Database: Neon (Free Tier)
 *   **Role**: Hosted PostgreSQL Database.
 *   **Free Tier Benefit**: 500MB storage (enough for thousands of orders/users).
-*   **CRITICAL FOR 1000 USERS**: Both Supabase and Neon provide **Connection Pooling** (PgBouncer) for free.
+*   **CRITICAL FOR 1000 USERS**: Neon provides **Connection Pooling** (PgBouncer) for free.
     *   *Why this matters*: A standard Postgres instance has a limit of ~100 direct connections. 1000 users hitting the API would crash it. Connection pooling manages this traffic, queuing requests so the DB never crashes.
-    *   **Configuration**: Always use the "Transaction Mode" connection string provided by these services in your `.env`.
+    *   **Configuration**: Always use the pooled connection string provided by Neon in your `DATABASE_URL` and the direct unpooled connection in `DIRECT_URL` within your `.env`.
 
-#### 2. Frontend & Backend: Vercel (Hobby Tier)
+#### 2. Frontend & Backend: Netlify (Starter Tier)
 *   **Role**: Hosting Next.js App and API Routes.
-*   **Free Tier Benefit**: Unlimited deployment history, global CDN, and generous serverless function execution limits.
-*   **Why**: Vercel is built by the creators of Next.js. It automatically scales serverless functions to handle traffic spikes (unlike a traditional VPS which would crash).
+*   **Free Tier Benefit**: Global CDN, continuous deployment, and generous serverless function execution limits.
+*   **Why**: Netlify (via `@netlify/plugin-nextjs`) automatically scales Next.js App Router API routes to AWS Lambda serverless functions to handle traffic spikes.
 
-### Scaling Configuration Checklist
-To ensure the free tier handles the load:
-1.  **Connection Pooling**: Ensure `DATABASE_URL` in `.env` points to the pooler (port 6543 for Supabase usually), NOT the direct port 5432.
-2.  **Static Menu**: The menu page is static. It does not hit the DB on every load. This allows unlimited users to view the menu without costing you any database resources.
-3.  **Logging**: We have disabled query logging in production (`src/lib/prisma.ts`) to keep logs within free tier limits.
+### Scaling & Prisma Configuration Checklist
+To ensure the application handles the load and deploys successfully:
+1.  **Connection Pooling**: Ensure `DATABASE_URL` in `.env` points to the pooler.
+2.  **Prisma Binary Targets**: The `schema.prisma` file must explicitly declare `binaryTargets = ["native", "rhel-openssl-3.0.x"]`. This is absolutely required for Prisma to locate the correct Query Engine binary when deployed on Netlify's AWS Lambda backend.
+3.  **Static Menu**: The menu page is largely static. It does not hit the DB on every single load, allowing many users to view it simultaneously.
 
 ## 5. Custom Domain Configuration (GoDaddy)
 
-Yes, your **GoDaddy domain will work perfectly**. You do *not* need to transfer it. You can simply point it to your Vercel deployment.
+Yes, your **GoDaddy domain will work perfectly**. You do *not* need to transfer it. You can simply point it to your Netlify deployment.
 
-### Steps to Connect GoDaddy to Vercel:
+### Steps to Connect GoDaddy to Netlify:
 
-1.  **In Vercel Dashboard**:
-    *   Go to **Settings** -> **Domains**.
-    *   Enter your domain (e.g., `cafesouthcentral.com`) and click **Add**.
-    *   Vercel will give you a **A Record** (IP Address) and a **CNAME Record**.
+1.  **In Netlify Dashboard**:
+    *   Go to **Domain Management** -> **Add Custom Domain**.
+    *   Enter your domain (e.g., `cafesouthcentral.com`).
+    *   Netlify will give you the necessary **A Record** (IP Address) and/or **CNAME Record**.
 
 2.  **In GoDaddy Dashboard**:
     *   Go to **My Products** -> **DNS** (for your domain).
     *   **Add/Edit A Record**:
         *   **Host**: `@`
-        *   **Value**: `76.76.21.21` (Vercel's IP - check Vercel dashboard to confirm).
+        *   **Value**: `75.2.60.5` (Netlify's load balancer IP).
         *   **TTL**: `1 Hour`.
     *   **Add/Edit CNAME Record**:
         *   **Host**: `www`
-        *   **Value**: `cname.vercel-dns.com.`
+        *   **Value**: `your-site-name.netlify.app.`
         *   **TTL**: `1 Hour`.
 
 3.  **Verification**:
-    *   Wait for 5-10 minutes. Vercel will automatically verify the domain and issue a **Free SSL Certificate** (HTTPS).
+    *   Wait for DNS propagation. Netlify will automatically verify the domain and provision a **Free Let's Encrypt SSL Certificate** (HTTPS).
 
 ### Summary of Costs
-*   **Hosting**: ₹0 (Vercel)
-*   **Database**: ₹0 (Supabase/Neon)
+*   **Hosting**: ₹0 (Netlify Starter)
+*   **Database**: ₹0 (Neon Free Tier)
 *   **Domain**: Purchased from GoDaddy (Yearly renewal cost only).
 *   **Total**: **Free** (excluding domain renewal).
 

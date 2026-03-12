@@ -154,7 +154,7 @@ export default function HeroSection({ onExplore, onLoginClick, user }: HeroSecti
                     <div style={{ paddingRight: '1rem', paddingLeft: '3rem', zIndex: 10, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
                         {/* Main Headline */}
-                        <h1 className="font-serif text-5xl md:text-7xl font-black leading-tight mb-4 max-w-4xl text-[#2f4f2f]">
+                        <h1 className="font-serif text-5xl lg:text-7xl font-black leading-tight mb-4 max-w-4xl text-[#2f4f2f]">
                             Healthy breakfast.<br />
                             Quick bites.<br />
                             Clean lunch.

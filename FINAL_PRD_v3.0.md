@@ -499,22 +499,21 @@ interface OrderQRPayload {
 
 **Backend:**
 - **Runtime:** Next.js API Routes (Node.js 20+)
-- **Database:** PostgreSQL 16 (Supabase/Neon)
-- **ORM:** Prisma 5.8+
+- **Database:** PostgreSQL 16 (Neon)
+- **ORM:** Prisma 5.8+ (Configured for AWS Lambda via Netlify)
 - **Caching:** Redis (Upstash or self-hosted)
-- **File Storage:** AWS S3 or Supabase Storage
+- **File Storage:** AWS S3
 - **Authentication:** Custom (OTP-based)
 - **Payment Gateway:** Razorpay
 - **SMS:** Msg91 or 2Factor (Indian Gateway), AWS SNS (fallback)
 - **Email:** Resend or SendGrid
 
 **DevOps:**
-**DevOps:**
-- **Hosting:** Vercel (Free Tier for Launch → Pro when scaling)
-- **Database:** Supabase (Free Tier for Launch → Pro when scaling)
-- **Monitoring:** Sentry (errors), Vercel Analytics (Free)
+- **Hosting:** Netlify (Starter Tier for Launch → Pro when scaling)
+- **Database:** Neon (Free Tier for Launch → Pro when scaling)
+- **Monitoring:** Sentry (errors), Netlify Analytics (Free)
 - **Logging:** Better Stack (formerly Logtail)
-- **CI/CD:** GitHub Actions
+- **CI/CD:** GitHub Actions / Netlify CI
 - **Testing:** Jest, Playwright, K6
 
 ### 4.2 System Architecture Diagram
@@ -526,7 +525,7 @@ interface OrderQRPayload {
 └───────────────────────────┬──────────────────────────────────┘
                             │
 ┌───────────────────────────▼──────────────────────────────────┐
-│                      VERCEL (Frontend)                        │
+│                      NETLIFY (Frontend)                      │
 │  ┌─────────────────────────────────────────────────────┐    │
 │  │         Next.js 14 (App Router + API Routes)        │    │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │    │
@@ -540,7 +539,7 @@ interface OrderQRPayload {
            │          │          │          │           │
     ┌──────▼───┐ ┌───▼────┐ ┌───▼────┐ ┌───▼─────┐ ┌──▼────┐
     │PostgreSQL│ │ Redis  │ │ Razorpay│ │ Msg91   │ │ AWS S3│
-    │(Supabase)│ │(Upstash)│ │         │ │         │ │       │
+    │  (Neon)  │ │(Upstash)│ │         │ │         │ │       │
     └──────────┘ └────────┘ └─────────┘ └─────────┘ └───────┘
          │            │           │           │           │
     ┌────▼────┐  ┌───▼────┐ ┌────▼─────┐ ┌──▼──────┐   │
@@ -2459,7 +2458,7 @@ export async function handleDataBreach(incident: {
 #### 9.1.4 Data Localization
 
 **Server Locations:**
-- **Infrastructure**: Vercel (Frontend/API), Supabase (Database), Upstash Redis (Rate Limiting/Auth), Pusher (Real-time).
+- **Infrastructure**: Netlify (Frontend/API), Neon (Database), Upstash Redis (Rate Limiting/Auth), Pusher (Real-time).
 - **Notifications**: WhatsApp-first (Direct Meta API), replacing SMS for cost-efficiency.
 - **Security**: CSP, Rate Limiting, Argon2 Hashing, Audit Logs.
 - **File Storage:** AWS S3 (ap-south-1 - Mumbai)
@@ -2474,7 +2473,7 @@ export async function handleDataBreach(incident: {
 #### 9.2.1 Data at Rest
 
 ```typescript
-// Database-level encryption (Supabase default: AES-256)
+// Database-level encryption (Neon default: AES-256)
 // Application-level encryption for sensitive fields
 
 // Encrypt TOTP secrets for admins
@@ -2934,7 +2933,7 @@ export class AppError extends Error {
 
 ### 10.2 Resilience
 - **Webhooks**: Razorpay webhooks (`src/app/api/webhooks/razorpay`) handle async payment confirmation.
-- **Database**: Connection pooling enabled for Supabase to handle 1000+ users.
+- **Database**: Connection pooling enabled for Neon to handle 1000+ users.
       {
         status: error.statusCode,
         headers: { 'Content-Type': 'application/json' }
@@ -4523,8 +4522,9 @@ npx prisma migrate dev --create-only --name add_indexes
 ### 16.4 Rollback Procedure
 
 ```bash
-# Vercel rollback (instant)
-vercel rollback https://cafe-south-central-abc123.vercel.app
+# Netlify rollback (instant)
+netlify open:admin
+# Navigate to "Deploys" -> select previous successful deploy -> click "Publish deploy"
 
 # Database rollback (manual)
 # 1. Identify last good migration

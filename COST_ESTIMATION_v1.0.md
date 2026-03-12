@@ -20,13 +20,13 @@ We will use the **Free Tiers** for the first phase of growth. These tiers are su
 
 | Service | Provider | Tier | Monthly Cost | Limits / Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **B2C Hosting** | Vercel | Hobby (Free) | **₹0** | Bandwidth limits apply. Excellent for launch. |
-| **Database** | Supabase | Free | **₹0** | 500MB storage is plenty for initial text/order data. |
+| **B2C Hosting** | Netlify | Starter (Free) | **₹0** | Bandwidth limits apply. Excellent for launch. |
+| **Database** | Neon | Free | **₹0** | 500MB storage is plenty for initial text/order data. |
 | **Caching** | Upstash Redis | Free | **₹0** | 10,000 requests/day free. |
-| **Image Storage** | Supabase Storage | Free | **₹0** | Included in Supabase free tier (up to 1GB). |
-| **Monitoring** | Vercel Analytics | Free | **₹0** | Basic views and error tracking. |
+| **Image Storage** | Cloudinary/S3 | Free/Pay-as-you-go | **₹0** | Images for menu items. |
+| **Monitoring** | Netlify Analytics | Free | **₹0** | Basic views and error tracking. |
 
-**Upgrade Trigger:** When daily active users exceed ~1,000 consistently, we may need to upgrade to Vercel Pro ($20/mo) and Supabase Pro ($25/mo).
+**Upgrade Trigger:** When daily active users exceed ~1,000 consistently, we may need to upgrade to Netlify Pro ($19/user/mo) and Neon Pro (Pay as you go).
 
 ---
 

@@ -206,7 +206,7 @@ function SubscriptionCheckoutContent({ user, planId }: { user: any, planId: stri
                 Review your order and complete payment
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left: Order Summary */}
                 <div>
                     <div style={{ backgroundColor: 'white', borderRadius: '1.5rem', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '2px solid #5C3A1A' }}>

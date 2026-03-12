@@ -268,6 +268,18 @@ export default function MenuGrid({
                     }
                 }
 
+                @media (min-width: 768px) {
+                    .menu-grid {
+                        grid-template-columns: repeat(3, 1fr);
+                    }
+                }
+
+                @media (min-width: 1024px) {
+                    .menu-grid {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                }
+
                 @media (min-width: 1280px) {
                     .menu-grid {
                         grid-template-columns: repeat(5, 1fr);
